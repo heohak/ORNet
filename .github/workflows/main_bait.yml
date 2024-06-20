@@ -28,7 +28,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: java-app
-          path: build/libs/*.jar
+          path: build/libs/bait-0.0.1-SNAPSHOT.jar
 
   deploy:
     runs-on: windows-latest
@@ -50,4 +50,4 @@ jobs:
           app-name: 'bait'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_10046D98C989476DA92E16E8B8685D35 }}
-          package: '*.jar'
+          package: 'bait-0.0.1-SNAPSHOT.jar'
