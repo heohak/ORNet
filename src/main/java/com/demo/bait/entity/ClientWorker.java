@@ -22,4 +22,5 @@ public class ClientWorker {
     private String email;
     private String phoneNumber;
     private String title;
+    private Integer clientId;
 }

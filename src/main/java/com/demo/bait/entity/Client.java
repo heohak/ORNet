@@ -19,5 +19,5 @@ public class Client {
     private Integer id;
     private String fullName;
     private String shortName;
-
+    private String thirdPartyIT;
 }
