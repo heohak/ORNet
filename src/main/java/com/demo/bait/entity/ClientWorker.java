@@ -12,12 +12,14 @@ import lombok.Setter;
 @Setter
 @Entity
 @NoArgsConstructor
-public class Client {
+public class ClientWorker {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    private String fullName;
-    private String shortName;
-
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phoneNumber;
+    private String title;
 }

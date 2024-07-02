@@ -6,10 +6,13 @@ import com.demo.bait.entity.Client;
 import com.demo.bait.mapper.ClientMapper;
 import com.demo.bait.repository.ClientRepo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ClientService {
@@ -19,8 +22,10 @@ public class ClientService {
 
     public ResponseDTO addClient(ClientDTO clientDTO) {
         Client client = new Client();
+        client.setFullName(clientDTO.fullName());
+        client.setShortName(clientDTO.shortName());
         clientRepo.save(client);
-        return new ResponseDTO("success");
+        return new ResponseDTO("Client added successfully");
     }
 
     public List<ClientDTO> getAllClients() {
