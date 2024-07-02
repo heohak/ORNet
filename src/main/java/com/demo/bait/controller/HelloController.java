@@ -1,4 +1,4 @@
-package com.demo.bait;
+package com.demo.bait.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
