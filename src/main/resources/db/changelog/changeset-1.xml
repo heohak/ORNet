@@ -28,9 +28,9 @@
             <column name="title" type="VARCHAR(255)"/>
             <column name="client_id" type="INTEGER"/>
         </createTable>
-        <addForeignKeyConstraint baseTableName="client_worker"
+        <addForeignKeyConstraint baseTableName="client_worker-test"
                                  baseColumnNames="client_id"
-                                 referencedTableName="client"
+                                 referencedTableName="client-test"
                                  referencedColumnNames="id"
                                  constraintName="client_worker_client_id_fk"/>
     </changeSet>
