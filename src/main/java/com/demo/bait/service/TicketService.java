@@ -39,7 +39,6 @@ public class TicketService {
             ticket.setClient(clientOpt.get());
             ticket.setDescription(ticketDTO.description());
             ticketRepo.save(ticket);
-            System.out.println("############# " + ticket.getClient());
             return new ResponseDTO("Ticket added successfully");
         } else {
             throw new EntityNotFoundException("Client with id " + ticketDTO.clientId() + " not found");
