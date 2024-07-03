@@ -22,3 +22,11 @@ CREATE TABLE public."ticket" (
     description VARCHAR(255),
     CONSTRAINT client_ticket_client_id_fk FOREIGN KEY (client_id) REFERENCES public."client" (id)
 );
+
+CREATE TABLE public."device" (
+    id INTEGER PRIMARY KEY,
+    client_id INTEGER,
+    device_name VARCHAR(255),
+    serial_number INTEGER,
+    CONSTRAINT client_device_client_id_fk FOREIGN KEY (client_id) REFERENCES public."client" (id)
+);
