@@ -28,4 +28,9 @@ public class ClientWorkerController {
     public void addEmployer(@PathVariable Integer workerId, @PathVariable Integer clientId) {
         clientWorkerService.addEmployer(workerId, clientId);
     }
+
+    @GetMapping("/workers/{clientId}")
+    public List<ClientWorkerDTO> getWorkersByClientId(@PathVariable Integer clientId) {
+        return clientWorkerService.getWorkersByClientId(clientId);
+    }
 }

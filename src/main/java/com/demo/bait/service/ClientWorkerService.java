@@ -40,4 +40,8 @@ public class ClientWorkerService {
         worker.setClientId(clientId);
         clientWorkerRepo.save(worker);
     }
+
+    public List<ClientWorkerDTO> getWorkersByClientId(Integer clientId) {
+        return clientWorkerMapper.toDtoList(clientWorkerRepo.findByClientId(clientId));
+    }
 }

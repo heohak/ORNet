@@ -24,6 +24,7 @@ public class ClientService {
         Client client = new Client();
         client.setFullName(clientDTO.fullName());
         client.setShortName(clientDTO.shortName());
+        client.setThirdPartyIT(clientDTO.thirdPartyIT());
         clientRepo.save(client);
         return new ResponseDTO("Client added successfully");
     }

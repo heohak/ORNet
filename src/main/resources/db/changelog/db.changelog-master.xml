@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<!--    <changeSet id="5" author="joosep">-->
+<!--        <dropTable tableName="client_worker"/>-->
+<!--    </changeSet>-->
+
+<!--    <changeSet id="6" author="joosep">-->
+<!--        <dropTable tableName="client"/>-->
+<!--    </changeSet>-->
+
+<!--    <changeSet id="7" author="joosep">-->
+<!--        <dropTable tableName="ticket"/>-->
+<!--    </changeSet>-->
+<!--    <changeSet id="9" author="joosep">-->
+<!--        <dropTable tableName="client_worker"/>-->
+<!--    </changeSet>-->
+
+<!--    <changeSet id="10" author="joosep">-->
+<!--        <dropTable tableName="client"/>-->
+<!--    </changeSet>-->
+
+<!--    <changeSet id="11" author="joosep">-->
+<!--        <dropTable tableName="ticket"/>-->
+<!--    </changeSet>-->
+
+<!--    <changeSet id="8" author="joosep">-->
+<!--        <sqlFile path="db/scripts/V5_create_more_tables.sql"/>-->
+<!--    </changeSet>-->
+
+    <changeSet id="12" author="joosep">
+        <sqlFile path="db/scripts/V5_create_more_tables.sql"/>
+    </changeSet>
+</databaseChangeLog>
