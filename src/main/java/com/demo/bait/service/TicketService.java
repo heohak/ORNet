@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -23,5 +25,9 @@ public class TicketService {
         ticket.setDescription(ticketDTO.description());
         ticketRepo.save(ticket);
         return new ResponseDTO("Ticket added successfully");
+    }
+
+    public List<TicketDTO> getTicketsByClientId(Integer clientId) {
+        return ticketMapper.toDtoList(ticketRepo.findByClientId(clientId));
     }
 }

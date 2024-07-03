@@ -4,9 +4,9 @@ import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.TicketDTO;
 import com.demo.bait.service.TicketService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -17,5 +17,10 @@ public class TicketController {
     @PostMapping("/ticket")
     public ResponseDTO addTicket(@RequestBody TicketDTO ticketDTO) {
         return ticketService.addTicket(ticketDTO);
+    }
+
+    @GetMapping("/tickets/{clientId}")
+    public List<TicketDTO> getTicketsByClientId(@PathVariable Integer clientId) {
+        return ticketService.getTicketsByClientId(clientId);
     }
 }

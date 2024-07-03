@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ClientWorkerRepo extends JpaRepository<ClientWorker, Integer> {
+
     List<ClientWorker> findByClientId(Integer clientId);
 }
