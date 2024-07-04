@@ -23,4 +23,9 @@ public class DeviceController {
     public List<DeviceDTO> getDevicesByClientId(@PathVariable Integer clientId) {
         return deviceService.getDevicesByClientId(clientId);
     }
+
+    @GetMapping("/devices")
+    public List<DeviceDTO> getAllDevices() {
+        return deviceService.getAllDevices();
+    }
 }

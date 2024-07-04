@@ -51,4 +51,8 @@ public class DeviceService {
     public List<DeviceDTO> getDevicesByClientId(Integer clientId) {
         return deviceMapper.toDtoList(deviceRepo.findByClientId(clientId));
     }
+
+    public List<DeviceDTO> getAllDevices() {
+        return deviceMapper.toDtoList(deviceRepo.findAll());
+    }
 }
