@@ -13,10 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -76,8 +73,17 @@ public class TicketService {
         }
 
         Ticket mainTicket = mainTicketOpt.get();
-        List<Ticket> ticketList = ticketRepo.findByTicketId(mainTicketId);
-        ticketList.add(mainTicket);
+        List<Ticket> ticketList = new ArrayList<>();
+
+        if (mainTicket.getTicket() != null) {
+            Integer actualMainTicketId = mainTicket.getTicket().getId();
+            Ticket actualMainTicket = ticketRepo.getReferenceById(actualMainTicketId);
+            ticketList.addAll(ticketRepo.findByTicketId(actualMainTicketId));
+            ticketList.add(actualMainTicket);
+        } else {
+            ticketList.addAll(ticketRepo.findByTicketId(mainTicketId));
+            ticketList.add(mainTicket);
+        }
 
         List<Ticket> sortedTickets = ticketList.stream().sorted(Comparator.comparing(Ticket::getId)).toList();
 
