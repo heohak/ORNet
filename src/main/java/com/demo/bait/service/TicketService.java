@@ -36,7 +36,6 @@ public class TicketService {
 //        ticketRepo.save(ticket);
 //        return new ResponseDTO("Ticket added successfully");
         Optional<Client> clientOpt = clientRepo.findById(ticketDTO.clientId());
-        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketDTO.mainTicketId());
 
         if (clientOpt.isEmpty()) {
             throw new EntityNotFoundException("Client with id " + ticketDTO.clientId() + " not found");
@@ -45,12 +44,15 @@ public class TicketService {
         Ticket ticket = new Ticket();
         ticket.setClient(clientOpt.get());
         ticket.setDescription(ticketDTO.description());
-//        ticketOpt.ifPresent(ticket::setTicket);
-        if (ticketOpt.isPresent()) {
-            if (ticketOpt.get().getTicket() != null) {
-                ticket.setTicket(ticketOpt.get().getTicket());
-            } else {
-                ticket.setTicket(ticketOpt.get());
+
+        if (ticketDTO.mainTicketId() != null) {
+            Optional<Ticket> ticketOpt = ticketRepo.findById(ticketDTO.mainTicketId());
+
+            if (ticketOpt.isPresent()) {
+                Ticket mainTicket = ticketOpt.get();
+                if (mainTicket.getClient().getId().equals(clientOpt.get().getId())) {
+                    ticket.setTicket(mainTicket.getTicket() != null ? mainTicket.getTicket() : mainTicket);
+                }
             }
         }
         ticketRepo.save(ticket);
