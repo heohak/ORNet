@@ -14,8 +14,10 @@ import java.util.List;
 public interface TicketMapper {
 
     @Mapping(source = "client.id", target = "clientId")
+    @Mapping(source = "ticket.id", target = "mainTicketId")
     List<TicketDTO> toDtoList(List<Ticket> tickets);
 
     @Mapping(source = "client.id", target = "clientId")
+    @Mapping(source = "ticket.id", target = "mainTicketId")
     TicketDTO toDto(Ticket ticket);
 }

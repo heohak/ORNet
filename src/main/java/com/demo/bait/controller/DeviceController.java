@@ -4,10 +4,7 @@ import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.service.DeviceService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,7 +15,7 @@ public class DeviceController {
     public final DeviceService deviceService;
 
     @PostMapping("/device")
-    public ResponseDTO addDevice(DeviceDTO deviceDTO) {
+    public ResponseDTO addDevice(@RequestBody DeviceDTO deviceDTO) {
         return deviceService.addDevice(deviceDTO);
     }
 

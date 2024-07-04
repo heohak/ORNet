@@ -33,16 +33,18 @@ public class TicketService {
 //        ticketRepo.save(ticket);
 //        return new ResponseDTO("Ticket added successfully");
         Optional<Client> clientOpt = clientRepo.findById(ticketDTO.clientId());
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketDTO.mainTicketId());
 
-        if (clientOpt.isPresent()) {
-            Ticket ticket = new Ticket();
-            ticket.setClient(clientOpt.get());
-            ticket.setDescription(ticketDTO.description());
-            ticketRepo.save(ticket);
-            return new ResponseDTO("Ticket added successfully");
-        } else {
+        if (clientOpt.isEmpty()) {
             throw new EntityNotFoundException("Client with id " + ticketDTO.clientId() + " not found");
         }
+
+        Ticket ticket = new Ticket();
+        ticket.setClient(clientOpt.get());
+        ticket.setDescription(ticketDTO.description());
+        ticketOpt.ifPresent(ticket::setTicket);
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Ticket added successfully");
     }
 
     public List<TicketDTO> getTicketsByClientId(Integer clientId) {
