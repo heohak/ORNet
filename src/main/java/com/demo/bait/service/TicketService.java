@@ -13,8 +13,11 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -42,7 +45,14 @@ public class TicketService {
         Ticket ticket = new Ticket();
         ticket.setClient(clientOpt.get());
         ticket.setDescription(ticketDTO.description());
-        ticketOpt.ifPresent(ticket::setTicket);
+//        ticketOpt.ifPresent(ticket::setTicket);
+        if (ticketOpt.isPresent()) {
+            if (ticketOpt.get().getTicket() != null) {
+                ticket.setTicket(ticketOpt.get().getTicket());
+            } else {
+                ticket.setTicket(ticketOpt.get());
+            }
+        }
         ticketRepo.save(ticket);
         return new ResponseDTO("Ticket added successfully");
     }
@@ -53,5 +63,22 @@ public class TicketService {
 
     public List<TicketDTO> getAllTickets() {
         return ticketMapper.toDtoList(ticketRepo.findAll());
+    }
+
+    public List<TicketDTO> getTicketsByMainTicketId(Integer mainTicketId) {
+//        return ticketMapper.toDtoList(ticketRepo.findByTicketId(mainTicketId));
+        Optional<Ticket> mainTicketOpt = ticketRepo.findById(mainTicketId);
+
+        if (mainTicketOpt.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Ticket mainTicket = mainTicketOpt.get();
+        List<Ticket> ticketList = ticketRepo.findByTicketId(mainTicketId);
+        ticketList.add(mainTicket);
+
+        List<Ticket> sortedTickets = ticketList.stream().sorted(Comparator.comparing(Ticket::getId)).toList();
+
+        return ticketMapper.toDtoList(sortedTickets);
     }
 }
