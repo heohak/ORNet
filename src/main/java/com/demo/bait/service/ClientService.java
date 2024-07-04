@@ -32,4 +32,8 @@ public class ClientService {
     public List<ClientDTO> getAllClients() {
         return clientMapper.toDtoList(clientRepo.findAll());
     }
+
+    public void deleteClient(Integer id) {
+        clientRepo.deleteById(id);
+    }
 }
