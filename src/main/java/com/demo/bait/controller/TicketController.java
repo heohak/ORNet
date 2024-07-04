@@ -23,4 +23,9 @@ public class TicketController {
     public List<TicketDTO> getTicketsByClientId(@PathVariable Integer clientId) {
         return ticketService.getTicketsByClientId(clientId);
     }
+
+    @GetMapping("/tickets")
+    public List<TicketDTO> getAllTickets() {
+        return ticketService.getAllTickets();
+    }
 }

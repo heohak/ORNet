@@ -50,4 +50,8 @@ public class TicketService {
     public List<TicketDTO> getTicketsByClientId(Integer clientId) {
         return ticketMapper.toDtoList(ticketRepo.findByClientId(clientId));
     }
+
+    public List<TicketDTO> getAllTickets() {
+        return ticketMapper.toDtoList(ticketRepo.findAll());
+    }
 }
