@@ -20,4 +20,14 @@ public class Client {
     private String fullName;
     private String shortName;
     private String thirdPartyIT;
+    // locationi ja third party IT-d peab saama siduda mugavalt linnukesega
+//    private String location;
+//    private String locationAddress;
+
+//    private String locationPhoneNumber;
+//    private boolean pathologyClient;
+//    private boolean surgeryClient;
+//    private boolean editorClient;
+//    private String otherMedicalInformation;
+
 }

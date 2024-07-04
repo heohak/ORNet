@@ -1,4 +1,3 @@
-
 package com.demo.bait.config;
 
 import org.springframework.context.annotation.Bean;

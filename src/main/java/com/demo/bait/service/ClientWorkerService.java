@@ -2,14 +2,19 @@ package com.demo.bait.service;
 
 import com.demo.bait.dto.ClientWorkerDTO;
 import com.demo.bait.dto.ResponseDTO;
+import com.demo.bait.entity.Client;
 import com.demo.bait.entity.ClientWorker;
 import com.demo.bait.mapper.ClientWorkerMapper;
+import com.demo.bait.repository.ClientRepo;
 import com.demo.bait.repository.ClientWorkerRepo;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -18,6 +23,7 @@ public class ClientWorkerService {
 
     private ClientWorkerRepo clientWorkerRepo;
     private ClientWorkerMapper clientWorkerMapper;
+    private ClientRepo clientRepo;
 
 
     public ResponseDTO addWorker(ClientWorkerDTO workerDTO) {
@@ -35,10 +41,27 @@ public class ClientWorkerService {
         return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll());
     }
 
+    @Transactional
     public void addEmployer(Integer workerId, Integer clientId) {
-        ClientWorker worker = clientWorkerRepo.getReferenceById(workerId);
-        worker.setClientId(clientId);
-        clientWorkerRepo.save(worker);
+//        ClientWorker worker = clientWorkerRepo.getReferenceById(workerId);
+//        worker.setClientId(clientId);
+//        clientWorkerRepo.save(worker);
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        Optional<Client> clientOpt = clientRepo.findById(clientId);
+
+        if (workerOpt.isPresent() && clientOpt.isPresent()) {
+            ClientWorker worker = workerOpt.get();
+            Client client = clientOpt.get();
+            worker.setClient(client);
+            clientWorkerRepo.save(worker);
+        } else {
+            if (workerOpt.isEmpty()) {
+                throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+            }
+            if (clientOpt.isEmpty()) {
+                throw new EntityNotFoundException("Client with id " + clientId + " not found");
+            }
+        }
     }
 
     public List<ClientWorkerDTO> getWorkersByClientId(Integer clientId) {
