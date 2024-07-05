@@ -33,6 +33,9 @@ public class ClientWorkerService {
         worker.setEmail(workerDTO.email());
         worker.setPhoneNumber(workerDTO.phoneNumber());
         worker.setTitle(workerDTO.title());
+        if (workerDTO.clientId() != null && clientRepo.findById(workerDTO.clientId()).isPresent()) {
+            worker.setClient(clientRepo.getReferenceById(workerDTO.clientId()));
+        }
         clientWorkerRepo.save(worker);
         return new ResponseDTO("Client Worker added successfully");
     }
