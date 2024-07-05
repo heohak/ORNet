@@ -52,19 +52,17 @@ public class ClientWorkerService {
         Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
         Optional<Client> clientOpt = clientRepo.findById(clientId);
 
-        if (workerOpt.isPresent() && clientOpt.isPresent()) {
-            ClientWorker worker = workerOpt.get();
-            Client client = clientOpt.get();
-            worker.setClient(client);
-            clientWorkerRepo.save(worker);
-        } else {
-            if (workerOpt.isEmpty()) {
-                throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
-            }
-            if (clientOpt.isEmpty()) {
-                throw new EntityNotFoundException("Client with id " + clientId + " not found");
-            }
+        if (workerOpt.isEmpty()) {
+            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
         }
+        if (clientOpt.isEmpty()) {
+            throw new EntityNotFoundException("Client with id " + clientId + " not found");
+        }
+
+        ClientWorker worker = workerOpt.get();
+        Client client = clientOpt.get();
+        worker.setClient(client);
+        clientWorkerRepo.save(worker);
     }
 
     public List<ClientWorkerDTO> getWorkersByClientId(Integer clientId) {

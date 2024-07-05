@@ -33,4 +33,9 @@ public class DeviceController {
     public DeviceDTO getDeviceById(@PathVariable Integer deviceId) {
         return deviceService.getDeviceById(deviceId);
     }
+
+    @DeleteMapping("/device/{deviceId}")
+    public ResponseDTO deleteDevice(@PathVariable Integer deviceId) {
+        return deviceService.deleteDevice(deviceId);
+    }
 }
