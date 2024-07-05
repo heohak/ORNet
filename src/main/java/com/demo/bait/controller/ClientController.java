@@ -25,9 +25,8 @@ public class ClientController {
         return clientService.getAllClients();
     }
     @DeleteMapping("/client/{id}")
-    public ResponseEntity<Void> deleteClient(@PathVariable Integer id) {
-        clientService.deleteClient(id);
-        return ResponseEntity.noContent().build();
+    public ResponseDTO deleteClient(@PathVariable Integer id) {
+        return clientService.deleteClient(id);
     }
 
 
