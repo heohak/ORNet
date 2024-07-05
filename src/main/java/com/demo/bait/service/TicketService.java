@@ -103,4 +103,9 @@ public class TicketService {
                 .map(ticketMapper::toDtoList)
                 .orElse(Collections.emptyList());
     }
+
+    public ResponseDTO deleteTicket(Integer ticketId) {
+        ticketRepo.deleteById(ticketId);
+        return new ResponseDTO("Ticket deleted successfully");
+    }
 }

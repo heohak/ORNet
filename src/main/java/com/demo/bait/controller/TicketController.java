@@ -33,4 +33,9 @@ public class TicketController {
     public List<TicketDTO> getTicketsByMainTicketId(@PathVariable Integer mainTicketId) {
         return ticketService.getTicketsByMainTicketId(mainTicketId);
     }
+
+    @DeleteMapping("/ticket/{ticketId}")
+    public ResponseDTO deleteTicket(@PathVariable Integer ticketId) {
+        return ticketService.deleteTicket(ticketId);
+    }
 }

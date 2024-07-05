@@ -96,4 +96,9 @@ public class SoftwareService {
     public List<SoftwareDTO> getSoftwareByClientId(Integer clientId) {
         return softwareMapper.toDtoList(softwareRepo.findByClientId(clientId));
     }
+
+    public ResponseDTO deleteSoftware(Integer softwareId) {
+        softwareRepo.deleteById(softwareId);
+        return new ResponseDTO("Software deleted");
+    }
 }

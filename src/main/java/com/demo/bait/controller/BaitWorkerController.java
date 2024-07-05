@@ -4,10 +4,7 @@ import com.demo.bait.dto.BaitWorkerDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.service.BaitWorkerService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,5 +22,10 @@ public class BaitWorkerController {
     @GetMapping("/bait/workers")
     public List<BaitWorkerDTO> getAllWorkers() {
         return baitWorkerService.getAllWorkers();
+    }
+
+    @DeleteMapping("/bait/worker/{workerId}")
+    public ResponseDTO deleteWorker(@PathVariable Integer workerId) {
+        return baitWorkerService.deleteBaitWorker(workerId);
     }
 }

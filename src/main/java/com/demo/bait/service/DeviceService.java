@@ -59,4 +59,9 @@ public class DeviceService {
     public DeviceDTO getDeviceById(Integer deviceId) {
         return deviceMapper.toDto(deviceRepo.getReferenceById(deviceId));
     }
+
+    public ResponseDTO deleteDevice(Integer deviceId) {
+        deviceRepo.deleteById(deviceId);
+        return new ResponseDTO("Device deleted successfully");
+    }
 }

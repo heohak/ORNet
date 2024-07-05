@@ -34,4 +34,9 @@ public class SoftwareController {
     public List<SoftwareDTO> getSoftwareByClientId(@PathVariable Integer clientId) {
         return softwareService.getSoftwareByClientId(clientId);
     }
+
+    @DeleteMapping("/{softwareId}")
+    public ResponseDTO deleteSoftware(@PathVariable Integer softwareId) {
+        return softwareService.deleteSoftware(softwareId);
+    }
 }
