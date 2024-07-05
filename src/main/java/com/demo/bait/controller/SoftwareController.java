@@ -24,4 +24,14 @@ public class SoftwareController {
     public List<SoftwareDTO> getAllSoftwareVariations() {
         return softwareService.getAllSoftwareVariations();
     }
+
+    @PutMapping("/add/client/{softwareId}/{clientId}")
+    public ResponseDTO addClientToSoftware(@PathVariable Integer softwareId, @PathVariable Integer clientId) {
+        return softwareService.addClientToSoftware(softwareId, clientId);
+    }
+
+    @GetMapping("/{clientId}")
+    public List<SoftwareDTO> getSoftwareByClientId(@PathVariable Integer clientId) {
+        return softwareService.getSoftwareByClientId(clientId);
+    }
 }
