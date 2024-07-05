@@ -34,4 +34,9 @@ public class LinkedDeviceController {
     public ResponseDTO linkDevice(@PathVariable Integer linkedDeviceId, @PathVariable Integer deviceId) {
         return linkedDeviceService.linkDevice(linkedDeviceId, deviceId);
     }
+
+    @DeleteMapping("/{deviceId}")
+    public ResponseDTO deleteDevice(@PathVariable Integer deviceId) {
+        return linkedDeviceService.deleteLinkedDevice(deviceId);
+    }
 }

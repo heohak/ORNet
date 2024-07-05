@@ -33,4 +33,9 @@ public class BaitWorkerService {
     public List<BaitWorkerDTO> getAllWorkers() {
         return baitWorkerMapper.toDtoList(baitWorkerRepo.findAll());
     }
+
+    public ResponseDTO deleteBaitWorker(Integer baitWorkerId) {
+        baitWorkerRepo.deleteById(baitWorkerId);
+        return new ResponseDTO("Bait Worker deleted successfully");
+    }
 }

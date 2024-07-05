@@ -66,4 +66,9 @@ public class LinkedDeviceService {
         linkedDeviceRepo.save(linkedDevice);
         return new ResponseDTO("Device linked successfully");
     }
+
+    public ResponseDTO deleteLinkedDevice(Integer linkedDeviceId) {
+        linkedDeviceRepo.deleteById(linkedDeviceId);
+        return new ResponseDTO("Linked Device deleted");
+    }
 }
