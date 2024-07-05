@@ -15,6 +15,9 @@ public class Software {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    @ManyToOne
+    @JoinColumn(name = "client_id", referencedColumnName = "id")
+    private Client client;
     private String name;
     private String dbVersion;
     @Embedded

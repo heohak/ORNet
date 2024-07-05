@@ -3,14 +3,19 @@ package com.demo.bait.service;
 import com.demo.bait.components.*;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.SoftwareDTO;
+import com.demo.bait.entity.Client;
 import com.demo.bait.entity.Software;
 import com.demo.bait.mapper.SoftwareMapper;
+import com.demo.bait.repository.ClientRepo;
 import com.demo.bait.repository.SoftwareRepo;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -19,12 +24,17 @@ public class SoftwareService {
 
     private SoftwareRepo softwareRepo;
     private SoftwareMapper softwareMapper;
+    private ClientRepo clientRepo;
 
     public ResponseDTO addSoftware(SoftwareDTO softwareDTO) {
         Software software = new Software();
 
         software.setName(softwareDTO.name());
         software.setDbVersion(softwareDTO.dbVersion());
+
+        if (softwareDTO.clientId() != null && clientRepo.findById(softwareDTO.clientId()).isPresent()) {
+            software.setClient(clientRepo.getReferenceById(softwareDTO.clientId()));
+        }
 
         HIS his = new HIS();
         his.setVendorName(softwareDTO.his().vendorName());
@@ -62,5 +72,28 @@ public class SoftwareService {
 
     public List<SoftwareDTO> getAllSoftwareVariations() {
         return softwareMapper.toDtoList(softwareRepo.findAll());
+    }
+
+    @Transactional
+    public ResponseDTO addClientToSoftware(Integer softwareId, Integer clientId) {
+        Optional<Software> softwareOpt = softwareRepo.findById(softwareId);
+        Optional<Client> clientOpt = clientRepo.findById(clientId);
+
+        if (softwareOpt.isEmpty()) {
+            throw new EntityNotFoundException("Software with id " + softwareId + " not found");
+        }
+        if (clientOpt.isEmpty()) {
+            throw new EntityNotFoundException("Client with id " + clientId + " not found");
+        }
+
+        Software software = softwareOpt.get();
+        Client client = clientOpt.get();
+        software.setClient(client);
+        softwareRepo.save(software);
+        return new ResponseDTO("Client added to software");
+    }
+
+    public List<SoftwareDTO> getSoftwareByClientId(Integer clientId) {
+        return softwareMapper.toDtoList(softwareRepo.findByClientId(clientId));
     }
 }
