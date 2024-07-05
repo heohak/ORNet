@@ -30,7 +30,7 @@ public class SoftwareController {
         return softwareService.addClientToSoftware(softwareId, clientId);
     }
 
-    @GetMapping("/{clientId}")
+    @GetMapping("/client/{clientId}")
     public List<SoftwareDTO> getSoftwareByClientId(@PathVariable Integer clientId) {
         return softwareService.getSoftwareByClientId(clientId);
     }
@@ -38,5 +38,10 @@ public class SoftwareController {
     @DeleteMapping("/{softwareId}")
     public ResponseDTO deleteSoftware(@PathVariable Integer softwareId) {
         return softwareService.deleteSoftware(softwareId);
+    }
+
+    @GetMapping("/{softwareId}")
+    public SoftwareDTO getSoftwareById(@PathVariable Integer softwareId) {
+        return softwareService.getSoftwareById(softwareId);
     }
 }

@@ -101,4 +101,8 @@ public class SoftwareService {
         softwareRepo.deleteById(softwareId);
         return new ResponseDTO("Software deleted");
     }
+
+    public SoftwareDTO getSoftwareById(Integer softwareId) {
+        return softwareMapper.toDto(softwareRepo.getReferenceById(softwareId));
+    }
 }
