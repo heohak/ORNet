@@ -33,4 +33,9 @@ public class ClientWorkerController {
     public List<ClientWorkerDTO> getWorkersByClientId(@PathVariable Integer clientId) {
         return clientWorkerService.getWorkersByClientId(clientId);
     }
+
+    @DeleteMapping("/workers/{workerId}")
+    public ResponseDTO deleteWorker(@PathVariable Integer workerId) {
+        return clientWorkerService.deleteWorker(workerId);
+    }
 }

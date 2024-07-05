@@ -70,4 +70,9 @@ public class ClientWorkerService {
     public List<ClientWorkerDTO> getWorkersByClientId(Integer clientId) {
         return clientWorkerMapper.toDtoList(clientWorkerRepo.findByClientId(clientId));
     }
+
+    public ResponseDTO deleteWorker(Integer workerId) {
+        clientWorkerRepo.deleteById(workerId);
+        return new ResponseDTO("Worker deleted successfully");
+    }
 }
