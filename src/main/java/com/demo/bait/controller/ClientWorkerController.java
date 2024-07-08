@@ -25,8 +25,8 @@ public class ClientWorkerController {
     }
 
     @PutMapping("/worker/{workerId}/{clientId}")
-    public void addEmployer(@PathVariable Integer workerId, @PathVariable Integer clientId) {
-        clientWorkerService.addEmployer(workerId, clientId);
+    public ResponseDTO addEmployer(@PathVariable Integer workerId, @PathVariable Integer clientId) {
+        return clientWorkerService.addEmployer(workerId, clientId);
     }
 
     @GetMapping("/workers/{clientId}")
