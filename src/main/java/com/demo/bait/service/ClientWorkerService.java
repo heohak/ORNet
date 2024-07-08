@@ -45,7 +45,7 @@ public class ClientWorkerService {
     }
 
     @Transactional
-    public void addEmployer(Integer workerId, Integer clientId) {
+    public ResponseDTO addEmployer(Integer workerId, Integer clientId) {
 //        ClientWorker worker = clientWorkerRepo.getReferenceById(workerId);
 //        worker.setClientId(clientId);
 //        clientWorkerRepo.save(worker);
@@ -63,6 +63,7 @@ public class ClientWorkerService {
         Client client = clientOpt.get();
         worker.setClient(client);
         clientWorkerRepo.save(worker);
+        return new ResponseDTO("Employer added successfully");
     }
 
     public List<ClientWorkerDTO> getWorkersByClientId(Integer clientId) {
