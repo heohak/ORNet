@@ -5,34 +5,21 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
-<!--    <changeSet id="5" author="joosep">-->
+
+<!--    <changeSet id="23" author="joosep">-->
+<!--        <sqlFile path="db/scripts/V6_create_device_table.sql"/>-->
+<!--    </changeSet>-->
+<!--    <changeSet id="19" author="joosep">-->
 <!--        <dropTable tableName="client_worker"/>-->
 <!--    </changeSet>-->
 
-<!--    <changeSet id="6" author="joosep">-->
-<!--        <dropTable tableName="client"/>-->
-<!--    </changeSet>-->
-
-<!--    <changeSet id="7" author="joosep">-->
+<!--    <changeSet id="20" author="joosep">-->
 <!--        <dropTable tableName="ticket"/>-->
 <!--    </changeSet>-->
-<!--    <changeSet id="9" author="joosep">-->
-<!--        <dropTable tableName="client_worker"/>-->
+<!--    <changeSet id="21" author="joosep">-->
+<!--        <dropTable tableName="device"/>-->
 <!--    </changeSet>-->
-
-<!--    <changeSet id="10" author="joosep">-->
+<!--    <changeSet id="22" author="joosep">-->
 <!--        <dropTable tableName="client"/>-->
 <!--    </changeSet>-->
-
-<!--    <changeSet id="11" author="joosep">-->
-<!--        <dropTable tableName="ticket"/>-->
-<!--    </changeSet>-->
-
-<!--    <changeSet id="8" author="joosep">-->
-<!--        <sqlFile path="db/scripts/V5_create_more_tables.sql"/>-->
-<!--    </changeSet>-->
-
-    <changeSet id="12" author="joosep">
-        <sqlFile path="db/scripts/V5_create_more_tables.sql"/>
-    </changeSet>
 </databaseChangeLog>

@@ -1,6 +1,9 @@
 package com.demo.bait.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,7 +12,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @NoArgsConstructor
-public class ClientWorker {
+public class BaitWorker {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,8 +22,4 @@ public class ClientWorker {
     private String email;
     private String phoneNumber;
     private String title;
-//    private Integer clientId;
-    @ManyToOne
-    @JoinColumn(name = "client_id", referencedColumnName = "id")
-    private Client client;
 }

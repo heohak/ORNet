@@ -13,8 +13,14 @@ public class Ticket {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-//    @SequenceGenerator(name = "ticket_seq", sequenceName = "ticket_seq", allocationSize = 1)
     private Integer id;
-    private Integer clientId;
+//    private Integer clientId;
+    @ManyToOne
+    @JoinColumn(name = "client_id", referencedColumnName = "id")
+    private Client client;
     private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "main_ticket_id", referencedColumnName = "id")
+    private Ticket ticket;
 }

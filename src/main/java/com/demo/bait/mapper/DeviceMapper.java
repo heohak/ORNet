@@ -1,7 +1,7 @@
 package com.demo.bait.mapper;
 
-import com.demo.bait.dto.ClientWorkerDTO;
-import com.demo.bait.entity.ClientWorker;
+import com.demo.bait.dto.DeviceDTO;
+import com.demo.bait.entity.Device;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -11,11 +11,11 @@ import java.util.List;
 
 @Component
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
-public interface ClientWorkerMapper {
+public interface DeviceMapper {
 
     @Mapping(source = "client.id", target = "clientId")
-    List<ClientWorkerDTO> toDtoList(List<ClientWorker> clientWorkerList);
+    List<DeviceDTO> toDtoList(List<Device> devices);
 
     @Mapping(source = "client.id", target = "clientId")
-    ClientWorkerDTO toDto(ClientWorker clientWorker);
+    DeviceDTO toDto(Device device);
 }

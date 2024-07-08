@@ -9,18 +9,15 @@ import lombok.Setter;
 @Setter
 @Entity
 @NoArgsConstructor
-public class ClientWorker {
+public class Device {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private String phoneNumber;
-    private String title;
 //    private Integer clientId;
     @ManyToOne
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client client;
+    private String deviceName;
+    private Integer serialNumber;
 }

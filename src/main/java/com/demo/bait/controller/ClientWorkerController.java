@@ -25,12 +25,17 @@ public class ClientWorkerController {
     }
 
     @PutMapping("/worker/{workerId}/{clientId}")
-    public void addEmployer(@PathVariable Integer workerId, @PathVariable Integer clientId) {
-        clientWorkerService.addEmployer(workerId, clientId);
+    public ResponseDTO addEmployer(@PathVariable Integer workerId, @PathVariable Integer clientId) {
+        return clientWorkerService.addEmployer(workerId, clientId);
     }
 
     @GetMapping("/workers/{clientId}")
     public List<ClientWorkerDTO> getWorkersByClientId(@PathVariable Integer clientId) {
         return clientWorkerService.getWorkersByClientId(clientId);
+    }
+
+    @DeleteMapping("/workers/{workerId}")
+    public ResponseDTO deleteWorker(@PathVariable Integer workerId) {
+        return clientWorkerService.deleteWorker(workerId);
     }
 }

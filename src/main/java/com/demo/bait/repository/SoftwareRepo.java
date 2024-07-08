@@ -1,11 +1,11 @@
 package com.demo.bait.repository;
 
 import com.demo.bait.entity.ClientWorker;
+import com.demo.bait.entity.Software;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface ClientWorkerRepo extends JpaRepository<ClientWorker, Integer> {
-
-    List<ClientWorker> findByClientId(Integer clientId);
+public interface SoftwareRepo extends JpaRepository<Software, Integer> {
+    List<Software> findByClientId(Integer clientId);
 }
