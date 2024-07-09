@@ -42,7 +42,6 @@ public class ClientService {
         Client client = new Client();
         client.setFullName(clientDTO.fullName());
         client.setShortName(clientDTO.shortName());
-//        client.setThirdPartyIT(clientDTO.thirdPartyIT());
 
         if (clientDTO.locationIds() != null) {
             Set<Location> locations = new HashSet<>();
@@ -63,6 +62,28 @@ public class ClientService {
             }
             client.setThirdPartyITs(thirdPartyITs);
         }
+
+        if (clientDTO.pathologyClient() == null) {
+            client.setPathologyClient(false);
+        } else {
+            client.setPathologyClient(clientDTO.pathologyClient());
+        }
+
+        if (clientDTO.surgeryClient() == null) {
+            client.setSurgeryClient(false);
+        } else {
+            client.setSurgeryClient(clientDTO.surgeryClient());
+        }
+
+        if (clientDTO.editorClient() == null) {
+            client.setEditorClient(false);
+        } else {
+            client.setEditorClient(clientDTO.editorClient());
+        }
+
+        client.setOtherMedicalInformation(clientDTO.otherMedicalInformation());
+        client.setLastMaintenance(clientDTO.lastMaintenance());
+        client.setNextMaintenance(clientDTO.nextMaintenance());
 
         clientRepo.save(client);
         return new ResponseDTO("Client added successfully");
