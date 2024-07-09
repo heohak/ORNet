@@ -19,7 +19,7 @@ public class Client {
     private Integer id;
     private String fullName;
     private String shortName;
-    private String thirdPartyIT;
+//    private String thirdPartyIT;
     // locationi ja third party IT-d peab saama siduda mugavalt linnukesega
 
     @ManyToMany
@@ -29,6 +29,14 @@ public class Client {
             inverseJoinColumns = @JoinColumn(name = "location_id")
     )
     private Set<Location> locations = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "client_third_party_IT",
+            joinColumns = @JoinColumn(name = "client_id"),
+            inverseJoinColumns = @JoinColumn(name = "third_party_IT_id")
+    )
+    private Set<ThirdPartyIT> thirdPartyITs = new HashSet<>();
 
 //    private boolean pathologyClient;
 //    private boolean surgeryClient;
