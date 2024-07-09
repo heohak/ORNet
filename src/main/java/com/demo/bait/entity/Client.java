@@ -1,12 +1,12 @@
 package com.demo.bait.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -25,6 +25,14 @@ public class Client {
 //    private String locationAddress;
 
 //    private String locationPhoneNumber;
+    @ManyToMany
+    @JoinTable(
+            name = "client_location",
+            joinColumns = @JoinColumn(name = "client_id"),
+            inverseJoinColumns = @JoinColumn(name = "location_id")
+    )
+    private Set<Location> locations = new HashSet<>();
+
 //    private boolean pathologyClient;
 //    private boolean surgeryClient;
 //    private boolean editorClient;
