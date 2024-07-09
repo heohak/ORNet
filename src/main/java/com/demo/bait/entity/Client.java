@@ -21,10 +21,7 @@ public class Client {
     private String shortName;
     private String thirdPartyIT;
     // locationi ja third party IT-d peab saama siduda mugavalt linnukesega
-//    private String location;
-//    private String locationAddress;
 
-//    private String locationPhoneNumber;
     @ManyToMany
     @JoinTable(
             name = "client_location",

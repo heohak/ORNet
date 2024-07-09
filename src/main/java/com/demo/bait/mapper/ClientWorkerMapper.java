@@ -14,8 +14,10 @@ import java.util.List;
 public interface ClientWorkerMapper {
 
     @Mapping(source = "client.id", target = "clientId")
+    @Mapping(source = "location.id", target = "locationId")
     List<ClientWorkerDTO> toDtoList(List<ClientWorker> clientWorkerList);
 
     @Mapping(source = "client.id", target = "clientId")
+    @Mapping(source = "location.id", target = "locationId")
     ClientWorkerDTO toDto(ClientWorker clientWorker);
 }
