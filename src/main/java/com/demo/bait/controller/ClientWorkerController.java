@@ -1,6 +1,7 @@
 package com.demo.bait.controller;
 
 import com.demo.bait.dto.ClientWorkerDTO;
+import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.service.ClientWorkerService;
 import lombok.AllArgsConstructor;
@@ -37,5 +38,15 @@ public class ClientWorkerController {
     @DeleteMapping("/workers/{workerId}")
     public ResponseDTO deleteWorker(@PathVariable Integer workerId) {
         return clientWorkerService.deleteWorker(workerId);
+    }
+
+    @PutMapping("/worker/location/{workerId}/{locationId}")
+    public ResponseDTO addLocation(@PathVariable Integer workerId, @PathVariable Integer locationId) {
+        return clientWorkerService.addLocationToEmployee(workerId, locationId);
+    }
+
+    @GetMapping("/worker/location/{workerId}")
+    public LocationDTO getWorkerLocation(@PathVariable Integer workerId) {
+        return clientWorkerService.getWorkerLocation(workerId);
     }
 }
