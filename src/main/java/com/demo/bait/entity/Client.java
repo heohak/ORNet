@@ -1,12 +1,12 @@
 package com.demo.bait.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -19,12 +19,25 @@ public class Client {
     private Integer id;
     private String fullName;
     private String shortName;
-    private String thirdPartyIT;
+//    private String thirdPartyIT;
     // locationi ja third party IT-d peab saama siduda mugavalt linnukesega
-//    private String location;
-//    private String locationAddress;
 
-//    private String locationPhoneNumber;
+    @ManyToMany
+    @JoinTable(
+            name = "client_location",
+            joinColumns = @JoinColumn(name = "client_id"),
+            inverseJoinColumns = @JoinColumn(name = "location_id")
+    )
+    private Set<Location> locations = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "client_third_party_IT",
+            joinColumns = @JoinColumn(name = "client_id"),
+            inverseJoinColumns = @JoinColumn(name = "third_party_IT_id")
+    )
+    private Set<ThirdPartyIT> thirdPartyITs = new HashSet<>();
+
 //    private boolean pathologyClient;
 //    private boolean surgeryClient;
 //    private boolean editorClient;

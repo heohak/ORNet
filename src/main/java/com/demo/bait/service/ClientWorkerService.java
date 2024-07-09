@@ -1,12 +1,16 @@
 package com.demo.bait.service;
 
 import com.demo.bait.dto.ClientWorkerDTO;
+import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.Client;
 import com.demo.bait.entity.ClientWorker;
+import com.demo.bait.entity.Location;
 import com.demo.bait.mapper.ClientWorkerMapper;
+import com.demo.bait.mapper.LocationMapper;
 import com.demo.bait.repository.ClientRepo;
 import com.demo.bait.repository.ClientWorkerRepo;
+import com.demo.bait.repository.LocationRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +28,8 @@ public class ClientWorkerService {
     private ClientWorkerRepo clientWorkerRepo;
     private ClientWorkerMapper clientWorkerMapper;
     private ClientRepo clientRepo;
+    private LocationRepo locationRepo;
+    private LocationMapper locationMapper;
 
 
     public ResponseDTO addWorker(ClientWorkerDTO workerDTO) {
@@ -35,6 +41,9 @@ public class ClientWorkerService {
         worker.setTitle(workerDTO.title());
         if (workerDTO.clientId() != null && clientRepo.findById(workerDTO.clientId()).isPresent()) {
             worker.setClient(clientRepo.getReferenceById(workerDTO.clientId()));
+        }
+        if (workerDTO.locationId() != null && locationRepo.findById(workerDTO.locationId()).isPresent()) {
+            worker.setLocation(locationRepo.getReferenceById(workerDTO.locationId()));
         }
         clientWorkerRepo.save(worker);
         return new ResponseDTO("Client Worker added successfully");
@@ -66,6 +75,25 @@ public class ClientWorkerService {
         return new ResponseDTO("Employer added successfully");
     }
 
+    @Transactional
+    public ResponseDTO addLocationToEmployee(Integer workerId, Integer locationId) {
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        Optional<Location> locationOpt = locationRepo.findById(locationId);
+
+        if (workerOpt.isEmpty()) {
+            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        }
+        if (locationOpt.isEmpty()) {
+            throw new EntityNotFoundException("Location with id " + locationId + " not found");
+        }
+
+        ClientWorker worker = workerOpt.get();
+        Location location = locationOpt.get();
+        worker.setLocation(location);
+        clientWorkerRepo.save(worker);
+        return new ResponseDTO("Location to worker added successfully");
+    }
+
     public List<ClientWorkerDTO> getWorkersByClientId(Integer clientId) {
         return clientWorkerMapper.toDtoList(clientWorkerRepo.findByClientId(clientId));
     }
@@ -73,5 +101,11 @@ public class ClientWorkerService {
     public ResponseDTO deleteWorker(Integer workerId) {
         clientWorkerRepo.deleteById(workerId);
         return new ResponseDTO("Worker deleted successfully");
+    }
+
+    public LocationDTO getWorkerLocation(Integer workerId) {
+        ClientWorker worker = clientWorkerRepo.getReferenceById(workerId);
+        Location location = worker.getLocation();
+        return locationMapper.toDto(location);
     }
 }
