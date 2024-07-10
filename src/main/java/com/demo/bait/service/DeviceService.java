@@ -43,12 +43,18 @@ public class DeviceService {
 //        deviceRepo.save(device);
 //        return new ResponseDTO("Device added successfully");
 
-        Optional<Client> clientOpt = clientRepo.findById(deviceDTO.clientId());
-        Optional<Location> locationOpt = locationRepo.findById(deviceDTO.locationId());
         Device device = new Device();
 
-        clientOpt.ifPresent(device::setClient);
-        locationOpt.ifPresent(device::setLocation);
+//        Optional<Client> clientOpt = clientRepo.findById(deviceDTO.clientId());
+//        Optional<Location> locationOpt = locationRepo.findById(deviceDTO.locationId());
+//        clientOpt.ifPresent(device::setClient);
+//        locationOpt.ifPresent(device::setLocation);
+        if (deviceDTO.clientId() != null && clientRepo.findById(deviceDTO.clientId()).isPresent()) {
+            device.setClient(clientRepo.getReferenceById(deviceDTO.clientId()));
+        }
+        if (deviceDTO.locationId() != null && locationRepo.findById(deviceDTO.locationId()).isPresent()) {
+            device.setLocation(locationRepo.getReferenceById(deviceDTO.locationId()));
+        }
 
         device.setDeviceName(deviceDTO.deviceName());
         device.setDepartment(deviceDTO.department());
@@ -155,6 +161,25 @@ public class DeviceService {
         device.setLocation(location);
         deviceRepo.save(device);
         return new ResponseDTO("Location added successfully to device");
+    }
+
+    @Transactional
+    public ResponseDTO addClientToDevice(Integer deviceId, Integer clientId) {
+        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+        Optional<Client> clientOpt = clientRepo.findById(clientId);
+
+        if (deviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        }
+        if (clientOpt.isEmpty()) {
+            throw new EntityNotFoundException("Client with id " + clientId + " not found");
+        }
+
+        Device device = deviceOpt.get();
+        Client client = clientOpt.get();
+        device.setClient(client);
+        deviceRepo.save(device);
+        return new ResponseDTO("Client added successfully");
     }
 
     public List<MaintenanceDTO> getDeviceMaintenances(Integer deviceId) {
