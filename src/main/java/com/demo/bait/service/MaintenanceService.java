@@ -46,7 +46,7 @@ public class MaintenanceService {
             maintenance.setFiles(files);
         }
         maintenanceRepo.save(maintenance);
-        return new ResponseDTO("Maintenance added successfully");
+        return new ResponseDTO(maintenance.getId().toString());
     }
 
     public List<MaintenanceDTO> getAllMaintenances() {
