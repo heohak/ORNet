@@ -86,7 +86,7 @@ public class ClientService {
         client.setNextMaintenance(clientDTO.nextMaintenance());
 
         clientRepo.save(client);
-        return new ResponseDTO("Client added successfully");
+        return new ResponseDTO(client.getId().toString());
     }
 
     public List<ClientDTO> getAllClients() {
