@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -43,7 +44,7 @@ public class Client {
     private Boolean surgeryClient;
     private Boolean editorClient;
     private String otherMedicalInformation;
-    private LocalDateTime lastMaintenance;
-    private LocalDateTime nextMaintenance;
+    private LocalDate lastMaintenance;
+    private LocalDate nextMaintenance;
 
 }

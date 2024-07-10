@@ -5,7 +5,9 @@ import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.service.DeviceService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -37,5 +39,21 @@ public class DeviceController {
     @DeleteMapping("/device/{deviceId}")
     public ResponseDTO deleteDevice(@PathVariable Integer deviceId) {
         return deviceService.deleteDevice(deviceId);
+    }
+
+    @PutMapping("/device/maintenance/{deviceId}/{maintenanceId}")
+    public ResponseDTO addMaintenance(@PathVariable Integer deviceId, @PathVariable Integer maintenanceId) {
+        return deviceService.addMaintenanceToDevice(deviceId, maintenanceId);
+    }
+
+    @PutMapping("/device/upload/{deviceId}")
+    public ResponseDTO uploadFile(@PathVariable Integer deviceId, @RequestParam("files") List<MultipartFile> files)
+            throws IOException {
+        return deviceService.uploadFilesToDevice(deviceId, files);
+    }
+
+    @PutMapping("/device/location/{deviceId}/{locationId}")
+    public ResponseDTO addLocation(@PathVariable Integer deviceId, @PathVariable Integer locationId) {
+        return deviceService.addLocationToDevice(deviceId, locationId);
     }
 }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,5 +15,5 @@ import java.time.LocalDateTime;
 public class LIS {
     private String vendorName;
     private String version;
-    private LocalDateTime updateDate;
+    private LocalDate updateDate;
 }
