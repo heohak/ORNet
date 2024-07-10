@@ -1,9 +1,11 @@
 package com.demo.bait.service;
 
 import com.demo.bait.dto.DeviceDTO;
+import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.*;
 import com.demo.bait.mapper.DeviceMapper;
+import com.demo.bait.mapper.MaintenanceMapper;
 import com.demo.bait.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -30,6 +32,7 @@ public class DeviceService {
     private MaintenanceRepo maintenanceRepo;
     private FileUploadRepo fileUploadRepo;
     private FileUploadService fileUploadService;
+    private MaintenanceMapper maintenanceMapper;
 
     @Transactional
     public ResponseDTO addDevice(DeviceDTO deviceDTO) {
@@ -152,5 +155,15 @@ public class DeviceService {
         device.setLocation(location);
         deviceRepo.save(device);
         return new ResponseDTO("Location added successfully to device");
+    }
+
+    public List<MaintenanceDTO> getDeviceMaintenances(Integer deviceId) {
+        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+        if (deviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        }
+
+        Device device = deviceOpt.get();
+        return maintenanceMapper.toDtoList(device.getMaintenances().stream().toList());
     }
 }

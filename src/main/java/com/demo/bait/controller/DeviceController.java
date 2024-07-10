@@ -1,6 +1,7 @@
 package com.demo.bait.controller;
 
 import com.demo.bait.dto.DeviceDTO;
+import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.service.DeviceService;
 import lombok.AllArgsConstructor;
@@ -55,5 +56,10 @@ public class DeviceController {
     @PutMapping("/device/location/{deviceId}/{locationId}")
     public ResponseDTO addLocation(@PathVariable Integer deviceId, @PathVariable Integer locationId) {
         return deviceService.addLocationToDevice(deviceId, locationId);
+    }
+
+    @GetMapping("/device/maintenances/{deviceId}")
+    public List<MaintenanceDTO> getMaintenances(@PathVariable Integer deviceId) {
+        return deviceService.getDeviceMaintenances(deviceId);
     }
 }
