@@ -62,4 +62,11 @@ public class DeviceController {
     public List<MaintenanceDTO> getMaintenances(@PathVariable Integer deviceId) {
         return deviceService.getDeviceMaintenances(deviceId);
     }
+
+    @PutMapping("/device/client/{deviceId}/{clientId}")
+    public ResponseDTO addClient(@PathVariable Integer deviceId, @PathVariable Integer clientId) {
+        return deviceService.addClientToDevice(deviceId, clientId);
+    }
+
+    // written off date PUT endpoint
 }
