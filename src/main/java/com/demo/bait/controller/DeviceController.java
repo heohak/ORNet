@@ -89,5 +89,10 @@ public class DeviceController {
         deviceService.addAttributeToAllDevices(attributeName, attributeValue);
     }
 
+    @PutMapping("/device/classificator/{deviceId}/{classificatorId}")
+    public ResponseDTO addClassificatorToDevice(@PathVariable Integer deviceId, @PathVariable Integer classificatorId) {
+        return deviceService.addClassificatorToDevice(deviceId, classificatorId);
+    }
+
     // written off date PUT endpoint
 }

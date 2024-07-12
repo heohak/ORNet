@@ -4,9 +4,11 @@ import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.*;
+import com.demo.bait.entity.classificator.DeviceClassificator;
 import com.demo.bait.mapper.DeviceMapper;
 import com.demo.bait.mapper.MaintenanceMapper;
 import com.demo.bait.repository.*;
+import com.demo.bait.repository.classificator.DeviceClassificatorRepo;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -30,6 +32,8 @@ public class DeviceService {
     private FileUploadRepo fileUploadRepo;
     private FileUploadService fileUploadService;
     private MaintenanceMapper maintenanceMapper;
+    private DeviceClassificatorRepo deviceClassificatorRepo;
+
 
     @Transactional
     public ResponseDTO addDevice(DeviceDTO deviceDTO) {
@@ -184,6 +188,25 @@ public class DeviceService {
         device.setClient(client);
         deviceRepo.save(device);
         return new ResponseDTO("Client added successfully");
+    }
+
+    @Transactional
+    public ResponseDTO addClassificatorToDevice(Integer deviceId, Integer classificatorId) {
+        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+        Optional<DeviceClassificator> deviceClassificatorOpt = deviceClassificatorRepo.findById(classificatorId);
+
+        if (deviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        }
+        if (deviceClassificatorOpt.isEmpty()) {
+            throw new EntityNotFoundException("Classificator with id " + classificatorId + " not found");
+        }
+
+        Device device = deviceOpt.get();
+        DeviceClassificator deviceClassificator = deviceClassificatorOpt.get();
+        device.setClassificator(deviceClassificator);
+        deviceRepo.save(device);
+        return new ResponseDTO("Classificator added successfully");
     }
 
     public List<MaintenanceDTO> getDeviceMaintenances(Integer deviceId) {
