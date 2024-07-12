@@ -28,7 +28,7 @@ public class ClientController {
         return clientService.getAllClients();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseDTO deleteClient(@PathVariable Integer id) {
         return clientService.deleteClient(id);
     }
