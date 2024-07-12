@@ -15,10 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -76,6 +73,7 @@ public class DeviceService {
 
         device.setFirstIPAddress(deviceDTO.firstIPAddress());
         device.setSecondIPAddress(deviceDTO.secondIPAddress());
+        device.setSubnetMask(deviceDTO.subnetMask());
         device.setSoftwareKey(deviceDTO.softwareKey());
         device.setIntroducedDate(deviceDTO.introducedDate());
         device.setWrittenOffDate(deviceDTO.writtenOffDate());
@@ -89,6 +87,12 @@ public class DeviceService {
                 files.add(file);
             }
             device.setFiles(files);
+        }
+
+        if (deviceDTO.attributes() != null) {
+            device.setAttributes(deviceDTO.attributes());
+        } else {
+            device.setAttributes(new HashMap<>());
         }
 
         deviceRepo.save(device);
@@ -190,5 +194,29 @@ public class DeviceService {
 
         Device device = deviceOpt.get();
         return maintenanceMapper.toDtoList(device.getMaintenances().stream().toList());
+    }
+
+    public DeviceDTO updateDeviceAttributes(Integer deviceId, Map<String, Object> newAttributes) {
+        Device device = deviceRepo.findById(deviceId)
+                .orElseThrow(() -> new RuntimeException("Device not found"));
+        device.getAttributes().putAll(newAttributes);
+        Device updatedDevice = deviceRepo.save(device);
+        return deviceMapper.toDto(updatedDevice);
+    }
+
+    public DeviceDTO removeDeviceAttribute(Integer deviceId, String attributeName) {
+        Device device = deviceRepo.findById(deviceId)
+                .orElseThrow(() -> new RuntimeException("Device not found"));
+        device.getAttributes().remove(attributeName);
+        Device updatedDevice = deviceRepo.save(device);
+        return deviceMapper.toDto(updatedDevice);
+    }
+
+    public void addAttributeToAllDevices(String attributeName, Object attributeValue) {
+        List<Device> devices = deviceRepo.findAll();
+        for (Device device : devices) {
+            device.getAttributes().put(attributeName, attributeValue);
+        }
+        deviceRepo.saveAll(devices);
     }
 }

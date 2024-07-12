@@ -1,5 +1,6 @@
 package com.demo.bait.entity;
 
+import com.demo.bait.converter.JsonConverter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @Getter
@@ -45,6 +47,7 @@ public class Device {
 
     private String firstIPAddress;
     private String secondIPAddress;
+    private String subnetMask;
     private String softwareKey; // kui null siis ei ole olemas seda ehk ei ole vaja
     private LocalDate introducedDate;
     private LocalDate writtenOffDate;
@@ -56,5 +59,8 @@ public class Device {
             inverseJoinColumns = @JoinColumn(name = "file_upload_id")
     )
     private Set<FileUpload> files = new HashSet<>();
+
+    @Convert(converter = JsonConverter.class)
+    private Map<String, Object> attributes;
 
 }

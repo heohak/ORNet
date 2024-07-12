@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -66,6 +67,26 @@ public class DeviceController {
     @PutMapping("/device/client/{deviceId}/{clientId}")
     public ResponseDTO addClient(@PathVariable Integer deviceId, @PathVariable Integer clientId) {
         return deviceService.addClientToDevice(deviceId, clientId);
+    }
+
+    @PutMapping("/device/{deviceId}/attributes")
+    public DeviceDTO updateDeviceAttributes(@PathVariable Integer deviceId, @RequestBody Map<String, Object> attributes) {
+        return deviceService.updateDeviceAttributes(deviceId, attributes);
+    }
+
+    @DeleteMapping("/device/{deviceId}/{attributeName}")
+    public DeviceDTO removeDeviceAttribute(@PathVariable Integer deviceId, @PathVariable String attributeName) {
+        return deviceService.removeDeviceAttribute(deviceId, attributeName);
+    }
+
+    @PostMapping("/device/attributes/add-to-all")
+    public void addAttributeToAllDevices(@RequestBody Map<String, Object> attribute) {
+        if (attribute.size() != 1) {
+            throw new IllegalArgumentException("Please provide exactly one attribute name-value pair");
+        }
+        String attributeName = attribute.keySet().iterator().next();
+        Object attributeValue = attribute.values().iterator().next();
+        deviceService.addAttributeToAllDevices(attributeName, attributeValue);
     }
 
     // written off date PUT endpoint
