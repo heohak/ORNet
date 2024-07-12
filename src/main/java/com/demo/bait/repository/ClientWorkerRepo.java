@@ -8,4 +8,5 @@ import java.util.List;
 public interface ClientWorkerRepo extends JpaRepository<ClientWorker, Integer> {
 
     List<ClientWorker> findByClientId(Integer clientId);
+    List<ClientWorker> findByLocationId(Integer locationId);
 }
