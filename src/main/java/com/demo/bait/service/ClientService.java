@@ -155,4 +155,12 @@ public class ClientService {
         Client client = clientOpt.get();
         return thirdPartyITMapper.toDtoList(client.getThirdPartyITs().stream().toList());
     }
+
+    public ClientDTO getClientById(Integer clientId) {
+        Optional<Client> clientOpt = clientRepo.findById(clientId);
+        if (clientOpt.isEmpty()) {
+            throw new EntityNotFoundException("Client with id " + clientId + " not found");
+        }
+        return clientMapper.toDto(clientOpt.get());
+    }
 }
