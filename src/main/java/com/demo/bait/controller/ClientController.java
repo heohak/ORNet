@@ -52,4 +52,9 @@ public class ClientController {
     public List<ThirdPartyITDTO> getClientThirdPartyITs(@PathVariable Integer clientId) {
         return clientService.getClientThirdPartyITs(clientId);
     }
+
+    @GetMapping("/{clientId}")
+    public ClientDTO getClientById(@PathVariable Integer clientId) {
+        return clientService.getClientById(clientId);
+    }
 }

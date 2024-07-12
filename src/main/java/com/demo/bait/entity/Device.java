@@ -1,6 +1,7 @@
 package com.demo.bait.entity;
 
 import com.demo.bait.converter.JsonConverter;
+import com.demo.bait.entity.classificator.DeviceClassificator;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,7 +30,10 @@ public class Device {
     @ManyToOne
     @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
-    private String deviceName; // vb tuleks teha enum-iga et saaks lihtsamalt yldistusi teha
+    private String deviceName;
+    @ManyToOne
+    @JoinColumn(name = "classificator_id")
+    private DeviceClassificator classificator;
     private String department;
     private String room;
     private Integer serialNumber;

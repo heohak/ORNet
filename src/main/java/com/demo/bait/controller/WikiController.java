@@ -30,4 +30,9 @@ public class WikiController {
     public ResponseDTO deleteWiki(@PathVariable Integer wikiId) {
         return wikiService.deleteWiki(wikiId);
     }
+
+    @GetMapping("/{wikiId}")
+    public WikiDTO getWikiById(@PathVariable Integer wikiId) {
+        return wikiService.getWikiById(wikiId);
+    }
 }

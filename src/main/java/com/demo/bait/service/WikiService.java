@@ -5,11 +5,13 @@ import com.demo.bait.dto.WikiDTO;
 import com.demo.bait.entity.Wiki;
 import com.demo.bait.mapper.WikiMapper;
 import com.demo.bait.repository.WikiRepo;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -35,5 +37,13 @@ public class WikiService {
     public ResponseDTO deleteWiki(Integer wikiId) {
         wikiRepo.deleteById(wikiId);
         return new ResponseDTO("Wiki deleted successfully");
+    }
+
+    public WikiDTO getWikiById(Integer id) {
+        Optional<Wiki> wikiOpt = wikiRepo.findById(id);
+        if (wikiOpt.isEmpty()) {
+            throw new EntityNotFoundException("Wiki with id " + id + " not found");
+        }
+        return wikiMapper.toDto(wikiOpt.get());
     }
 }
