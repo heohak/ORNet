@@ -221,7 +221,7 @@ public class DeviceService {
 
     public DeviceDTO updateDeviceAttributes(Integer deviceId, Map<String, Object> newAttributes) {
         Device device = deviceRepo.findById(deviceId)
-                .orElseThrow(() -> new RuntimeException("Device not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Device not found"));
         device.getAttributes().putAll(newAttributes);
         Device updatedDevice = deviceRepo.save(device);
         return deviceMapper.toDto(updatedDevice);
@@ -229,7 +229,7 @@ public class DeviceService {
 
     public DeviceDTO removeDeviceAttribute(Integer deviceId, String attributeName) {
         Device device = deviceRepo.findById(deviceId)
-                .orElseThrow(() -> new RuntimeException("Device not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Device not found"));
         device.getAttributes().remove(attributeName);
         Device updatedDevice = deviceRepo.save(device);
         return deviceMapper.toDto(updatedDevice);
