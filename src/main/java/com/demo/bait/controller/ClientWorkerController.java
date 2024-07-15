@@ -11,41 +11,42 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/worker")
 public class ClientWorkerController {
 
     public final ClientWorkerService clientWorkerService;
 
-    @PostMapping("/worker")
+    @PostMapping("/add")
     public ResponseDTO addWorker(@RequestBody ClientWorkerDTO workerDTO) {
         return clientWorkerService.addWorker(workerDTO);
     }
 
-    @GetMapping("/worker")
+    @GetMapping("/all")
     public List<ClientWorkerDTO> getAllWorkers() {
         return clientWorkerService.getAllWorkers();
     }
 
-    @PutMapping("/worker/{workerId}/{clientId}")
+    @PutMapping("/{workerId}/{clientId}")
     public ResponseDTO addEmployer(@PathVariable Integer workerId, @PathVariable Integer clientId) {
         return clientWorkerService.addEmployer(workerId, clientId);
     }
 
-    @GetMapping("/workers/{clientId}")
+    @GetMapping("/{clientId}")
     public List<ClientWorkerDTO> getWorkersByClientId(@PathVariable Integer clientId) {
         return clientWorkerService.getWorkersByClientId(clientId);
     }
 
-    @DeleteMapping("/workers/{workerId}")
+    @DeleteMapping("/{workerId}")
     public ResponseDTO deleteWorker(@PathVariable Integer workerId) {
         return clientWorkerService.deleteWorker(workerId);
     }
 
-    @PutMapping("/worker/location/{workerId}/{locationId}")
+    @PutMapping("/location/{workerId}/{locationId}")
     public ResponseDTO addLocation(@PathVariable Integer workerId, @PathVariable Integer locationId) {
         return clientWorkerService.addLocationToEmployee(workerId, locationId);
     }
 
-    @GetMapping("/worker/location/{workerId}")
+    @GetMapping("/location/{workerId}")
     public LocationDTO getWorkerLocation(@PathVariable Integer workerId) {
         return clientWorkerService.getWorkerLocation(workerId);
     }

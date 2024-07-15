@@ -14,72 +14,73 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/device")
 public class DeviceController {
 
     public final DeviceService deviceService;
 
-    @PostMapping("/device")
+    @PostMapping("/add")
     public ResponseDTO addDevice(@RequestBody DeviceDTO deviceDTO) {
         return deviceService.addDevice(deviceDTO);
     }
 
-    @GetMapping("/devices/{clientId}")
+    @GetMapping("/client/{clientId}")
     public List<DeviceDTO> getDevicesByClientId(@PathVariable Integer clientId) {
         return deviceService.getDevicesByClientId(clientId);
     }
 
-    @GetMapping("/devices")
+    @GetMapping("/all")
     public List<DeviceDTO> getAllDevices() {
         return deviceService.getAllDevices();
     }
 
-    @GetMapping("/device/{deviceId}")
+    @GetMapping("/{deviceId}")
     public DeviceDTO getDeviceById(@PathVariable Integer deviceId) {
         return deviceService.getDeviceById(deviceId);
     }
 
-    @DeleteMapping("/device/{deviceId}")
+    @DeleteMapping("/delete/{deviceId}")
     public ResponseDTO deleteDevice(@PathVariable Integer deviceId) {
         return deviceService.deleteDevice(deviceId);
     }
 
-    @PutMapping("/device/maintenance/{deviceId}/{maintenanceId}")
+    @PutMapping("/maintenance/{deviceId}/{maintenanceId}")
     public ResponseDTO addMaintenance(@PathVariable Integer deviceId, @PathVariable Integer maintenanceId) {
         return deviceService.addMaintenanceToDevice(deviceId, maintenanceId);
     }
 
-    @PutMapping("/device/upload/{deviceId}")
+    @PutMapping("/upload/{deviceId}")
     public ResponseDTO uploadFile(@PathVariable Integer deviceId, @RequestParam("files") List<MultipartFile> files)
             throws IOException {
         return deviceService.uploadFilesToDevice(deviceId, files);
     }
 
-    @PutMapping("/device/location/{deviceId}/{locationId}")
+    @PutMapping("/location/{deviceId}/{locationId}")
     public ResponseDTO addLocation(@PathVariable Integer deviceId, @PathVariable Integer locationId) {
         return deviceService.addLocationToDevice(deviceId, locationId);
     }
 
-    @GetMapping("/device/maintenances/{deviceId}")
+    @GetMapping("/maintenances/{deviceId}")
     public List<MaintenanceDTO> getMaintenances(@PathVariable Integer deviceId) {
         return deviceService.getDeviceMaintenances(deviceId);
     }
 
-    @PutMapping("/device/client/{deviceId}/{clientId}")
+    @PutMapping("/client/{deviceId}/{clientId}")
     public ResponseDTO addClient(@PathVariable Integer deviceId, @PathVariable Integer clientId) {
         return deviceService.addClientToDevice(deviceId, clientId);
     }
 
-    @PutMapping("/device/{deviceId}/attributes")
+    @PutMapping("/{deviceId}/attributes")
     public DeviceDTO updateDeviceAttributes(@PathVariable Integer deviceId, @RequestBody Map<String, Object> attributes) {
         return deviceService.updateDeviceAttributes(deviceId, attributes);
     }
 
-    @DeleteMapping("/device/{deviceId}/{attributeName}")
+    @DeleteMapping("/{deviceId}/{attributeName}")
     public DeviceDTO removeDeviceAttribute(@PathVariable Integer deviceId, @PathVariable String attributeName) {
         return deviceService.removeDeviceAttribute(deviceId, attributeName);
     }
 
-    @PostMapping("/device/attributes/add-to-all")
+    @PostMapping("/attributes/add-to-all")
     public void addAttributeToAllDevices(@RequestBody Map<String, Object> attribute) {
         if (attribute.size() != 1) {
             throw new IllegalArgumentException("Please provide exactly one attribute name-value pair");
@@ -89,7 +90,7 @@ public class DeviceController {
         deviceService.addAttributeToAllDevices(attributeName, attributeValue);
     }
 
-    @PutMapping("/device/classificator/{deviceId}/{classificatorId}")
+    @PutMapping("/classificator/{deviceId}/{classificatorId}")
     public ResponseDTO addClassificatorToDevice(@PathVariable Integer deviceId, @PathVariable Integer classificatorId) {
         return deviceService.addClassificatorToDevice(deviceId, classificatorId);
     }
