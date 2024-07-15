@@ -37,7 +37,7 @@ public class LinkedDeviceService {
         linkedDevice.setSerialNumber(linkedDeviceDTO.serialNumber());
         linkedDevice.setComment(linkedDeviceDTO.comment());
         linkedDeviceRepo.save(linkedDevice);
-        return new ResponseDTO("Linked Device added successfully");
+        return new ResponseDTO(linkedDevice.getId().toString());
     }
 
     public List<LinkedDeviceDTO> getAllLinkedDevices() {
