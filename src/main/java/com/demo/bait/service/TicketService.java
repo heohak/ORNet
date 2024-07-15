@@ -2,9 +2,8 @@ package com.demo.bait.service;
 
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.TicketDTO;
-import com.demo.bait.entity.Client;
-import com.demo.bait.entity.ClientWorker;
-import com.demo.bait.entity.Ticket;
+import com.demo.bait.entity.*;
+import com.demo.bait.entity.classificator.TicketStatusClassificator;
 import com.demo.bait.mapper.TicketMapper;
 import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.TicketStatusClassificatorRepo;
@@ -33,11 +32,6 @@ public class TicketService {
 
     @Transactional
     public ResponseDTO addTicket(TicketDTO ticketDTO) {
-//        Ticket ticket = new Ticket();
-//        ticket.setClientId(ticketDTO.clientId());
-//        ticket.setDescription(ticketDTO.description());
-//        ticketRepo.save(ticket);
-//        return new ResponseDTO("Ticket added successfully");
         Optional<Client> clientOpt = clientRepo.findById(ticketDTO.clientId());
 
         if (clientOpt.isEmpty()) {
@@ -158,5 +152,81 @@ public class TicketService {
     public ResponseDTO deleteTicket(Integer ticketId) {
         ticketRepo.deleteById(ticketId);
         return new ResponseDTO("Ticket deleted successfully");
+    }
+
+    @Transactional
+    public ResponseDTO addResponsibleBaitWorkerToTicket(Integer ticketId, Integer baitWorkerId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        Optional<BaitWorker> baitWorkerOpt = baitWorkerRepo.findById(baitWorkerId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        if (baitWorkerOpt.isEmpty()) {
+            throw new EntityNotFoundException("Bait worker with id " + baitWorkerId + " not found");
+        }
+
+        Ticket ticket = ticketOpt.get();
+        BaitWorker baitWorker = baitWorkerOpt.get();
+        ticket.setBaitWorker(baitWorker);
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Responsible bait worker added to ticket");
+    }
+
+    @Transactional
+    public ResponseDTO addLocationToTicket(Integer ticketId, Integer locationId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        Optional<Location> locationOpt = locationRepo.findById(locationId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        if (locationOpt.isEmpty()) {
+            throw new EntityNotFoundException("Location with id " + locationId + " not found");
+        }
+
+        Ticket ticket = ticketOpt.get();
+        Location location = locationOpt.get();
+        ticket.setLocation(location);
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Location added to ticket successfully");
+    }
+
+    @Transactional
+    public ResponseDTO addStatusToTicket(Integer ticketId, Integer statusId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        Optional<TicketStatusClassificator> statusOpt = ticketStatusRepo.findById(statusId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        if (statusOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket status with id " + statusId + " not found");
+        }
+
+        Ticket ticket = ticketOpt.get();
+        TicketStatusClassificator status = statusOpt.get();
+        ticket.setStatus(status);
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Status added to ticket successfully");
+    }
+
+    @Transactional
+    public ResponseDTO addContactToTicket(Integer ticketId, Integer workerId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        if (workerOpt.isEmpty()) {
+            throw new EntityNotFoundException("Worker with id " + workerId + " not found");
+        }
+
+        Ticket ticket = ticketOpt.get();
+        ClientWorker worker = workerOpt.get();
+        ticket.getContacts().add(worker);
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Contact added to ticket successfully");
     }
 }
