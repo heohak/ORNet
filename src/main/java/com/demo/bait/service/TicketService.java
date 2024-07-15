@@ -3,10 +3,11 @@ package com.demo.bait.service;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.TicketDTO;
 import com.demo.bait.entity.Client;
+import com.demo.bait.entity.ClientWorker;
 import com.demo.bait.entity.Ticket;
 import com.demo.bait.mapper.TicketMapper;
-import com.demo.bait.repository.ClientRepo;
-import com.demo.bait.repository.TicketRepo;
+import com.demo.bait.repository.*;
+import com.demo.bait.repository.classificator.TicketStatusClassificatorRepo;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -24,6 +25,11 @@ public class TicketService {
     private TicketRepo ticketRepo;
     private TicketMapper ticketMapper;
     private ClientRepo clientRepo;
+    private LocationRepo locationRepo;
+    private ClientWorkerRepo clientWorkerRepo;
+    private TicketStatusClassificatorRepo ticketStatusRepo;
+    private BaitWorkerRepo baitWorkerRepo;
+
 
     @Transactional
     public ResponseDTO addTicket(TicketDTO ticketDTO) {
@@ -52,6 +58,51 @@ public class TicketService {
                 }
             }
         }
+
+        ticket.setStartDateTime(ticketDTO.startDateTime());
+
+        if (ticketDTO.locationId() != null && locationRepo.findById(ticketDTO.locationId()).isPresent()) {
+            ticket.setLocation(locationRepo.getReferenceById(ticketDTO.locationId()));
+        }
+
+        if (ticketDTO.contactIds() != null) {
+            Set<ClientWorker> contacts = new HashSet<>();
+            for (Integer id : ticketDTO.contactIds()) {
+                ClientWorker contact = clientWorkerRepo.findById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid worker ID: " + id));
+                contacts.add(contact);
+            }
+            ticket.setContacts(contacts);
+        }
+
+        ticket.setWorkType(ticketDTO.workType());
+
+        if (ticketDTO.remote() == null) {
+            ticket.setRemote(false);
+        } else {
+            ticket.setRemote(ticketDTO.remote());
+        }
+
+        if (ticketDTO.crisis() == null) {
+            ticket.setCrisis(false);
+        } else {
+            ticket.setCrisis(ticketDTO.crisis());
+        }
+
+        if (ticketDTO.statusId() != null && ticketStatusRepo.findById(ticketDTO.statusId()).isPresent()) {
+            ticket.setStatus(ticketStatusRepo.getReferenceById(ticketDTO.statusId()));
+        }
+
+        if (ticketDTO.baitWorkerId() != null && baitWorkerRepo.findById(ticketDTO.baitWorkerId()).isPresent()) {
+            ticket.setBaitWorker(baitWorkerRepo.getReferenceById(ticketDTO.baitWorkerId()));
+        }
+
+        ticket.setResponseDateTime(ticketDTO.responseDateTime());
+        ticket.setResponse(ticketDTO.response());
+        ticket.setInsideInfo(ticketDTO.insideInfo());
+        ticket.setEndDateTime(ticketDTO.endDateTime());
+        ticket.setRootCause(ticketDTO.rootCause());
+
         ticketRepo.save(ticket);
         return new ResponseDTO("Ticket added successfully");
     }
