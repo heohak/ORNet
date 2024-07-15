@@ -10,31 +10,32 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/ticket")
 public class TicketController {
 
     public final TicketService ticketService;
 
-    @PostMapping("/ticket")
+    @PostMapping("/add")
     public ResponseDTO addTicket(@RequestBody TicketDTO ticketDTO) {
         return ticketService.addTicket(ticketDTO);
     }
 
-    @GetMapping("/tickets/{clientId}")
+    @GetMapping("/client/{clientId}")
     public List<TicketDTO> getTicketsByClientId(@PathVariable Integer clientId) {
         return ticketService.getTicketsByClientId(clientId);
     }
 
-    @GetMapping("/tickets")
+    @GetMapping("/all")
     public List<TicketDTO> getAllTickets() {
         return ticketService.getAllTickets();
     }
 
-    @GetMapping("/tickets/main/{mainTicketId}")
+    @GetMapping("/main/{mainTicketId}")
     public List<TicketDTO> getTicketsByMainTicketId(@PathVariable Integer mainTicketId) {
         return ticketService.getTicketsByMainTicketId(mainTicketId);
     }
 
-    @DeleteMapping("/ticket/{ticketId}")
+    @DeleteMapping("/delete/{ticketId}")
     public ResponseDTO deleteTicket(@PathVariable Integer ticketId) {
         return ticketService.deleteTicket(ticketId);
     }

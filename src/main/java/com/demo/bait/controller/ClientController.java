@@ -18,12 +18,12 @@ public class ClientController {
 
     public final ClientService clientService;
 
-    @PostMapping("")
+    @PostMapping("/add")
     public ResponseDTO addClient(@RequestBody ClientDTO clientDTO) {
         return clientService.addClient(clientDTO);
     }
 
-    @GetMapping("")
+    @GetMapping("/all")
     public List<ClientDTO> getAllClients() {
         return clientService.getAllClients();
     }
