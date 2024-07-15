@@ -14,7 +14,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -36,8 +38,15 @@ public class LinkedDeviceService {
         linkedDevice.setProductCode(linkedDeviceDTO.productCode());
         linkedDevice.setSerialNumber(linkedDeviceDTO.serialNumber());
         linkedDevice.setComment(linkedDeviceDTO.comment());
+
+        if (linkedDeviceDTO.attributes() != null) {
+            linkedDevice.setAttributes(linkedDeviceDTO.attributes());
+        } else {
+            linkedDevice.setAttributes(new HashMap<>());
+        }
+
         linkedDeviceRepo.save(linkedDevice);
-        return new ResponseDTO("Linked Device added successfully");
+        return new ResponseDTO(linkedDevice.getId().toString());
     }
 
     public List<LinkedDeviceDTO> getAllLinkedDevices() {
@@ -70,5 +79,21 @@ public class LinkedDeviceService {
     public ResponseDTO deleteLinkedDevice(Integer linkedDeviceId) {
         linkedDeviceRepo.deleteById(linkedDeviceId);
         return new ResponseDTO("Linked Device deleted");
+    }
+
+    public ResponseDTO updateLinkedDeviceAttributes(Integer linkedDeviceId, Map<String, Object> newAttributes) {
+        LinkedDevice linkedDevice = linkedDeviceRepo.findById(linkedDeviceId)
+                .orElseThrow(() -> new EntityNotFoundException("Linked device not found"));
+        linkedDevice.getAttributes().putAll(newAttributes);
+        linkedDeviceRepo.save(linkedDevice);
+        return new ResponseDTO("Linked device attributes updated successfully");
+    }
+
+    public ResponseDTO removeLinkedDeviceAttribute(Integer linkedDeviceId, String attributeName) {
+        LinkedDevice linkedDevice = linkedDeviceRepo.findById(linkedDeviceId)
+                .orElseThrow(() -> new EntityNotFoundException("Linked device not found"));
+        linkedDevice.getAttributes().remove(attributeName);
+        linkedDeviceRepo.save(linkedDevice);
+        return new ResponseDTO("Attribute removed successfully");
     }
 }
