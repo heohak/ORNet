@@ -10,21 +10,22 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
+@RequestMapping("/bait/worker")
 public class BaitWorkerController {
 
     public final BaitWorkerService baitWorkerService;
 
-    @PostMapping("/bait/worker")
+    @PostMapping("/add")
     public ResponseDTO addWorker(@RequestBody BaitWorkerDTO workerDTO) {
         return baitWorkerService.addWorker(workerDTO);
     }
 
-    @GetMapping("/bait/workers")
+    @GetMapping("/all")
     public List<BaitWorkerDTO> getAllWorkers() {
         return baitWorkerService.getAllWorkers();
     }
 
-    @DeleteMapping("/bait/worker/{workerId}")
+    @DeleteMapping("/{workerId}")
     public ResponseDTO deleteWorker(@PathVariable Integer workerId) {
         return baitWorkerService.deleteBaitWorker(workerId);
     }

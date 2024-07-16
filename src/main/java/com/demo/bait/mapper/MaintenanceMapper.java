@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface MaintenanceMapper {
 
-    @Mapping(target = "fileIds", expression = "java(mapFilesToIds(maintenance.getFiles()))")
+//    @Mapping(target = "fileIds", expression = "java(mapFilesToIds(maintenance.getFiles()))")
     List<MaintenanceDTO> toDtoList(List<Maintenance> maintenances);
 
     @Mapping(target = "fileIds", expression = "java(mapFilesToIds(maintenance.getFiles()))")

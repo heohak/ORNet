@@ -66,6 +66,40 @@ public class SoftwareService {
         lis.setUpdateDate(softwareDTO.lis().updateDate());
         software.setLis(lis);
 
+        ReturnImagesToLIS returnImagesToLIS = new ReturnImagesToLIS();
+        returnImagesToLIS.setToReturn(softwareDTO.returnImagesToLIS().toReturn());
+        returnImagesToLIS.setLink(softwareDTO.returnImagesToLIS().link());
+        returnImagesToLIS.setUpdateDate(softwareDTO.returnImagesToLIS().updateDate());
+        software.setReturnImagesToLIS(returnImagesToLIS);
+
+        ORNetAPI orNetAPI = new ORNetAPI();
+        orNetAPI.setVersion(softwareDTO.orNetAPI().version());
+        orNetAPI.setUpdateDate(softwareDTO.orNetAPI().updateDate());
+        software.setOrNetAPI(orNetAPI);
+
+        software.setTxtIntegrationDate(softwareDTO.txtIntegrationDate());
+
+        CustomerAPI customerAPI = new CustomerAPI();
+        customerAPI.setVendorName(softwareDTO.customerAPI().vendorName());
+        customerAPI.setVersion(softwareDTO.customerAPI().version());
+        customerAPI.setUpdateDate(softwareDTO.customerAPI().updateDate());
+        software.setCustomerAPI(customerAPI);
+
+        ORNetAPIClient orNetAPIClient = new ORNetAPIClient();
+        orNetAPIClient.setVersion(softwareDTO.orNetAPIClient().version());
+        orNetAPIClient.setUpdateDate(softwareDTO.orNetAPIClient().updateDate());
+        software.setOrNetAPIClient(orNetAPIClient);
+
+        ConsultationModule consultationModule = new ConsultationModule();
+        consultationModule.setVersion(softwareDTO.consultationModule().version());
+        consultationModule.setUpdateDate(softwareDTO.consultationModule().updateDate());
+        software.setConsultationModule(consultationModule);
+
+        AIModule aiModule = new AIModule();
+        aiModule.setVersion(softwareDTO.aiModule().version());
+        aiModule.setUpdateDate(softwareDTO.aiModule().updateDate());
+        software.setAiModule(aiModule);
+
         softwareRepo.save(software);
         return new ResponseDTO("Software added successfully");
     }

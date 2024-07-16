@@ -3,6 +3,7 @@ package com.demo.bait.controller;
 import com.demo.bait.dto.ClientWorkerDTO;
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.ResponseDTO;
+import com.demo.bait.dto.classificator.ClientWorkerRoleClassificatorDTO;
 import com.demo.bait.service.ClientWorkerService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -46,8 +47,18 @@ public class ClientWorkerController {
         return clientWorkerService.addLocationToEmployee(workerId, locationId);
     }
 
+    @PutMapping("/role/{workerId}/{roleId}")
+    public ResponseDTO addRole(@PathVariable Integer workerId, @PathVariable Integer roleId) {
+        return clientWorkerService.addRoleToEmployee(workerId, roleId);
+    }
+
     @GetMapping("/location/{workerId}")
     public LocationDTO getWorkerLocation(@PathVariable Integer workerId) {
         return clientWorkerService.getWorkerLocation(workerId);
+    }
+
+    @GetMapping("/role/{workerId}")
+    public List<ClientWorkerRoleClassificatorDTO> getWorkerRole(@PathVariable Integer workerId) {
+        return clientWorkerService.getWorkerRole(workerId);
     }
 }

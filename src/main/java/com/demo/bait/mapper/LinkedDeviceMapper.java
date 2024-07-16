@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface LinkedDeviceMapper {
 
-    @Mapping(source = "device.id", target = "deviceId")
+//    @Mapping(source = "device.id", target = "deviceId")
     List<LinkedDeviceDTO> toDtoList(List<LinkedDevice> linkedDevice);
 
     @Mapping(source = "device.id", target = "deviceId")

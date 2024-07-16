@@ -23,6 +23,7 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client client;
+    private String title;
     private String description;
 
     @ManyToOne
