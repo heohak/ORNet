@@ -13,8 +13,8 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ClientWorkerMapper {
 
-    @Mapping(source = "client.id", target = "clientId")
-    @Mapping(source = "location.id", target = "locationId")
+//    @Mapping(source = "client.id", target = "clientId")
+//    @Mapping(source = "location.id", target = "locationId")
     List<ClientWorkerDTO> toDtoList(List<ClientWorker> clientWorkerList);
 
     @Mapping(source = "client.id", target = "clientId")

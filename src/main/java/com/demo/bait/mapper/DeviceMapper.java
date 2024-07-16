@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface DeviceMapper {
 
-    @Mapping(source = "client.id", target = "clientId")
-    @Mapping(source = "location.id", target = "locationId")
-    @Mapping(source = "classificator.id", target = "classificatorId")
-    @Mapping(target = "maintenanceIds", expression = "java(mapMaintenancesToIds(device.getMaintenances()))")
-    @Mapping(target = "fileIds", expression = "java(mapFilesToIds(device.getFiles()))")
+//    @Mapping(source = "client.id", target = "clientId")
+//    @Mapping(source = "location.id", target = "locationId")
+//    @Mapping(source = "classificator.id", target = "classificatorId")
+//    @Mapping(target = "maintenanceIds", expression = "java(mapMaintenancesToIds(device.getMaintenances()))")
+//    @Mapping(target = "fileIds", expression = "java(mapFilesToIds(device.getFiles()))")
     List<DeviceDTO> toDtoList(List<Device> devices);
 
     @Mapping(source = "client.id", target = "clientId")

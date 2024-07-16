@@ -20,8 +20,8 @@ public interface ClientMapper {
 
     ClientMapper INSTANCE = Mappers.getMapper(ClientMapper.class);
 
-    @Mapping(target = "locationIds", expression = "java(mapLocationsToIds(client.getLocations()))")
-    @Mapping(target = "thirdPartyITIds", expression = "java(mapThirdPartyITsToIds(client.getThirdPartyITs()))")
+//    @Mapping(target = "locationIds", expression = "java(mapLocationsToIds(client.getLocations()))")
+//    @Mapping(target = "thirdPartyITIds", expression = "java(mapThirdPartyITsToIds(client.getThirdPartyITs()))")
     List<ClientDTO> toDtoList(List<Client> clientList);
 
     @Mapping(target = "locationIds", expression = "java(mapLocationsToIds(client.getLocations()))")
