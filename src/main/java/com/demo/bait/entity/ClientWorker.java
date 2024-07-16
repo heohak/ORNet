@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
@@ -29,7 +32,11 @@ public class ClientWorker {
     @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
 
-    @ManyToOne
-    @JoinColumn(name = "role_id", referencedColumnName = "id")
-    private ClientWorkerRoleClassificator role;
+    @ManyToMany
+    @JoinTable(
+            name = "client_worker_role",
+            joinColumns = @JoinColumn(name = "client_worker_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<ClientWorkerRoleClassificator> roles = new HashSet<>();
 }

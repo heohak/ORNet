@@ -21,8 +21,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -51,9 +53,17 @@ public class ClientWorkerService {
         if (workerDTO.locationId() != null && locationRepo.findById(workerDTO.locationId()).isPresent()) {
             worker.setLocation(locationRepo.getReferenceById(workerDTO.locationId()));
         }
-        if (workerDTO.roleId() != null && workerRoleClassificatorRepo.findById(workerDTO.roleId()).isPresent()) {
-            worker.setRole(workerRoleClassificatorRepo.getReferenceById(workerDTO.roleId()));
+
+        if(workerDTO.roleIds() != null) {
+            Set<ClientWorkerRoleClassificator> roles = new HashSet<>();
+            for (Integer roleId : workerDTO.roleIds()) {
+                ClientWorkerRoleClassificator role = workerRoleClassificatorRepo.findById(roleId)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid client worker role ID " + roleId));
+                roles.add(role);
+            }
+            worker.setRoles(roles);
         }
+
         clientWorkerRepo.save(worker);
         return new ResponseDTO("Client Worker added successfully");
     }
@@ -117,7 +127,7 @@ public class ClientWorkerService {
 
         ClientWorker worker = workerOpt.get();
         ClientWorkerRoleClassificator role = roleOpt.get();
-        worker.setRole(role);
+        worker.getRoles().add(role);
         clientWorkerRepo.save(worker);
         return new ResponseDTO("Client worker role added successfully to worker");
     }
@@ -132,14 +142,21 @@ public class ClientWorkerService {
     }
 
     public LocationDTO getWorkerLocation(Integer workerId) {
-        ClientWorker worker = clientWorkerRepo.getReferenceById(workerId);
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        if (workerOpt.isEmpty()) {
+            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        }
+        ClientWorker worker = workerOpt.get();
         Location location = worker.getLocation();
         return locationMapper.toDto(location);
     }
 
-    public ClientWorkerRoleClassificatorDTO getWorkerRole(Integer workerId) {
-        ClientWorker worker = clientWorkerRepo.getReferenceById(workerId);
-        ClientWorkerRoleClassificator role = worker.getRole();
-        return workerRoleClassificatorMapper.toDto(role);
+    public List<ClientWorkerRoleClassificatorDTO> getWorkerRole(Integer workerId) {
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        if (workerOpt.isEmpty()) {
+            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        }
+        ClientWorker worker = workerOpt.get();
+        return workerRoleClassificatorMapper.toDtoList(worker.getRoles().stream().toList());
     }
 }
