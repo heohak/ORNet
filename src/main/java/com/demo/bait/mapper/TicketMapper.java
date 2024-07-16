@@ -16,14 +16,16 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface TicketMapper {
 
-    @Mapping(source = "client.id", target = "clientId")
-    @Mapping(source = "ticket.id", target = "mainTicketId")
-    @Mapping(source = "location.id", target = "locationId")
-    @Mapping(source = "status.id", target = "statusId")
-    @Mapping(source = "baitWorker.id", target = "baitWorkerId")
-    @Mapping(target = "contactIds", expression = "java(mapContactsToIds(ticket.getContacts()))")
+//    @Mapping(source = "client.shortName", target = "clientName")
+//    @Mapping(source = "client.id", target = "clientId")
+//    @Mapping(source = "ticket.id", target = "mainTicketId")
+//    @Mapping(source = "location.id", target = "locationId")
+//    @Mapping(source = "status.id", target = "statusId")
+//    @Mapping(source = "baitWorker.id", target = "baitWorkerId")
+//    @Mapping(target = "contactIds", expression = "java(mapContactsToIds(ticket.getContacts()))")
     List<TicketDTO> toDtoList(List<Ticket> tickets);
 
+    @Mapping(source = "client.fullName", target = "clientName")
     @Mapping(source = "client.id", target = "clientId")
     @Mapping(source = "ticket.id", target = "mainTicketId")
     @Mapping(source = "location.id", target = "locationId")
