@@ -230,4 +230,21 @@ public class TicketService {
         ticketRepo.save(ticket);
         return new ResponseDTO("Contact added to ticket successfully");
     }
+
+    @Transactional
+    public ResponseDTO updateTicketResponseAndInsideInfo(Integer ticketId, TicketDTO ticketDTO) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+
+        Ticket ticket = ticketOpt.get();
+        ticket.setResponse(ticketDTO.response());
+        ticket.setInsideInfo(ticketDTO.insideInfo());
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Ticket response and inside info updated successfully");
+    }
+
+
 }

@@ -59,4 +59,10 @@ public class TicketController {
     public ResponseDTO addContactToTicket(@PathVariable Integer ticketId, @PathVariable Integer workerId) {
         return ticketService.addContactToTicket(ticketId, workerId);
     }
+
+    @PutMapping("/update/{ticketId}")
+    public ResponseDTO updateTicketResponseAndInsideInfo(@PathVariable Integer ticketId,
+                                                         @RequestBody TicketDTO ticketDTO) {
+        return ticketService.updateTicketResponseAndInsideInfo(ticketId, ticketDTO);
+    }
 }
