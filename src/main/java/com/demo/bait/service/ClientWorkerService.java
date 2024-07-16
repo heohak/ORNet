@@ -3,14 +3,18 @@ package com.demo.bait.service;
 import com.demo.bait.dto.ClientWorkerDTO;
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.ResponseDTO;
+import com.demo.bait.dto.classificator.ClientWorkerRoleClassificatorDTO;
 import com.demo.bait.entity.Client;
 import com.demo.bait.entity.ClientWorker;
 import com.demo.bait.entity.Location;
+import com.demo.bait.entity.classificator.ClientWorkerRoleClassificator;
 import com.demo.bait.mapper.ClientWorkerMapper;
 import com.demo.bait.mapper.LocationMapper;
+import com.demo.bait.mapper.classificator.ClientWorkerRoleClassificatorMapper;
 import com.demo.bait.repository.ClientRepo;
 import com.demo.bait.repository.ClientWorkerRepo;
 import com.demo.bait.repository.LocationRepo;
+import com.demo.bait.repository.classificator.ClientWorkerRoleClassificatorRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +34,8 @@ public class ClientWorkerService {
     private ClientRepo clientRepo;
     private LocationRepo locationRepo;
     private LocationMapper locationMapper;
+    private ClientWorkerRoleClassificatorRepo workerRoleClassificatorRepo;
+    private ClientWorkerRoleClassificatorMapper workerRoleClassificatorMapper;
 
 
     public ResponseDTO addWorker(ClientWorkerDTO workerDTO) {
@@ -44,6 +50,9 @@ public class ClientWorkerService {
         }
         if (workerDTO.locationId() != null && locationRepo.findById(workerDTO.locationId()).isPresent()) {
             worker.setLocation(locationRepo.getReferenceById(workerDTO.locationId()));
+        }
+        if (workerDTO.roleId() != null && workerRoleClassificatorRepo.findById(workerDTO.roleId()).isPresent()) {
+            worker.setRole(workerRoleClassificatorRepo.getReferenceById(workerDTO.roleId()));
         }
         clientWorkerRepo.save(worker);
         return new ResponseDTO("Client Worker added successfully");
@@ -94,6 +103,25 @@ public class ClientWorkerService {
         return new ResponseDTO("Location to worker added successfully");
     }
 
+    @Transactional
+    public ResponseDTO addRoleToEmployee(Integer workerId, Integer roleId) {
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        Optional<ClientWorkerRoleClassificator> roleOpt = workerRoleClassificatorRepo.findById(roleId);
+
+        if (workerOpt.isEmpty()) {
+            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        }
+        if (roleOpt.isEmpty()) {
+            throw new EntityNotFoundException("Client worker role classificator with id " + roleId + " not found");
+        }
+
+        ClientWorker worker = workerOpt.get();
+        ClientWorkerRoleClassificator role = roleOpt.get();
+        worker.setRole(role);
+        clientWorkerRepo.save(worker);
+        return new ResponseDTO("Client worker role added successfully to worker");
+    }
+
     public List<ClientWorkerDTO> getWorkersByClientId(Integer clientId) {
         return clientWorkerMapper.toDtoList(clientWorkerRepo.findByClientId(clientId));
     }
@@ -107,5 +135,11 @@ public class ClientWorkerService {
         ClientWorker worker = clientWorkerRepo.getReferenceById(workerId);
         Location location = worker.getLocation();
         return locationMapper.toDto(location);
+    }
+
+    public ClientWorkerRoleClassificatorDTO getWorkerRole(Integer workerId) {
+        ClientWorker worker = clientWorkerRepo.getReferenceById(workerId);
+        ClientWorkerRoleClassificator role = worker.getRole();
+        return workerRoleClassificatorMapper.toDto(role);
     }
 }

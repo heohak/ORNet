@@ -1,5 +1,6 @@
 package com.demo.bait.entity;
 
+import com.demo.bait.entity.classificator.ClientWorkerRoleClassificator;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,4 +28,8 @@ public class ClientWorker {
     @ManyToOne
     @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    private ClientWorkerRoleClassificator role;
 }

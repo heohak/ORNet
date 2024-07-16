@@ -19,5 +19,6 @@ public interface ClientWorkerMapper {
 
     @Mapping(source = "client.id", target = "clientId")
     @Mapping(source = "location.id", target = "locationId")
+    @Mapping(source = "role.id", target = "roleId")
     ClientWorkerDTO toDto(ClientWorker clientWorker);
 }
