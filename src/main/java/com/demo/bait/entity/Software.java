@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @Entity
@@ -59,4 +61,50 @@ public class Software {
             @AttributeOverride(name = "updateDate", column = @Column(name = "lis_update_date"))
     })
     private LIS lis;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "toReturn", column = @Column(name = "return_images")),
+            @AttributeOverride(name = "link", column = @Column(name = "images_link")),
+            @AttributeOverride(name = "updateDate", column = @Column(name = "images_update_date"))
+    })
+    private ReturnImagesToLIS returnImagesToLIS;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "version", column = @Column(name = "ORNetAPI_version")),
+            @AttributeOverride(name = "updateDate", column = @Column(name = "ORNetAPI_update_date"))
+    })
+    private ORNetAPI orNetAPI;
+
+    private LocalDate txtIntegrationDate;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "vendorName", column = @Column(name = "customerAPI_vendor_name")),
+            @AttributeOverride(name = "version", column = @Column(name = "customerAPI_version")),
+            @AttributeOverride(name = "updateDate", column = @Column(name = "customerAPI_update_date"))
+    })
+    private CustomerAPI customerAPI;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "version", column = @Column(name = "ORNetAPIClient_version")),
+            @AttributeOverride(name = "updateDate", column = @Column(name = "ORNetAPIClient_update_date"))
+    })
+    private ORNetAPIClient orNetAPIClient;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "version", column = @Column(name = "consultationModule_version")),
+            @AttributeOverride(name = "updateDate", column = @Column(name = "consultationModule_update_date"))
+    })
+    private ConsultationModule consultationModule;
+
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "version", column = @Column(name = "AIModule_version")),
+            @AttributeOverride(name = "updateDate", column = @Column(name = "AIModule_update_date"))
+    })
+    private AIModule aiModule;
 }
