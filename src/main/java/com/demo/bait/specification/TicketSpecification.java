@@ -16,6 +16,9 @@ public class TicketSpecification implements Specification<Ticket> {
 
     @Override
     public Predicate toPredicate(Root<Ticket> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+        if (searchTerm == null || searchTerm.trim().isEmpty()) {
+            return criteriaBuilder.conjunction();
+        }
         String likePattern = "%" + searchTerm.toLowerCase() + "%";
         Predicate titlePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), likePattern);
         Predicate descriptionPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), likePattern);
