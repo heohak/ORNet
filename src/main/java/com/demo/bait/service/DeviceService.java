@@ -100,7 +100,7 @@ public class DeviceService {
         }
 
         deviceRepo.save(device);
-        return new ResponseDTO("Device added successfully");
+        return new ResponseDTO(device.getId().toString());
     }
 
     public List<DeviceDTO> getDevicesByClientId(Integer clientId) {
