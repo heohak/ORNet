@@ -7,10 +7,12 @@ import com.demo.bait.entity.classificator.TicketStatusClassificator;
 import com.demo.bait.mapper.TicketMapper;
 import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.TicketStatusClassificatorRepo;
+import com.demo.bait.specification.TicketSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -250,5 +252,8 @@ public class TicketService {
         return new ResponseDTO("Ticket response and inside info updated successfully");
     }
 
-
+    public List<TicketDTO> searchTickets(String searchTerm) {
+        Specification<Ticket> spec = new TicketSpecification(searchTerm);
+        return ticketMapper.toDtoList(ticketRepo.findAll(spec));
+    }
 }

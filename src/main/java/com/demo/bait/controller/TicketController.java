@@ -70,4 +70,9 @@ public class TicketController {
     public List<TicketDTO> getTicketsByStatusId(@PathVariable Integer statusId) {
         return ticketService.getTicketsByStatusId(statusId);
     }
+
+    @GetMapping("/search")
+    public List<TicketDTO> searchTickets(@RequestParam("q") String query) {
+        return ticketService.searchTickets(query);
+    }
 }
