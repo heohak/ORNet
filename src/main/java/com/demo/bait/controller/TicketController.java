@@ -65,4 +65,9 @@ public class TicketController {
                                                          @RequestBody TicketDTO ticketDTO) {
         return ticketService.updateTicketResponseAndInsideInfo(ticketId, ticketDTO);
     }
+
+    @GetMapping("/status/{statusId}")
+    public List<TicketDTO> getTicketsByStatusId(@PathVariable Integer statusId) {
+        return ticketService.getTicketsByStatusId(statusId);
+    }
 }

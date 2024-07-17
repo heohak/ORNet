@@ -150,6 +150,10 @@ public class TicketService {
                 .orElse(Collections.emptyList());
     }
 
+    public List<TicketDTO> getTicketsByStatusId(Integer statusId) {
+        return ticketMapper.toDtoList(ticketRepo.findByStatusId(statusId));
+    }
+
     public ResponseDTO deleteTicket(Integer ticketId) {
         ticketRepo.deleteById(ticketId);
         return new ResponseDTO("Ticket deleted successfully");

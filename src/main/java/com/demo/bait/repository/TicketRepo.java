@@ -9,4 +9,5 @@ public interface TicketRepo extends JpaRepository<Ticket, Integer> {
 
     List<Ticket> findByClientId(Integer clientId);
     List<Ticket> findByTicketId(Integer mainTicketId);
+    List<Ticket> findByStatusId(Integer statusId);
 }
