@@ -242,4 +242,8 @@ public class DeviceService {
         }
         deviceRepo.saveAll(devices);
     }
+
+    public List<DeviceDTO> getDevicesByClassificatorId(Integer classificatorId) {
+        return deviceMapper.toDtoList(deviceRepo.findByClassificatorId(classificatorId));
+    }
 }

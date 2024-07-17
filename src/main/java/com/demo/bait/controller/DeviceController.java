@@ -96,4 +96,10 @@ public class DeviceController {
     }
 
     // written off date PUT endpoint
+
+
+    @GetMapping("/classificator/{classificatorId}")
+    public List<DeviceDTO> getDevicesByClassificatorId(@PathVariable Integer classificatorId) {
+        return deviceService.getDevicesByClassificatorId(classificatorId);
+    }
 }
