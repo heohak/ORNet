@@ -246,4 +246,19 @@ public class DeviceService {
     public List<DeviceDTO> getDevicesByClassificatorId(Integer classificatorId) {
         return deviceMapper.toDtoList(deviceRepo.findByClassificatorId(classificatorId));
     }
+
+
+    @Transactional
+    public ResponseDTO addWrittenOffDate(Integer deviceId, DeviceDTO deviceDTO) {
+        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+
+        if (deviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        }
+
+        Device device = deviceOpt.get();
+        device.setWrittenOffDate(deviceDTO.writtenOffDate());
+        deviceRepo.save(device);
+        return new ResponseDTO("Written off date added successfully");
+    }
 }

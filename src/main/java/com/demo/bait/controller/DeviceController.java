@@ -96,6 +96,10 @@ public class DeviceController {
     }
 
     // written off date PUT endpoint
+    @PutMapping("/written-off/{deviceId}")
+    public ResponseDTO addWrittenOffDate(@PathVariable Integer deviceId, @RequestBody DeviceDTO deviceDTO) {
+        return deviceService.addWrittenOffDate(deviceId, deviceDTO);
+    }
 
 
     @GetMapping("/classificator/{classificatorId}")
