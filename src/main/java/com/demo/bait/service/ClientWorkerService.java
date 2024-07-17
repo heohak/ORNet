@@ -159,4 +159,8 @@ public class ClientWorkerService {
         ClientWorker worker = workerOpt.get();
         return workerRoleClassificatorMapper.toDtoList(worker.getRoles().stream().toList());
     }
+
+    public List<ClientWorkerDTO> getWorkersByRoleId(Integer roleId) {
+        return clientWorkerMapper.toDtoList(clientWorkerRepo.findByRoleId(roleId));
+    }
 }

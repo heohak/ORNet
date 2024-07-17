@@ -61,4 +61,9 @@ public class ClientWorkerController {
     public List<ClientWorkerRoleClassificatorDTO> getWorkerRole(@PathVariable Integer workerId) {
         return clientWorkerService.getWorkerRole(workerId);
     }
+
+    @GetMapping("/role/id/{roleId}")
+    public List<ClientWorkerDTO> getWorkersByRoleId(@PathVariable Integer roleId) {
+        return clientWorkerService.getWorkersByRoleId(roleId);
+    }
 }
