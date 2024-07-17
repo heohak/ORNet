@@ -1,5 +1,6 @@
 package com.demo.bait.controller;
 
+import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.TicketDTO;
 import com.demo.bait.service.TicketService;
@@ -74,5 +75,15 @@ public class TicketController {
     @GetMapping("/search")
     public List<TicketDTO> searchTickets(@RequestParam("q") String query) {
         return ticketService.searchTickets(query);
+    }
+
+    @PutMapping("/maintenance/{ticketId}/{maintenanceId}")
+    public ResponseDTO addMaintenanceToTicket(@PathVariable Integer ticketId, @PathVariable Integer maintenanceId) {
+        return ticketService.addMaintenanceToTicket(ticketId, maintenanceId);
+    }
+
+    @GetMapping("/maintenance/{ticketId}")
+    public List<MaintenanceDTO> getTicketMaintenances(@PathVariable Integer ticketId) {
+        return ticketService.getTicketMaintenances(ticketId);
     }
 }

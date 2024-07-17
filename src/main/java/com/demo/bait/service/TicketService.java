@@ -1,9 +1,11 @@
 package com.demo.bait.service;
 
+import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.TicketDTO;
 import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.TicketStatusClassificator;
+import com.demo.bait.mapper.MaintenanceMapper;
 import com.demo.bait.mapper.TicketMapper;
 import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.TicketStatusClassificatorRepo;
@@ -30,6 +32,8 @@ public class TicketService {
     private ClientWorkerRepo clientWorkerRepo;
     private TicketStatusClassificatorRepo ticketStatusRepo;
     private BaitWorkerRepo baitWorkerRepo;
+    private MaintenanceRepo maintenanceRepo;
+    private MaintenanceMapper maintenanceMapper;
 
 
     @Transactional
@@ -99,6 +103,16 @@ public class TicketService {
         ticket.setInsideInfo(ticketDTO.insideInfo());
         ticket.setEndDateTime(ticketDTO.endDateTime());
         ticket.setRootCause(ticketDTO.rootCause());
+
+        if (ticketDTO.maintenanceIds() != null) {
+            Set<Maintenance> maintenances = new HashSet<>();
+            for (Integer id : ticketDTO.maintenanceIds()) {
+                Maintenance maintenance = maintenanceRepo.findById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid maintenance ID: " + id));
+                maintenances.add(maintenance);
+            }
+            ticket.setMaintenances(maintenances);
+        }
 
         ticketRepo.save(ticket);
         return new ResponseDTO("Ticket added successfully");
@@ -238,6 +252,25 @@ public class TicketService {
     }
 
     @Transactional
+    public ResponseDTO addMaintenanceToTicket(Integer ticketId, Integer maintenanceId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        if (maintenanceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found");
+        }
+
+        Ticket ticket = ticketOpt.get();
+        Maintenance maintenance = maintenanceOpt.get();
+        ticket.getMaintenances().add(maintenance);
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Maintenance added to ticket successfully");
+    }
+
+    @Transactional
     public ResponseDTO updateTicketResponseAndInsideInfo(Integer ticketId, TicketDTO ticketDTO) {
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
 
@@ -255,5 +288,16 @@ public class TicketService {
     public List<TicketDTO> searchTickets(String searchTerm) {
         Specification<Ticket> spec = new TicketSpecification(searchTerm);
         return ticketMapper.toDtoList(ticketRepo.findAll(spec));
+    }
+
+    public List<MaintenanceDTO> getTicketMaintenances(Integer ticketId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+
+        Ticket ticket = ticketOpt.get();
+        return maintenanceMapper.toDtoList(ticket.getMaintenances().stream().toList());
     }
 }

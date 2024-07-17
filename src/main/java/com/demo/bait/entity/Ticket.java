@@ -59,4 +59,12 @@ public class Ticket {
     private LocalDateTime endDateTime;
     private String rootCause;
 
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "ticket_maintenance",
+            joinColumns = @JoinColumn(name = "ticket_id"),
+            inverseJoinColumns = @JoinColumn(name = "maintenance_id")
+    )
+    private Set<Maintenance> maintenances = new HashSet<>();
+
 }
