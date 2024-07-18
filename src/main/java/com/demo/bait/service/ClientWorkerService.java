@@ -65,7 +65,7 @@ public class ClientWorkerService {
         }
 
         clientWorkerRepo.save(worker);
-        return new ResponseDTO("Client Worker added successfully");
+        return new ResponseDTO(worker.getId().toString());
     }
 
     public List<ClientWorkerDTO> getAllWorkers() {
@@ -158,5 +158,9 @@ public class ClientWorkerService {
         }
         ClientWorker worker = workerOpt.get();
         return workerRoleClassificatorMapper.toDtoList(worker.getRoles().stream().toList());
+    }
+
+    public List<ClientWorkerDTO> getWorkersByRoleId(Integer roleId) {
+        return clientWorkerMapper.toDtoList(clientWorkerRepo.findByRoleId(roleId));
     }
 }

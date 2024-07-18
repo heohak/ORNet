@@ -13,11 +13,13 @@ import com.demo.bait.mapper.ThirdPartyITMapper;
 import com.demo.bait.repository.ClientRepo;
 import com.demo.bait.repository.LocationRepo;
 import com.demo.bait.repository.ThirdPartyITRepo;
+import com.demo.bait.specification.ClientSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -162,5 +164,10 @@ public class ClientService {
             throw new EntityNotFoundException("Client with id " + clientId + " not found");
         }
         return clientMapper.toDto(clientOpt.get());
+    }
+
+    public List<ClientDTO> searchClients(String searchTerm) {
+        Specification<Client> spec = new ClientSpecification(searchTerm);
+        return clientMapper.toDtoList(clientRepo.findAll(spec));
     }
 }

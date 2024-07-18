@@ -50,7 +50,7 @@ public class DeviceController {
     }
 
     @PutMapping("/upload/{deviceId}")
-    public ResponseDTO uploadFile(@PathVariable Integer deviceId, @RequestParam("files") List<MultipartFile> files)
+    public ResponseDTO uploadFiles(@PathVariable Integer deviceId, @RequestParam("files") List<MultipartFile> files)
             throws IOException {
         return deviceService.uploadFilesToDevice(deviceId, files);
     }
@@ -96,4 +96,25 @@ public class DeviceController {
     }
 
     // written off date PUT endpoint
+    @PutMapping("/written-off/{deviceId}")
+    public ResponseDTO addWrittenOffDate(@PathVariable Integer deviceId, @RequestBody DeviceDTO deviceDTO) {
+        return deviceService.addWrittenOffDate(deviceId, deviceDTO);
+    }
+
+
+    @GetMapping("/classificator/{classificatorId}")
+    public List<DeviceDTO> getDevicesByClassificatorId(@PathVariable Integer classificatorId) {
+        return deviceService.getDevicesByClassificatorId(classificatorId);
+    }
+
+    @GetMapping("/search")
+    public List<DeviceDTO> searchDevices(@RequestParam("q") String query) {
+        return deviceService.searchDevices(query);
+    }
+
+    @GetMapping("/search/{classificatorId}")
+    public List<DeviceDTO> searchAndFilterDevices(@RequestParam("q") String query,
+                                                  @PathVariable Integer classificatorId) {
+        return deviceService.searchAndFilterDevices(query, classificatorId);
+    }
 }

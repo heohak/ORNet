@@ -1,11 +1,14 @@
 package com.demo.bait.controller;
 
+import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.TicketDTO;
 import com.demo.bait.service.TicketService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -58,5 +61,67 @@ public class TicketController {
     @PutMapping("/contact/{ticketId}/{workerId}")
     public ResponseDTO addContactToTicket(@PathVariable Integer ticketId, @PathVariable Integer workerId) {
         return ticketService.addContactToTicket(ticketId, workerId);
+    }
+
+    @PutMapping("/update/{ticketId}")
+    public ResponseDTO updateTicketResponseAndInsideInfo(@PathVariable Integer ticketId,
+                                                         @RequestBody TicketDTO ticketDTO) {
+        return ticketService.updateTicketResponseAndInsideInfo(ticketId, ticketDTO);
+    }
+
+    @GetMapping("/status/{statusId}")
+    public List<TicketDTO> getTicketsByStatusId(@PathVariable Integer statusId) {
+        return ticketService.getTicketsByStatusId(statusId);
+    }
+
+    @GetMapping("/search/{statusId}")
+    public List<TicketDTO> searchAndFilterTickets(@RequestParam("q") String query, @PathVariable Integer statusId) {
+        return ticketService.searchAndFilterTickets(query, statusId);
+    }
+
+    @GetMapping("/search")
+    public List<TicketDTO> searchTickets(@RequestParam("q") String query) {
+        return ticketService.searchTickets(query);
+    }
+
+    @PutMapping("/maintenance/{ticketId}/{maintenanceId}")
+    public ResponseDTO addMaintenanceToTicket(@PathVariable Integer ticketId, @PathVariable Integer maintenanceId) {
+        return ticketService.addMaintenanceToTicket(ticketId, maintenanceId);
+    }
+
+    @GetMapping("/maintenance/{ticketId}")
+    public List<MaintenanceDTO> getTicketMaintenances(@PathVariable Integer ticketId) {
+        return ticketService.getTicketMaintenances(ticketId);
+    }
+
+    @PutMapping("/cause/{ticketId}")
+    public ResponseDTO addRootCauseToTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
+        return ticketService.addRootCauseToTicket(ticketId, ticketDTO);
+    }
+
+    @PutMapping("/end/date/{ticketId}")
+    public ResponseDTO addEndDateTimeToTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
+        return ticketService.addEndDateToTicket(ticketId, ticketDTO);
+    }
+
+    @PutMapping("/response/date/{ticketId}")
+    public ResponseDTO addResponseDateTimeToTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
+        return ticketService.addResponseDateToTicket(ticketId, ticketDTO);
+    }
+
+    @PutMapping("/crisis/{ticketId}")
+    public ResponseDTO updateCrisisInTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
+        return ticketService.updateCrisisInTicket(ticketId, ticketDTO);
+    }
+
+    @PutMapping("/remote/{ticketId}")
+    public ResponseDTO updateRemoteInTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
+        return ticketService.updateRemoteInTicket(ticketId, ticketDTO);
+    }
+
+    @PutMapping("/upload/{ticketId}")
+    public ResponseDTO uploadFiles(@PathVariable Integer ticketId, @RequestParam("files") List<MultipartFile> files)
+            throws IOException {
+        return ticketService.uploadFilesToTicket(ticketId, files);
     }
 }
