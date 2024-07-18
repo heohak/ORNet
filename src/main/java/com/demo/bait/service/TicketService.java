@@ -181,7 +181,9 @@ public class TicketService {
     }
 
     public List<TicketDTO> getTicketsByStatusId(Integer statusId) {
-        return ticketMapper.toDtoList(ticketRepo.findByStatusId(statusId));
+//        return ticketMapper.toDtoList(ticketRepo.findByStatusId(statusId));
+        Specification<Ticket> spec = TicketSpecification.hasStatusId(statusId);
+        return ticketMapper.toDtoList(ticketRepo.findAll(spec));
     }
 
     public ResponseDTO deleteTicket(Integer ticketId) {

@@ -248,7 +248,9 @@ public class DeviceService {
     }
 
     public List<DeviceDTO> getDevicesByClassificatorId(Integer classificatorId) {
-        return deviceMapper.toDtoList(deviceRepo.findByClassificatorId(classificatorId));
+//        return deviceMapper.toDtoList(deviceRepo.findByClassificatorId(classificatorId));
+        Specification<Device> spec = DeviceSpecification.hasClassificatorId(classificatorId);
+        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
     }
 
     public List<DeviceDTO> searchDevices(String searchTerm) {
