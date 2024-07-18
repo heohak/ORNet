@@ -1,10 +1,8 @@
 package com.demo.bait.specification;
 
 import com.demo.bait.entity.Ticket;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import com.demo.bait.entity.classificator.TicketStatusClassificator;
+import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -14,6 +12,12 @@ public class TicketSpecification implements Specification<Ticket> {
 
     private String searchTerm;
 
+    public static Specification<Ticket> hasStatusId(Integer statusId) {
+        return (root, query, criteriaBuilder) -> {
+            Join<Ticket, TicketStatusClassificator> statusJoin = root.join("status");
+            return criteriaBuilder.equal(statusJoin.get("id"), statusId);
+        };
+    }
     @Override
     public Predicate toPredicate(Root<Ticket> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {

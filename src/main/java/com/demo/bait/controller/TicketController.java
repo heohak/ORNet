@@ -74,6 +74,11 @@ public class TicketController {
         return ticketService.getTicketsByStatusId(statusId);
     }
 
+    @GetMapping("/search/{statusId}")
+    public List<TicketDTO> searchAndFilterTickets(@RequestParam("q") String query, @PathVariable Integer statusId) {
+        return ticketService.searchAndFilterTickets(query, statusId);
+    }
+
     @GetMapping("/search")
     public List<TicketDTO> searchTickets(@RequestParam("q") String query) {
         return ticketService.searchTickets(query);

@@ -383,6 +383,13 @@ public class TicketService {
         return new ResponseDTO("Remote updated successfully");
     }
 
+    public List<TicketDTO> searchAndFilterTickets(String searchTerm, Integer statusId) {
+        Specification<Ticket> searchSpec = new TicketSpecification(searchTerm);
+        Specification<Ticket> statusSpec = TicketSpecification.hasStatusId(statusId);
+        Specification<Ticket> combinedSpec = Specification.where(searchSpec).and(statusSpec);
+        return ticketMapper.toDtoList(ticketRepo.findAll(combinedSpec));
+    }
+
     public List<TicketDTO> searchTickets(String searchTerm) {
         Specification<Ticket> spec = new TicketSpecification(searchTerm);
         return ticketMapper.toDtoList(ticketRepo.findAll(spec));
