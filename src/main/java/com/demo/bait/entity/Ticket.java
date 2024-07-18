@@ -67,4 +67,11 @@ public class Ticket {
     )
     private Set<Maintenance> maintenances = new HashSet<>();
 
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "ticket_file_upload",
+            joinColumns = @JoinColumn(name = "ticket_id"),
+            inverseJoinColumns = @JoinColumn(name = "file_upload_id")
+    )
+    private Set<FileUpload> files = new HashSet<>();
 }

@@ -50,7 +50,7 @@ public class DeviceController {
     }
 
     @PutMapping("/upload/{deviceId}")
-    public ResponseDTO uploadFile(@PathVariable Integer deviceId, @RequestParam("files") List<MultipartFile> files)
+    public ResponseDTO uploadFiles(@PathVariable Integer deviceId, @RequestParam("files") List<MultipartFile> files)
             throws IOException {
         return deviceService.uploadFilesToDevice(deviceId, files);
     }

@@ -16,7 +16,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,6 +36,8 @@ public class TicketService {
     private BaitWorkerRepo baitWorkerRepo;
     private MaintenanceRepo maintenanceRepo;
     private MaintenanceMapper maintenanceMapper;
+    private FileUploadRepo fileUploadRepo;
+    private FileUploadService fileUploadService;
 
 
     @Transactional
@@ -114,6 +118,16 @@ public class TicketService {
             ticket.setMaintenances(maintenances);
         }
 
+        if (ticketDTO.fileIds() != null) {
+            Set<FileUpload> files = new HashSet<>();
+            for (Integer fileId : ticketDTO.fileIds()) {
+                FileUpload file = fileUploadRepo.findById(fileId)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid file ID: " + fileId));
+                files.add(file);
+            }
+            ticket.setFiles(files);
+        }
+
         ticketRepo.save(ticket);
         return new ResponseDTO("Ticket added successfully");
     }
@@ -173,6 +187,20 @@ public class TicketService {
     public ResponseDTO deleteTicket(Integer ticketId) {
         ticketRepo.deleteById(ticketId);
         return new ResponseDTO("Ticket deleted successfully");
+    }
+
+    @Transactional
+    public ResponseDTO uploadFilesToTicket(Integer ticketId, List<MultipartFile> files) throws IOException {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        Set<FileUpload> uploadedFiles = fileUploadService.uploadFiles(files);
+        ticket.getFiles().addAll(uploadedFiles);
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Files uploaded successfully to ticket");
     }
 
     @Transactional
