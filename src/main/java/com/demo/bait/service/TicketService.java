@@ -285,6 +285,20 @@ public class TicketService {
         return new ResponseDTO("Ticket response and inside info updated successfully");
     }
 
+    @Transactional
+    public ResponseDTO addRootCauseToTicket(Integer ticketId, TicketDTO ticketDTO) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+
+        Ticket ticket = ticketOpt.get();
+        ticket.setRootCause(ticketDTO.rootCause());
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Root Cause added to ticket");
+    }
+
     public List<TicketDTO> searchTickets(String searchTerm) {
         Specification<Ticket> spec = new TicketSpecification(searchTerm);
         return ticketMapper.toDtoList(ticketRepo.findAll(spec));

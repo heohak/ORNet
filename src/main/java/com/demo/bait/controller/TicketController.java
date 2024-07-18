@@ -86,4 +86,9 @@ public class TicketController {
     public List<MaintenanceDTO> getTicketMaintenances(@PathVariable Integer ticketId) {
         return ticketService.getTicketMaintenances(ticketId);
     }
+
+    @PutMapping("/cause/{ticketId}")
+    public ResponseDTO addRootCauseToTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
+        return ticketService.addRootCauseToTicket(ticketId, ticketDTO);
+    }
 }
