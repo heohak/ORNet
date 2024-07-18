@@ -101,4 +101,14 @@ public class TicketController {
     public ResponseDTO addResponseDateTimeToTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
         return ticketService.addResponseDateToTicket(ticketId, ticketDTO);
     }
+
+    @PutMapping("/crisis/{ticketId}")
+    public ResponseDTO updateCrisisInTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
+        return ticketService.updateCrisisInTicket(ticketId, ticketDTO);
+    }
+
+    @PutMapping("/remote/{ticketId}")
+    public ResponseDTO updateRemoteInTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
+        return ticketService.updateRemoteInTicket(ticketId, ticketDTO);
+    }
 }

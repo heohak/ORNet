@@ -327,6 +327,34 @@ public class TicketService {
         return new ResponseDTO("Response Date added to ticket");
     }
 
+    @Transactional
+    public ResponseDTO updateCrisisInTicket(Integer ticketId, TicketDTO ticketDTO) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+
+        Ticket ticket = ticketOpt.get();
+        ticket.setCrisis(ticketDTO.crisis());
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Crisis updated successfully");
+    }
+
+    @Transactional
+    public ResponseDTO updateRemoteInTicket(Integer ticketId, TicketDTO ticketDTO) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+
+        Ticket ticket = ticketOpt.get();
+        ticket.setRemote(ticketDTO.remote());
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Remote updated successfully");
+    }
+
     public List<TicketDTO> searchTickets(String searchTerm) {
         Specification<Ticket> spec = new TicketSpecification(searchTerm);
         return ticketMapper.toDtoList(ticketRepo.findAll(spec));
