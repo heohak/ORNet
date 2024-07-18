@@ -299,6 +299,34 @@ public class TicketService {
         return new ResponseDTO("Root Cause added to ticket");
     }
 
+    @Transactional
+    public ResponseDTO addEndDateToTicket(Integer ticketId, TicketDTO ticketDTO) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+
+        Ticket ticket = ticketOpt.get();
+        ticket.setEndDateTime(ticketDTO.endDateTime());
+        ticketRepo.save(ticket);
+        return new ResponseDTO("End Date added to ticket");
+    }
+
+    @Transactional
+    public ResponseDTO addResponseDateToTicket(Integer ticketId, TicketDTO ticketDTO) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+
+        Ticket ticket = ticketOpt.get();
+        ticket.setResponseDateTime(ticketDTO.responseDateTime());
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Response Date added to ticket");
+    }
+
     public List<TicketDTO> searchTickets(String searchTerm) {
         Specification<Ticket> spec = new TicketSpecification(searchTerm);
         return ticketMapper.toDtoList(ticketRepo.findAll(spec));

@@ -91,4 +91,14 @@ public class TicketController {
     public ResponseDTO addRootCauseToTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
         return ticketService.addRootCauseToTicket(ticketId, ticketDTO);
     }
+
+    @PutMapping("/end/date/{ticketId}")
+    public ResponseDTO addEndDateTimeToTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
+        return ticketService.addEndDateToTicket(ticketId, ticketDTO);
+    }
+
+    @PutMapping("/response/date/{ticketId}")
+    public ResponseDTO addResponseDateTimeToTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
+        return ticketService.addResponseDateToTicket(ticketId, ticketDTO);
+    }
 }
