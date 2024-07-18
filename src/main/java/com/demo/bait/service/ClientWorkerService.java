@@ -65,7 +65,7 @@ public class ClientWorkerService {
         }
 
         clientWorkerRepo.save(worker);
-        return new ResponseDTO("Client Worker added successfully");
+        return new ResponseDTO(worker.getId().toString());
     }
 
     public List<ClientWorkerDTO> getAllWorkers() {
