@@ -106,4 +106,15 @@ public class DeviceController {
     public List<DeviceDTO> getDevicesByClassificatorId(@PathVariable Integer classificatorId) {
         return deviceService.getDevicesByClassificatorId(classificatorId);
     }
+
+    @GetMapping("/search")
+    public List<DeviceDTO> searchDevices(@RequestParam("q") String query) {
+        return deviceService.searchDevices(query);
+    }
+
+    @GetMapping("/search/{classificatorId}")
+    public List<DeviceDTO> searchAndFilterDevices(@RequestParam("q") String query,
+                                                  @PathVariable Integer classificatorId) {
+        return deviceService.searchAndFilterDevices(query, classificatorId);
+    }
 }

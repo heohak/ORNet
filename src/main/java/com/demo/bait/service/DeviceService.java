@@ -9,10 +9,14 @@ import com.demo.bait.mapper.DeviceMapper;
 import com.demo.bait.mapper.MaintenanceMapper;
 import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.DeviceClassificatorRepo;
+import com.demo.bait.specification.DeviceSpecification;
+import com.demo.bait.specification.TicketSpecification;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -245,6 +249,18 @@ public class DeviceService {
 
     public List<DeviceDTO> getDevicesByClassificatorId(Integer classificatorId) {
         return deviceMapper.toDtoList(deviceRepo.findByClassificatorId(classificatorId));
+    }
+
+    public List<DeviceDTO> searchDevices(String searchTerm) {
+        Specification<Device> spec = new DeviceSpecification(searchTerm);
+        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
+    }
+
+    public List<DeviceDTO> searchAndFilterDevices(String searchTerm, Integer deviceId) {
+        Specification<Device> searchSpec = new DeviceSpecification(searchTerm);
+        Specification<Device> statusSpec = DeviceSpecification.hasClassificatorId(deviceId);
+        Specification<Device> combinedSpec = Specification.where(searchSpec).and(statusSpec);
+        return deviceMapper.toDtoList(deviceRepo.findAll(combinedSpec));
     }
 
 
