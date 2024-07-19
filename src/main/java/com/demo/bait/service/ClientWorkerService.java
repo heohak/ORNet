@@ -6,6 +6,7 @@ import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.ClientWorkerRoleClassificatorDTO;
 import com.demo.bait.entity.Client;
 import com.demo.bait.entity.ClientWorker;
+import com.demo.bait.entity.Device;
 import com.demo.bait.entity.Location;
 import com.demo.bait.entity.classificator.ClientWorkerRoleClassificator;
 import com.demo.bait.mapper.ClientWorkerMapper;
@@ -15,9 +16,13 @@ import com.demo.bait.repository.ClientRepo;
 import com.demo.bait.repository.ClientWorkerRepo;
 import com.demo.bait.repository.LocationRepo;
 import com.demo.bait.repository.classificator.ClientWorkerRoleClassificatorRepo;
+import com.demo.bait.specification.ClientSpecification;
+import com.demo.bait.specification.ClientWorkerSpecification;
+import com.demo.bait.specification.DeviceSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -161,6 +166,14 @@ public class ClientWorkerService {
     }
 
     public List<ClientWorkerDTO> getWorkersByRoleId(Integer roleId) {
-        return clientWorkerMapper.toDtoList(clientWorkerRepo.findByRoleId(roleId));
+//        return clientWorkerMapper.toDtoList(clientWorkerRepo.findByRoleId(roleId));
+        Specification<ClientWorker> spec = ClientWorkerSpecification.hasRoleId(roleId);
+        return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll(spec));
+    }
+
+    public List<ClientWorkerDTO> getWorkersByClientAndRole(Integer clientId, Integer roleId) {
+        Specification<ClientWorker> spec = Specification.where(ClientWorkerSpecification.hasClientId(clientId))
+                .and(ClientWorkerSpecification.hasRoleId(roleId));
+        return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll(spec));
     }
 }

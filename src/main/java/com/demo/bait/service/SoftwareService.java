@@ -101,7 +101,7 @@ public class SoftwareService {
         software.setAiModule(aiModule);
 
         softwareRepo.save(software);
-        return new ResponseDTO("Software added successfully");
+        return new ResponseDTO(software.getId().toString());
     }
 
     public List<SoftwareDTO> getAllSoftwareVariations() {

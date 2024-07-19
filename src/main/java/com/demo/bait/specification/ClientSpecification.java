@@ -14,6 +14,21 @@ public class ClientSpecification implements Specification<Client> {
 
     private String searchTerm;
 
+    public static Specification<Client> hasClientType(String clientType) {
+        return (root, query, criteriaBuilder) -> {
+            switch (clientType) {
+                case "pathology":
+                    return criteriaBuilder.isTrue(root.get("pathologyClient"));
+                case "surgery":
+                    return criteriaBuilder.isTrue(root.get("surgeryClient"));
+                case "editor":
+                    return criteriaBuilder.isTrue(root.get("editorClient"));
+                default:
+                    return criteriaBuilder.conjunction();
+            }
+        };
+    }
+
     @Override
     public Predicate toPredicate(Root<Client> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {

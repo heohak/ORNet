@@ -1,5 +1,6 @@
 package com.demo.bait.specification;
 
+import com.demo.bait.entity.Client;
 import com.demo.bait.entity.Device;
 import com.demo.bait.entity.classificator.DeviceClassificator;
 import jakarta.persistence.criteria.*;
@@ -15,6 +16,13 @@ public class DeviceSpecification implements Specification<Device>{
         return (root, query, criteriaBuilder) -> {
             Join<Device, DeviceClassificator> classificatorJoin = root.join("classificator");
             return criteriaBuilder.equal(classificatorJoin.get("id"), deviceId);
+        };
+    }
+
+    public static Specification<Device> hasClientId(Integer deviceId) {
+        return (root, query, criteriaBuilder) -> {
+            Join<Device, Client> clientJoin = root.join("client");
+            return criteriaBuilder.equal(clientJoin.get("id"), deviceId);
         };
     }
 

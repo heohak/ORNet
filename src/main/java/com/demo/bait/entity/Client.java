@@ -1,5 +1,6 @@
 package com.demo.bait.entity;
 
+import com.sun.tools.javac.Main;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,4 +48,11 @@ public class Client {
     private LocalDate lastMaintenance;
     private LocalDate nextMaintenance;
 
+    @ManyToMany
+    @JoinTable(
+            name = "client_maintenance",
+            joinColumns = @JoinColumn(name = "client_id"),
+            inverseJoinColumns = @JoinColumn(name = "maintenance_id")
+    )
+    private Set<Maintenance> maintenances = new HashSet<>();
 }
