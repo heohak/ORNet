@@ -1,14 +1,12 @@
 package com.demo.bait.controller;
 
-import com.demo.bait.dto.ClientDTO;
-import com.demo.bait.dto.LocationDTO;
-import com.demo.bait.dto.ResponseDTO;
-import com.demo.bait.dto.ThirdPartyITDTO;
+import com.demo.bait.dto.*;
 import com.demo.bait.service.ClientService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Iterator;
 import java.util.List;
 
 @RestController
@@ -51,6 +49,16 @@ public class ClientController {
     @GetMapping("/third-parties/{clientId}")
     public List<ThirdPartyITDTO> getClientThirdPartyITs(@PathVariable Integer clientId) {
         return clientService.getClientThirdPartyITs(clientId);
+    }
+
+    @PutMapping("/maintenance/{clientId}/{maintenanceId}")
+    public ResponseDTO addMaintenanceToClient(@PathVariable Integer clientId, @PathVariable Integer maintenanceId) {
+        return clientService.addMaintenanceToClient(clientId, maintenanceId);
+    }
+
+    @GetMapping("/maintenance/{clientId}")
+    public List<MaintenanceDTO> getClientMaintenances(@PathVariable Integer clientId) {
+        return clientService.getClientMaintenances(clientId);
     }
 
     @GetMapping("/{clientId}")
