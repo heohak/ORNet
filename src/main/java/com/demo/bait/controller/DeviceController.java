@@ -117,4 +117,10 @@ public class DeviceController {
                                                   @PathVariable Integer classificatorId) {
         return deviceService.searchAndFilterDevices(query, classificatorId);
     }
+
+    @GetMapping("/filter/{clientId}/{classificatorId}")
+    public List<DeviceDTO> filterDevicesByClientAndClassificator(@PathVariable Integer clientId,
+                                                                 @PathVariable Integer classificatorId) {
+        return deviceService.getDevicesByClientIdAndClassificatorId(clientId, classificatorId);
+    }
 }

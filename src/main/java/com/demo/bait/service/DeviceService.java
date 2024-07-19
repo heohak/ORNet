@@ -266,6 +266,12 @@ public class DeviceService {
         return deviceMapper.toDtoList(deviceRepo.findAll(combinedSpec));
     }
 
+    public List<DeviceDTO> getDevicesByClientIdAndClassificatorId(Integer clientId, Integer classificatorId) {
+        Specification<Device> spec = Specification.where(DeviceSpecification.hasClientId(clientId))
+                .and(DeviceSpecification.hasClassificatorId(classificatorId));
+        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
+    }
+
 
     @Transactional
     public ResponseDTO addWrittenOffDate(Integer deviceId, DeviceDTO deviceDTO) {
