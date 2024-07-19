@@ -211,4 +211,9 @@ public class ClientService {
         Specification<Client> spec = new ClientSpecification(searchTerm);
         return clientMapper.toDtoList(clientRepo.findAll(spec));
     }
+
+    public List<ClientDTO> findClientsByType(String clientType) {
+        Specification<Client> spec = ClientSpecification.hasClientType(clientType);
+        return clientMapper.toDtoList(clientRepo.findAll(spec));
+    }
 }

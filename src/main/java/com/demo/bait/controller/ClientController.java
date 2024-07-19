@@ -70,4 +70,11 @@ public class ClientController {
     public List<ClientDTO> searchClients(@RequestParam("q") String query) {
         return clientService.searchClients(query);
     }
+
+
+    // clientType = "pathology" or "surgery" or "editor"
+    @GetMapping("/byType")
+    public List<ClientDTO> getClientByType(@RequestParam String clientType) {
+        return clientService.findClientsByType(clientType);
+    }
 }
