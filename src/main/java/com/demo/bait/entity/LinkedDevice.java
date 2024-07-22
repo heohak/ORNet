@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -24,7 +26,14 @@ public class LinkedDevice {
     private String manufacturer;
     private String productCode;
     private Integer serialNumber;
-    private String comment;
+//    private String comment;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "linked_device_comment",
+            joinColumns = @JoinColumn(name = "linked_device_id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id")
+    )
+    private Set<Comment> comments = new HashSet<>();
 
     @Convert(converter = JsonConverter.class)
     private Map<String, Object> attributes;
