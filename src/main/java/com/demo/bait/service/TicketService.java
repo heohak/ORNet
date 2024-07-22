@@ -1,10 +1,12 @@
 package com.demo.bait.service;
 
+import com.demo.bait.dto.CommentDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.TicketDTO;
 import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.TicketStatusClassificator;
+import com.demo.bait.mapper.CommentMapper;
 import com.demo.bait.mapper.MaintenanceMapper;
 import com.demo.bait.mapper.TicketMapper;
 import com.demo.bait.repository.*;
@@ -38,6 +40,9 @@ public class TicketService {
     private MaintenanceMapper maintenanceMapper;
     private FileUploadRepo fileUploadRepo;
     private FileUploadService fileUploadService;
+    private CommentRepo commentRepo;
+    private CommentMapper commentMapper;
+    private CommentService commentService;
 
 
     @Transactional
@@ -107,6 +112,16 @@ public class TicketService {
         ticket.setInsideInfo(ticketDTO.insideInfo());
         ticket.setEndDateTime(ticketDTO.endDateTime());
         ticket.setRootCause(ticketDTO.rootCause());
+
+        if (ticketDTO.commentIds() != null) {
+            Set<Comment> comments = new HashSet<>();
+            for (Integer commentId : ticketDTO.commentIds()) {
+                Comment comment = commentRepo.findById(commentId)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid comment ID: " + commentId));
+                comments.add(comment);
+            }
+            ticket.setComments(comments);
+        }
 
         if (ticketDTO.maintenanceIds() != null) {
             Set<Maintenance> maintenances = new HashSet<>();
@@ -302,6 +317,19 @@ public class TicketService {
     }
 
     @Transactional
+    public ResponseDTO addCommentToTicket(Integer ticketId, String newComment) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        Comment comment = commentService.addComment(newComment);
+        ticket.getComments().add(comment);
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Comment added successfully");
+    }
+
+    @Transactional
     public ResponseDTO updateTicketResponseAndInsideInfo(Integer ticketId, TicketDTO ticketDTO) {
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
 
@@ -407,5 +435,14 @@ public class TicketService {
 
         Ticket ticket = ticketOpt.get();
         return maintenanceMapper.toDtoList(ticket.getMaintenances().stream().toList());
+    }
+
+    public List<CommentDTO> getTicketComments(Integer ticketId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        return commentMapper.toDtoList(ticket.getComments().stream().toList());
     }
 }
