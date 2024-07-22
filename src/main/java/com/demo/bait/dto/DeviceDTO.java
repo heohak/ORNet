@@ -11,6 +11,6 @@ public record DeviceDTO(Integer id, Integer clientId, Integer locationId, String
                         String department, String room, Integer serialNumber, String licenseNumber, String version,
                         LocalDate versionUpdateDate, List<Integer> maintenanceIds, String firstIPAddress,
                         String secondIPAddress, String subnetMask, String softwareKey, LocalDate introducedDate,
-                        LocalDate writtenOffDate, String comment, List<Integer> fileIds,
+                        LocalDate writtenOffDate, List<Integer> commentIds, List<Integer> fileIds,
                         Map<String, Object> attributes) {
 }

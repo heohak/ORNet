@@ -28,6 +28,14 @@ public class CommentService {
         return new ResponseDTO("Comment added successfully");
     }
 
+    public Comment addComment(String newComment) {
+        Comment comment = new Comment();
+        comment.setComment(newComment);
+        comment.setTimestamp(LocalDateTime.now());
+        commentRepo.save(comment);
+        return comment;
+    }
+
     public List<CommentDTO> getAllComments() {
         return commentMapper.toDtoList(commentRepo.findAll());
     }

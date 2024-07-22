@@ -1,5 +1,6 @@
 package com.demo.bait.controller;
 
+import com.demo.bait.dto.CommentDTO;
 import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
@@ -122,5 +123,15 @@ public class DeviceController {
     public List<DeviceDTO> filterDevicesByClientAndClassificator(@PathVariable Integer clientId,
                                                                  @PathVariable Integer classificatorId) {
         return deviceService.getDevicesByClientIdAndClassificatorId(clientId, classificatorId);
+    }
+
+    @PutMapping("/comment/{deviceId}")
+    public ResponseDTO addCommentToDevice(@PathVariable Integer deviceId, @RequestParam("comment") String comment) {
+        return deviceService.addCommentToDevice(deviceId, comment);
+    }
+
+    @GetMapping("/comment/{deviceId}")
+    public List<CommentDTO> getDeviceComments(@PathVariable Integer deviceId) {
+        return deviceService.getDeviceComments(deviceId);
     }
 }
