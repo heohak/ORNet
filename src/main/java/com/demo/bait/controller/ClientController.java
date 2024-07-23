@@ -77,4 +77,9 @@ public class ClientController {
     public List<ClientDTO> getClientByType(@RequestParam String clientType) {
         return clientService.findClientsByType(clientType);
     }
+
+    @GetMapping("/search/byType")
+    public List<ClientDTO> searchAndFilterClients(@RequestParam("q") String query, @RequestParam String clientType) {
+        return clientService.searchAndFilterClients(query, clientType);
+    }
 }
