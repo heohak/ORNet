@@ -1,5 +1,6 @@
 package com.demo.bait.controller;
 
+import com.demo.bait.dto.CommentDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.TicketDTO;
@@ -123,5 +124,15 @@ public class TicketController {
     public ResponseDTO uploadFiles(@PathVariable Integer ticketId, @RequestParam("files") List<MultipartFile> files)
             throws IOException {
         return ticketService.uploadFilesToTicket(ticketId, files);
+    }
+
+    @PutMapping("/comment/{ticketId}")
+    public ResponseDTO addCommentToTicket(@PathVariable Integer ticketId, @RequestParam("comment") String comment) {
+        return ticketService.addCommentToTicket(ticketId, comment);
+    }
+
+    @GetMapping("/comment/{ticketId}")
+    public List<CommentDTO> getTicketComments(@PathVariable Integer ticketId) {
+        return ticketService.getTicketComments(ticketId);
     }
 }

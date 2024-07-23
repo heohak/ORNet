@@ -1,10 +1,12 @@
 package com.demo.bait.service;
 
+import com.demo.bait.dto.CommentDTO;
 import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.DeviceClassificator;
+import com.demo.bait.mapper.CommentMapper;
 import com.demo.bait.mapper.DeviceMapper;
 import com.demo.bait.mapper.MaintenanceMapper;
 import com.demo.bait.repository.*;
@@ -37,6 +39,9 @@ public class DeviceService {
     private FileUploadService fileUploadService;
     private MaintenanceMapper maintenanceMapper;
     private DeviceClassificatorRepo deviceClassificatorRepo;
+    private CommentRepo commentRepo;
+    private CommentMapper commentMapper;
+    private CommentService commentService;
 
 
     @Transactional
@@ -85,7 +90,16 @@ public class DeviceService {
         device.setSoftwareKey(deviceDTO.softwareKey());
         device.setIntroducedDate(deviceDTO.introducedDate());
         device.setWrittenOffDate(deviceDTO.writtenOffDate());
-        device.setComment(deviceDTO.comment());
+//        device.setComment(deviceDTO.comment());
+        if (deviceDTO.commentIds() != null) {
+            Set<Comment> comments = new HashSet<>();
+            for (Integer commentId : deviceDTO.commentIds()) {
+                Comment comment = commentRepo.findById(commentId)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid comment ID: " + commentId));
+                comments.add(comment);
+            }
+            device.setComments(comments);
+        }
 
         if (deviceDTO.fileIds() != null) {
             Set<FileUpload> files = new HashSet<>();
@@ -157,6 +171,19 @@ public class DeviceService {
     }
 
     @Transactional
+    public ResponseDTO addCommentToDevice(Integer deviceId, String newComment) {
+        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+        if (deviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        }
+        Device device = deviceOpt.get();
+        Comment comment = commentService.addComment(newComment);
+        device.getComments().add(comment);
+        deviceRepo.save(device);
+        return new ResponseDTO("Comment added successfully");
+    }
+
+    @Transactional
     public ResponseDTO addLocationToDevice(Integer deviceId, Integer locationId) {
         Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
         Optional<Location> locationOpt = locationRepo.findById(locationId);
@@ -221,6 +248,16 @@ public class DeviceService {
 
         Device device = deviceOpt.get();
         return maintenanceMapper.toDtoList(device.getMaintenances().stream().toList());
+    }
+
+    public List<CommentDTO> getDeviceComments(Integer deviceId) {
+        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+        if (deviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        }
+
+        Device device = deviceOpt.get();
+        return commentMapper.toDtoList(device.getComments().stream().toList());
     }
 
     public DeviceDTO updateDeviceAttributes(Integer deviceId, Map<String, Object> newAttributes) {
