@@ -18,6 +18,16 @@ public class TicketSpecification implements Specification<Ticket> {
             return criteriaBuilder.equal(statusJoin.get("id"), statusId);
         };
     }
+
+    public static Specification<Ticket> isCrisis(Boolean crisis) {
+        return (root, query, criteriaBuilder) -> {
+            if (crisis == null) {
+                return criteriaBuilder.conjunction();
+            }
+            return criteriaBuilder.equal(root.get("crisis"), crisis);
+        };
+    }
+
     @Override
     public Predicate toPredicate(Root<Ticket> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {

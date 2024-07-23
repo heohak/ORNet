@@ -476,16 +476,45 @@ public class TicketService {
         return new ResponseDTO("Whole ticket updated successfully");
     }
 
-    public List<TicketDTO> searchAndFilterTickets(String searchTerm, Integer statusId) {
-        Specification<Ticket> searchSpec = new TicketSpecification(searchTerm);
-        Specification<Ticket> statusSpec = TicketSpecification.hasStatusId(statusId);
-        Specification<Ticket> combinedSpec = Specification.where(searchSpec).and(statusSpec);
-        return ticketMapper.toDtoList(ticketRepo.findAll(combinedSpec));
-    }
+//    public List<TicketDTO> searchAndFilterTickets(String searchTerm, Integer statusId) {
+//        Specification<Ticket> searchSpec = new TicketSpecification(searchTerm);
+//        Specification<Ticket> statusSpec = TicketSpecification.hasStatusId(statusId);
+//        Specification<Ticket> combinedSpec = Specification.where(searchSpec).and(statusSpec);
+//        return ticketMapper.toDtoList(ticketRepo.findAll(combinedSpec));
+//    }
+//
+//    public List<TicketDTO> searchTickets(String searchTerm) {
+//        Specification<Ticket> spec = new TicketSpecification(searchTerm);
+//        return ticketMapper.toDtoList(ticketRepo.findAll(spec));
+//    }
+//
+//    public List<TicketDTO> searchAndFilterCrisisTickets(String searchTerm, Integer statusId, Boolean crisis) {
+//        Specification<Ticket> searchSpec = new TicketSpecification(searchTerm);
+//        Specification<Ticket> statusSpec = TicketSpecification.hasStatusId(statusId);
+//        Specification<Ticket> crisisSpec = TicketSpecification.isCrisis(crisis);
+//        Specification<Ticket> combinedSpec = Specification.where(searchSpec).and(statusSpec).and(crisisSpec);
+//        return ticketMapper.toDtoList(ticketRepo.findAll(combinedSpec));
+//    }
 
-    public List<TicketDTO> searchTickets(String searchTerm) {
-        Specification<Ticket> spec = new TicketSpecification(searchTerm);
-        return ticketMapper.toDtoList(ticketRepo.findAll(spec));
+    public List<TicketDTO> searchAndFilterTickets(String searchTerm, Integer statusId, Boolean crisis) {
+        Specification<Ticket> combinedSpec = Specification.where(null);
+
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            Specification<Ticket> searchSpec = new TicketSpecification(searchTerm);
+            combinedSpec = combinedSpec.and(searchSpec);
+        }
+
+        if (statusId != null) {
+            Specification<Ticket> statusSpec = TicketSpecification.hasStatusId(statusId);
+            combinedSpec = combinedSpec.and(statusSpec);
+        }
+
+        if (crisis != null) {
+            Specification<Ticket> crisisSpec = TicketSpecification.isCrisis(crisis);
+            combinedSpec = combinedSpec.and(crisisSpec);
+        }
+
+        return ticketMapper.toDtoList(ticketRepo.findAll(combinedSpec));
     }
 
     public List<MaintenanceDTO> getTicketMaintenances(Integer ticketId) {

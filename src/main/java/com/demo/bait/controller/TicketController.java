@@ -75,14 +75,28 @@ public class TicketController {
         return ticketService.getTicketsByStatusId(statusId);
     }
 
-    @GetMapping("/search/{statusId}")
-    public List<TicketDTO> searchAndFilterTickets(@RequestParam("q") String query, @PathVariable Integer statusId) {
-        return ticketService.searchAndFilterTickets(query, statusId);
-    }
+//    @GetMapping("/search/{statusId}")
+//    public List<TicketDTO> searchAndFilterTickets(@RequestParam("q") String query, @PathVariable Integer statusId) {
+//        return ticketService.searchAndFilterTickets(query, statusId);
+//    }
+//
+//    @GetMapping("/search")
+//    public List<TicketDTO> searchTickets(@RequestParam("q") String query) {
+//        return ticketService.searchTickets(query);
+//    }
+//
+//    @GetMapping("/search/crisis/{statusId}")
+//    public List<TicketDTO> searchAndFilterCrisisTickets(@RequestParam("q") String query, @PathVariable Integer statusId,
+//                                                        @RequestParam("crisis") Boolean crisis) {
+//        return ticketService.searchAndFilterCrisisTickets(query, statusId, crisis);
+//    }
 
     @GetMapping("/search")
-    public List<TicketDTO> searchTickets(@RequestParam("q") String query) {
-        return ticketService.searchTickets(query);
+    public List<TicketDTO> getTickets(
+            @RequestParam(value = "searchTerm", required = false) String searchTerm,
+            @RequestParam(value = "statusId", required = false) Integer statusId,
+            @RequestParam(value = "crisis", required = false) Boolean crisis) {
+        return ticketService.searchAndFilterTickets(searchTerm, statusId, crisis);
     }
 
     @PutMapping("/maintenance/{ticketId}/{maintenanceId}")
