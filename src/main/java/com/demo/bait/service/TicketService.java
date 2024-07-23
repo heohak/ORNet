@@ -317,6 +317,24 @@ public class TicketService {
     }
 
     @Transactional
+    public ResponseDTO addClientToTicket(Integer ticketId, Integer clientId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        Optional<Client> clientOpt = clientRepo.findById(clientId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        if (clientOpt.isEmpty()) {
+            throw new EntityNotFoundException("Client with id " + clientId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        Client client = clientOpt.get();
+        ticket.setClient(client);
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Client added to ticket");
+    }
+
+    @Transactional
     public ResponseDTO addCommentToTicket(Integer ticketId, String newComment) {
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         if (ticketOpt.isEmpty()) {
@@ -327,6 +345,18 @@ public class TicketService {
         ticket.getComments().add(comment);
         ticketRepo.save(ticket);
         return new ResponseDTO("Comment added successfully");
+    }
+
+    @Transactional
+    public ResponseDTO addWorkTypeToTicket(Integer ticketId, TicketDTO ticketDTO) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        ticket.setWorkType(ticketDTO.workType());
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Work type added to ticket");
     }
 
     @Transactional
@@ -342,6 +372,20 @@ public class TicketService {
         ticket.setInsideInfo(ticketDTO.insideInfo());
         ticketRepo.save(ticket);
         return new ResponseDTO("Ticket response and inside info updated successfully");
+    }
+
+    @Transactional
+    public ResponseDTO updateTicketDescription(Integer ticketId, TicketDTO ticketDTO) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+
+        Ticket ticket = ticketOpt.get();
+        ticket.setDescription(ticketDTO.description());
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Ticket description updated successfully");
     }
 
     @Transactional
@@ -412,6 +456,24 @@ public class TicketService {
         ticket.setRemote(ticketDTO.remote());
         ticketRepo.save(ticket);
         return new ResponseDTO("Remote updated successfully");
+    }
+
+    @Transactional
+    public ResponseDTO updateWholeTicket(Integer ticketId, TicketDTO ticketDTO) {
+        addResponseDateToTicket(ticketId, ticketDTO);
+        // endDateTime??
+        // updateDateTime??
+        updateCrisisInTicket(ticketId, ticketDTO);
+        updateRemoteInTicket(ticketId, ticketDTO);
+        addWorkTypeToTicket(ticketId, ticketDTO);
+        addResponsibleBaitWorkerToTicket(ticketId, ticketDTO.baitWorkerId());
+        addClientToTicket(ticketId, ticketDTO.clientId());
+        addLocationToTicket(ticketId, ticketDTO.locationId());
+        addStatusToTicket(ticketId, ticketDTO.statusId());
+        addRootCauseToTicket(ticketId, ticketDTO);
+        updateTicketDescription(ticketId, ticketDTO);
+        updateTicketResponseAndInsideInfo(ticketId, ticketDTO);
+        return new ResponseDTO("Whole ticket updated successfully");
     }
 
     public List<TicketDTO> searchAndFilterTickets(String searchTerm, Integer statusId) {

@@ -135,4 +135,9 @@ public class TicketController {
     public List<CommentDTO> getTicketComments(@PathVariable Integer ticketId) {
         return ticketService.getTicketComments(ticketId);
     }
+
+    @PutMapping("/update/whole/{ticketId}")
+    public ResponseDTO updateWholeTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
+        return ticketService.updateWholeTicket(ticketId, ticketDTO);
+    }
 }
