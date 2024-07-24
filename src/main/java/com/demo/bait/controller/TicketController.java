@@ -1,6 +1,7 @@
 package com.demo.bait.controller;
 
 import com.demo.bait.dto.*;
+import com.demo.bait.entity.ClientWorker;
 import com.demo.bait.service.TicketService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -155,5 +156,10 @@ public class TicketController {
     @GetMapping("/files/{ticketId}")
     public List<FileUploadDTO> getTicketFiles(@PathVariable Integer ticketId) {
         return ticketService.getTicketFiles(ticketId);
+    }
+
+    @GetMapping("/contacts/{ticketId}")
+    public List<ClientWorkerDTO> getTicketContacts(@PathVariable Integer ticketId) {
+        return ticketService.getTicketContacts(ticketId);
     }
 }

@@ -3,10 +3,7 @@ package com.demo.bait.service;
 import com.demo.bait.dto.*;
 import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.TicketStatusClassificator;
-import com.demo.bait.mapper.CommentMapper;
-import com.demo.bait.mapper.FileUploadMapper;
-import com.demo.bait.mapper.MaintenanceMapper;
-import com.demo.bait.mapper.TicketMapper;
+import com.demo.bait.mapper.*;
 import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.TicketStatusClassificatorRepo;
 import com.demo.bait.specification.TicketSpecification;
@@ -32,6 +29,7 @@ public class TicketService {
     private ClientRepo clientRepo;
     private LocationRepo locationRepo;
     private ClientWorkerRepo clientWorkerRepo;
+    private ClientWorkerMapper clientWorkerMapper;
     private TicketStatusClassificatorRepo ticketStatusRepo;
     private BaitWorkerRepo baitWorkerRepo;
     private MaintenanceRepo maintenanceRepo;
@@ -543,5 +541,14 @@ public class TicketService {
         }
         Ticket ticket = ticketOpt.get();
         return fileUploadMapper.toDtoList(ticket.getFiles().stream().toList());
+    }
+
+    public List<ClientWorkerDTO> getTicketContacts(Integer ticketId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        return clientWorkerMapper.toDtoList(ticket.getContacts().stream().toList());
     }
 }
