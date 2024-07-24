@@ -1,9 +1,13 @@
 package com.demo.bait.entity;
 
+import com.demo.bait.entity.classificator.ClientWorkerRoleClassificator;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -27,4 +31,12 @@ public class ClientWorker {
     @ManyToOne
     @JoinColumn(name = "location_id", referencedColumnName = "id")
     private Location location;
+
+    @ManyToMany
+    @JoinTable(
+            name = "client_worker_role",
+            joinColumns = @JoinColumn(name = "client_worker_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<ClientWorkerRoleClassificator> roles = new HashSet<>();
 }

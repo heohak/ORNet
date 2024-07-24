@@ -3,22 +3,33 @@ package com.demo.bait.service;
 import com.demo.bait.dto.ClientWorkerDTO;
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.ResponseDTO;
+import com.demo.bait.dto.classificator.ClientWorkerRoleClassificatorDTO;
 import com.demo.bait.entity.Client;
 import com.demo.bait.entity.ClientWorker;
+import com.demo.bait.entity.Device;
 import com.demo.bait.entity.Location;
+import com.demo.bait.entity.classificator.ClientWorkerRoleClassificator;
 import com.demo.bait.mapper.ClientWorkerMapper;
 import com.demo.bait.mapper.LocationMapper;
+import com.demo.bait.mapper.classificator.ClientWorkerRoleClassificatorMapper;
 import com.demo.bait.repository.ClientRepo;
 import com.demo.bait.repository.ClientWorkerRepo;
 import com.demo.bait.repository.LocationRepo;
+import com.demo.bait.repository.classificator.ClientWorkerRoleClassificatorRepo;
+import com.demo.bait.specification.ClientSpecification;
+import com.demo.bait.specification.ClientWorkerSpecification;
+import com.demo.bait.specification.DeviceSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -30,6 +41,8 @@ public class ClientWorkerService {
     private ClientRepo clientRepo;
     private LocationRepo locationRepo;
     private LocationMapper locationMapper;
+    private ClientWorkerRoleClassificatorRepo workerRoleClassificatorRepo;
+    private ClientWorkerRoleClassificatorMapper workerRoleClassificatorMapper;
 
 
     public ResponseDTO addWorker(ClientWorkerDTO workerDTO) {
@@ -45,8 +58,19 @@ public class ClientWorkerService {
         if (workerDTO.locationId() != null && locationRepo.findById(workerDTO.locationId()).isPresent()) {
             worker.setLocation(locationRepo.getReferenceById(workerDTO.locationId()));
         }
+
+        if(workerDTO.roleIds() != null) {
+            Set<ClientWorkerRoleClassificator> roles = new HashSet<>();
+            for (Integer roleId : workerDTO.roleIds()) {
+                ClientWorkerRoleClassificator role = workerRoleClassificatorRepo.findById(roleId)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid client worker role ID " + roleId));
+                roles.add(role);
+            }
+            worker.setRoles(roles);
+        }
+
         clientWorkerRepo.save(worker);
-        return new ResponseDTO("Client Worker added successfully");
+        return new ResponseDTO(worker.getId().toString());
     }
 
     public List<ClientWorkerDTO> getAllWorkers() {
@@ -94,6 +118,25 @@ public class ClientWorkerService {
         return new ResponseDTO("Location to worker added successfully");
     }
 
+    @Transactional
+    public ResponseDTO addRoleToEmployee(Integer workerId, Integer roleId) {
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        Optional<ClientWorkerRoleClassificator> roleOpt = workerRoleClassificatorRepo.findById(roleId);
+
+        if (workerOpt.isEmpty()) {
+            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        }
+        if (roleOpt.isEmpty()) {
+            throw new EntityNotFoundException("Client worker role classificator with id " + roleId + " not found");
+        }
+
+        ClientWorker worker = workerOpt.get();
+        ClientWorkerRoleClassificator role = roleOpt.get();
+        worker.getRoles().add(role);
+        clientWorkerRepo.save(worker);
+        return new ResponseDTO("Client worker role added successfully to worker");
+    }
+
     public List<ClientWorkerDTO> getWorkersByClientId(Integer clientId) {
         return clientWorkerMapper.toDtoList(clientWorkerRepo.findByClientId(clientId));
     }
@@ -104,8 +147,33 @@ public class ClientWorkerService {
     }
 
     public LocationDTO getWorkerLocation(Integer workerId) {
-        ClientWorker worker = clientWorkerRepo.getReferenceById(workerId);
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        if (workerOpt.isEmpty()) {
+            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        }
+        ClientWorker worker = workerOpt.get();
         Location location = worker.getLocation();
         return locationMapper.toDto(location);
+    }
+
+    public List<ClientWorkerRoleClassificatorDTO> getWorkerRole(Integer workerId) {
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        if (workerOpt.isEmpty()) {
+            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        }
+        ClientWorker worker = workerOpt.get();
+        return workerRoleClassificatorMapper.toDtoList(worker.getRoles().stream().toList());
+    }
+
+    public List<ClientWorkerDTO> getWorkersByRoleId(Integer roleId) {
+//        return clientWorkerMapper.toDtoList(clientWorkerRepo.findByRoleId(roleId));
+        Specification<ClientWorker> spec = ClientWorkerSpecification.hasRoleId(roleId);
+        return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll(spec));
+    }
+
+    public List<ClientWorkerDTO> getWorkersByClientAndRole(Integer clientId, Integer roleId) {
+        Specification<ClientWorker> spec = Specification.where(ClientWorkerSpecification.hasClientId(clientId))
+                .and(ClientWorkerSpecification.hasRoleId(roleId));
+        return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll(spec));
     }
 }

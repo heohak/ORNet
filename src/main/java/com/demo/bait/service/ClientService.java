@@ -1,23 +1,23 @@
 package com.demo.bait.service;
 
-import com.demo.bait.dto.ClientDTO;
-import com.demo.bait.dto.LocationDTO;
-import com.demo.bait.dto.ResponseDTO;
-import com.demo.bait.dto.ThirdPartyITDTO;
-import com.demo.bait.entity.Client;
-import com.demo.bait.entity.Location;
-import com.demo.bait.entity.ThirdPartyIT;
+import com.demo.bait.dto.*;
+import com.demo.bait.entity.*;
 import com.demo.bait.mapper.ClientMapper;
 import com.demo.bait.mapper.LocationMapper;
+import com.demo.bait.mapper.MaintenanceMapper;
 import com.demo.bait.mapper.ThirdPartyITMapper;
 import com.demo.bait.repository.ClientRepo;
 import com.demo.bait.repository.LocationRepo;
+import com.demo.bait.repository.MaintenanceRepo;
 import com.demo.bait.repository.ThirdPartyITRepo;
+import com.demo.bait.specification.ClientSpecification;
+import com.demo.bait.specification.TicketSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -36,6 +36,8 @@ public class ClientService {
     private LocationMapper locationMapper;
     private ThirdPartyITRepo thirdPartyITRepo;
     private ThirdPartyITMapper thirdPartyITMapper;
+    private MaintenanceRepo maintenanceRepo;
+    private MaintenanceMapper maintenanceMapper;
 
 
     public ResponseDTO addClient(ClientDTO clientDTO) {
@@ -85,8 +87,18 @@ public class ClientService {
         client.setLastMaintenance(clientDTO.lastMaintenance());
         client.setNextMaintenance(clientDTO.nextMaintenance());
 
+        if (clientDTO.maintenanceIds() != null) {
+            Set<Maintenance> maintenances = new HashSet<>();
+            for (Integer maintenanceId : clientDTO.maintenanceIds()) {
+                Maintenance maintenance = maintenanceRepo.findById(maintenanceId)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid maintenance ID: " + maintenanceId));
+                maintenances.add(maintenance);
+            }
+            client.setMaintenances(maintenances);
+        }
+
         clientRepo.save(client);
-        return new ResponseDTO("Client added successfully");
+        return new ResponseDTO(client.getId().toString());
     }
 
     public List<ClientDTO> getAllClients() {
@@ -136,6 +148,25 @@ public class ClientService {
         return new ResponseDTO("Third party added successfully");
     }
 
+    @Transactional
+    public ResponseDTO addMaintenanceToClient(Integer clientId, Integer maintenanceId) {
+        Optional<Client> clientOpt = clientRepo.findById(clientId);
+        Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
+
+        if (clientOpt.isEmpty()) {
+            throw new EntityNotFoundException("Client with id " + clientId + " not found");
+        }
+        if (maintenanceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found");
+        }
+
+        Client client = clientOpt.get();
+        Maintenance maintenance = maintenanceOpt.get();
+        client.getMaintenances().add(maintenance);
+        clientRepo.save(client);
+        return new ResponseDTO("Maintenance added successfully");
+    }
+
     public List<LocationDTO> getClientLocations(Integer clientId) {
         Optional<Client> clientOpt = clientRepo.findById(clientId);
         if (clientOpt.isEmpty()) {
@@ -154,5 +185,56 @@ public class ClientService {
 
         Client client = clientOpt.get();
         return thirdPartyITMapper.toDtoList(client.getThirdPartyITs().stream().toList());
+    }
+
+    public List<MaintenanceDTO> getClientMaintenances(Integer clientId) {
+        Optional<Client> clientOpt = clientRepo.findById(clientId);
+        if (clientOpt.isEmpty()) {
+            throw new EntityNotFoundException("Client with id " + clientId + " not found");
+        }
+
+        Client client = clientOpt.get();
+        return maintenanceMapper.toDtoList(client.getMaintenances().stream().toList());
+    }
+
+    public ClientDTO getClientById(Integer clientId) {
+        Optional<Client> clientOpt = clientRepo.findById(clientId);
+        if (clientOpt.isEmpty()) {
+            throw new EntityNotFoundException("Client with id " + clientId + " not found");
+        }
+        return clientMapper.toDto(clientOpt.get());
+    }
+
+//    public List<ClientDTO> searchClients(String searchTerm) {
+//        Specification<Client> spec = new ClientSpecification(searchTerm);
+//        return clientMapper.toDtoList(clientRepo.findAll(spec));
+//    }
+//
+//    public List<ClientDTO> findClientsByType(String clientType) {
+//        Specification<Client> spec = ClientSpecification.hasClientType(clientType);
+//        return clientMapper.toDtoList(clientRepo.findAll(spec));
+//    }
+//
+//    public List<ClientDTO> searchAndFilterClients(String searchTerm, String clientType) {
+//        Specification<Client> searchSpec = new ClientSpecification(searchTerm);
+//        Specification<Client> statusSpec = ClientSpecification.hasClientType(clientType);
+//        Specification<Client> combinedSpec = Specification.where(searchSpec).and(statusSpec);
+//        return clientMapper.toDtoList(clientRepo.findAll(combinedSpec));
+//    }
+
+    public List<ClientDTO> searchAndFilterClients(String searchTerm, String clientType) {
+        Specification<Client> combinedSpec = Specification.where(null);
+
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            Specification<Client> searchSpec = new ClientSpecification(searchTerm);
+            combinedSpec = combinedSpec.and(searchSpec);
+        }
+
+        if (clientType != null && !clientType.trim().isEmpty()) {
+            Specification<Client> typeSpec = ClientSpecification.hasClientType(clientType);
+            combinedSpec = combinedSpec.and(typeSpec);
+        }
+
+        return clientMapper.toDtoList(clientRepo.findAll(combinedSpec));
     }
 }

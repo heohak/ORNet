@@ -1,14 +1,12 @@
 package com.demo.bait.controller;
 
-import com.demo.bait.dto.ClientDTO;
-import com.demo.bait.dto.LocationDTO;
-import com.demo.bait.dto.ResponseDTO;
-import com.demo.bait.dto.ThirdPartyITDTO;
+import com.demo.bait.dto.*;
 import com.demo.bait.service.ClientService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Iterator;
 import java.util.List;
 
 @RestController
@@ -18,17 +16,17 @@ public class ClientController {
 
     public final ClientService clientService;
 
-    @PostMapping("")
+    @PostMapping("/add")
     public ResponseDTO addClient(@RequestBody ClientDTO clientDTO) {
         return clientService.addClient(clientDTO);
     }
 
-    @GetMapping("")
+    @GetMapping("/all")
     public List<ClientDTO> getAllClients() {
         return clientService.getAllClients();
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseDTO deleteClient(@PathVariable Integer id) {
         return clientService.deleteClient(id);
     }
@@ -51,5 +49,38 @@ public class ClientController {
     @GetMapping("/third-parties/{clientId}")
     public List<ThirdPartyITDTO> getClientThirdPartyITs(@PathVariable Integer clientId) {
         return clientService.getClientThirdPartyITs(clientId);
+    }
+
+    @PutMapping("/maintenance/{clientId}/{maintenanceId}")
+    public ResponseDTO addMaintenanceToClient(@PathVariable Integer clientId, @PathVariable Integer maintenanceId) {
+        return clientService.addMaintenanceToClient(clientId, maintenanceId);
+    }
+
+    @GetMapping("/maintenance/{clientId}")
+    public List<MaintenanceDTO> getClientMaintenances(@PathVariable Integer clientId) {
+        return clientService.getClientMaintenances(clientId);
+    }
+
+    @GetMapping("/{clientId}")
+    public ClientDTO getClientById(@PathVariable Integer clientId) {
+        return clientService.getClientById(clientId);
+    }
+
+//    @GetMapping("/search")
+//    public List<ClientDTO> searchClients(@RequestParam("q") String query) {
+//        return clientService.searchClients(query);
+//    }
+//
+//
+//    // clientType = "pathology" or "surgery" or "editor"
+//    @GetMapping("/byType")
+//    public List<ClientDTO> getClientByType(@RequestParam String clientType) {
+//        return clientService.findClientsByType(clientType);
+//    }
+
+    // clientType = "pathology" or "surgery" or "editor"
+    @GetMapping("/search")
+    public List<ClientDTO> searchAndFilterClients(@RequestParam("q") String query, @RequestParam String clientType) {
+        return clientService.searchAndFilterClients(query, clientType);
     }
 }
