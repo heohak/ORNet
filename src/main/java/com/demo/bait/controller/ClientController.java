@@ -61,10 +61,10 @@ public class ClientController {
         return clientService.getClientMaintenances(clientId);
     }
 
-//    @GetMapping("/{clientId}")
-//    public ClientDTO getClientById(@PathVariable Integer clientId) {
-//        return clientService.getClientById(clientId);
-//    }
+    @GetMapping("/{clientId}")
+    public ClientDTO getClientById(@PathVariable Integer clientId) {
+        return clientService.getClientById(clientId);
+    }
 //
 //    @GetMapping("/search")
 //    public List<ClientDTO> searchClients(@RequestParam("q") String query) {
