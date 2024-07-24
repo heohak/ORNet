@@ -61,24 +61,25 @@ public class ClientController {
         return clientService.getClientMaintenances(clientId);
     }
 
-    @GetMapping("/{clientId}")
-    public ClientDTO getClientById(@PathVariable Integer clientId) {
-        return clientService.getClientById(clientId);
-    }
-
-    @GetMapping("/search")
-    public List<ClientDTO> searchClients(@RequestParam("q") String query) {
-        return clientService.searchClients(query);
-    }
-
+//    @GetMapping("/{clientId}")
+//    public ClientDTO getClientById(@PathVariable Integer clientId) {
+//        return clientService.getClientById(clientId);
+//    }
+//
+//    @GetMapping("/search")
+//    public List<ClientDTO> searchClients(@RequestParam("q") String query) {
+//        return clientService.searchClients(query);
+//    }
+//
+//
+//    // clientType = "pathology" or "surgery" or "editor"
+//    @GetMapping("/byType")
+//    public List<ClientDTO> getClientByType(@RequestParam String clientType) {
+//        return clientService.findClientsByType(clientType);
+//    }
 
     // clientType = "pathology" or "surgery" or "editor"
-    @GetMapping("/byType")
-    public List<ClientDTO> getClientByType(@RequestParam String clientType) {
-        return clientService.findClientsByType(clientType);
-    }
-
-    @GetMapping("/search/byType")
+    @GetMapping("/search")
     public List<ClientDTO> searchAndFilterClients(@RequestParam("q") String query, @RequestParam String clientType) {
         return clientService.searchAndFilterClients(query, clientType);
     }

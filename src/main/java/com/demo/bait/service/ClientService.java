@@ -205,20 +205,36 @@ public class ClientService {
         return clientMapper.toDto(clientOpt.get());
     }
 
-    public List<ClientDTO> searchClients(String searchTerm) {
-        Specification<Client> spec = new ClientSpecification(searchTerm);
-        return clientMapper.toDtoList(clientRepo.findAll(spec));
-    }
-
-    public List<ClientDTO> findClientsByType(String clientType) {
-        Specification<Client> spec = ClientSpecification.hasClientType(clientType);
-        return clientMapper.toDtoList(clientRepo.findAll(spec));
-    }
+//    public List<ClientDTO> searchClients(String searchTerm) {
+//        Specification<Client> spec = new ClientSpecification(searchTerm);
+//        return clientMapper.toDtoList(clientRepo.findAll(spec));
+//    }
+//
+//    public List<ClientDTO> findClientsByType(String clientType) {
+//        Specification<Client> spec = ClientSpecification.hasClientType(clientType);
+//        return clientMapper.toDtoList(clientRepo.findAll(spec));
+//    }
+//
+//    public List<ClientDTO> searchAndFilterClients(String searchTerm, String clientType) {
+//        Specification<Client> searchSpec = new ClientSpecification(searchTerm);
+//        Specification<Client> statusSpec = ClientSpecification.hasClientType(clientType);
+//        Specification<Client> combinedSpec = Specification.where(searchSpec).and(statusSpec);
+//        return clientMapper.toDtoList(clientRepo.findAll(combinedSpec));
+//    }
 
     public List<ClientDTO> searchAndFilterClients(String searchTerm, String clientType) {
-        Specification<Client> searchSpec = new ClientSpecification(searchTerm);
-        Specification<Client> statusSpec = ClientSpecification.hasClientType(clientType);
-        Specification<Client> combinedSpec = Specification.where(searchSpec).and(statusSpec);
+        Specification<Client> combinedSpec = Specification.where(null);
+
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            Specification<Client> searchSpec = new ClientSpecification(searchTerm);
+            combinedSpec = combinedSpec.and(searchSpec);
+        }
+
+        if (clientType != null && !clientType.trim().isEmpty()) {
+            Specification<Client> typeSpec = ClientSpecification.hasClientType(clientType);
+            combinedSpec = combinedSpec.and(typeSpec);
+        }
+
         return clientMapper.toDtoList(clientRepo.findAll(combinedSpec));
     }
 }
