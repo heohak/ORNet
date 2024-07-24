@@ -2,6 +2,7 @@ package com.demo.bait.service;
 
 import com.demo.bait.entity.FileUpload;
 import com.demo.bait.repository.FileUploadRepo;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
@@ -33,6 +34,7 @@ public class FileUploadService {
 
     private static final String UPLOAD_DIR = "uploads/";
 
+    @Transactional
     public Set<FileUpload> uploadFiles(List<MultipartFile> files) throws IOException {
         Set<FileUpload> uploadedFiles = new HashSet<>();
         for (MultipartFile file : files) {
