@@ -1,9 +1,6 @@
 package com.demo.bait.controller;
 
-import com.demo.bait.dto.CommentDTO;
-import com.demo.bait.dto.DeviceDTO;
-import com.demo.bait.dto.MaintenanceDTO;
-import com.demo.bait.dto.ResponseDTO;
+import com.demo.bait.dto.*;
 import com.demo.bait.service.DeviceService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -133,5 +130,10 @@ public class DeviceController {
     @GetMapping("/comment/{deviceId}")
     public List<CommentDTO> getDeviceComments(@PathVariable Integer deviceId) {
         return deviceService.getDeviceComments(deviceId);
+    }
+
+    @GetMapping("/files/{deviceId}")
+    public List<FileUploadDTO> getDeviceFiles(@PathVariable Integer deviceId) {
+        return deviceService.getDeviceFiles(deviceId);
     }
 }

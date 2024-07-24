@@ -1,9 +1,6 @@
 package com.demo.bait.controller;
 
-import com.demo.bait.dto.CommentDTO;
-import com.demo.bait.dto.MaintenanceDTO;
-import com.demo.bait.dto.ResponseDTO;
-import com.demo.bait.dto.TicketDTO;
+import com.demo.bait.dto.*;
 import com.demo.bait.service.TicketService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -153,5 +150,10 @@ public class TicketController {
     @PutMapping("/update/whole/{ticketId}")
     public ResponseDTO updateWholeTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
         return ticketService.updateWholeTicket(ticketId, ticketDTO);
+    }
+
+    @GetMapping("/files/{ticketId}")
+    public List<FileUploadDTO> getTicketFiles(@PathVariable Integer ticketId) {
+        return ticketService.getTicketFiles(ticketId);
     }
 }

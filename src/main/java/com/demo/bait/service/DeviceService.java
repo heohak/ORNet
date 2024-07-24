@@ -1,13 +1,11 @@
 package com.demo.bait.service;
 
-import com.demo.bait.dto.CommentDTO;
-import com.demo.bait.dto.DeviceDTO;
-import com.demo.bait.dto.MaintenanceDTO;
-import com.demo.bait.dto.ResponseDTO;
+import com.demo.bait.dto.*;
 import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.DeviceClassificator;
 import com.demo.bait.mapper.CommentMapper;
 import com.demo.bait.mapper.DeviceMapper;
+import com.demo.bait.mapper.FileUploadMapper;
 import com.demo.bait.mapper.MaintenanceMapper;
 import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.DeviceClassificatorRepo;
@@ -18,12 +16,16 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -37,6 +39,7 @@ public class DeviceService {
     private MaintenanceRepo maintenanceRepo;
     private FileUploadRepo fileUploadRepo;
     private FileUploadService fileUploadService;
+    private FileUploadMapper fileUploadMapper;
     private MaintenanceMapper maintenanceMapper;
     private DeviceClassificatorRepo deviceClassificatorRepo;
     private CommentRepo commentRepo;
@@ -323,5 +326,16 @@ public class DeviceService {
         device.setWrittenOffDate(deviceDTO.writtenOffDate());
         deviceRepo.save(device);
         return new ResponseDTO("Written off date added successfully");
+    }
+
+    public List<FileUploadDTO> getDeviceFiles(Integer deviceId) {
+        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+
+        if (deviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        }
+
+        Device device = deviceOpt.get();
+        return fileUploadMapper.toDtoList(device.getFiles().stream().toList());
     }
 }
