@@ -132,4 +132,8 @@ public class LinkedDeviceService {
         LinkedDevice linkedDevice = linkedDeviceOpt.get();
         return commentMapper.toDtoList(linkedDevice.getComments().stream().toList());
     }
+
+    public List<LinkedDeviceDTO> getNotUsedLinkedDevices() {
+        return linkedDeviceMapper.toDtoList(linkedDeviceRepo.findByDeviceId(null));
+    }
 }
