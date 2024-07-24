@@ -25,6 +25,7 @@ public class FileUpload {
     private String fileType;
 
     @Lob
+    @Basic(fetch = FetchType.LAZY)
     private byte[] thumbnail;
 
 //    @CreationTimestamp
