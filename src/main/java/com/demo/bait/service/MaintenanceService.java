@@ -30,6 +30,7 @@ public class MaintenanceService {
     private FileUploadRepo fileUploadRepo;
     private FileUploadService fileUploadService;
 
+    @Transactional
     public ResponseDTO addMaintenance(MaintenanceDTO maintenanceDTO) {
         Maintenance maintenance = new Maintenance();
         maintenance.setMaintenanceName(maintenanceDTO.maintenanceName());
