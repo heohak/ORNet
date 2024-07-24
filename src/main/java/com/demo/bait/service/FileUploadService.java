@@ -1,13 +1,18 @@
 package com.demo.bait.service;
 
+import com.demo.bait.dto.FileUploadDTO;
 import com.demo.bait.entity.FileUpload;
+import com.demo.bait.mapper.FileUploadMapper;
 import com.demo.bait.repository.FileUploadRepo;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,6 +37,7 @@ import java.util.Set;
 public class FileUploadService {
 
     private FileUploadRepo fileUploadRepo;
+    private FileUploadMapper fileUploadMapper;
 
     private static final String UPLOAD_DIR = "uploads/";
 
@@ -84,5 +91,33 @@ public class FileUploadService {
         headers.set(HttpHeaders.CONTENT_TYPE, "image/jpeg");
 
         return new ResponseEntity<>(thumbnail, headers, HttpStatus.OK);
+    }
+
+    public List<FileUploadDTO> getAllFiles() {
+        return fileUploadMapper.toDtoList(fileUploadRepo.findAll());
+    }
+
+    public ResponseEntity<Resource> downloadFile(Integer fileId) {
+        FileUpload fileUpload = fileUploadRepo.findById(fileId)
+                .orElseThrow(() -> new RuntimeException("File not found"));
+
+        Path path = Paths.get(fileUpload.getFilePath());
+        Resource resource;
+        try {
+            resource = new UrlResource(path.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new RuntimeException("File not found or not readable");
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error loading file", e);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileUpload.getFileName() + "\"");
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentLength(fileUpload.getFileSize())
+                .contentType(MediaType.parseMediaType(fileUpload.getFileType()))
+                .body(resource);
     }
 }

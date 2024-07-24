@@ -1,7 +1,10 @@
 package com.demo.bait.controller;
 
+import com.demo.bait.dto.FileUploadDTO;
+import com.demo.bait.entity.FileUpload;
 import com.demo.bait.service.FileUploadService;
 import lombok.AllArgsConstructor;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,8 +30,18 @@ public class FileUploadController {
         }
     }
 
-    @GetMapping("/{fileId}")
+    @GetMapping("/thumbnail/{fileId}")
     public ResponseEntity<byte[]> getThumbnail(@PathVariable Integer fileId) {
         return fileUploadService.getThumbnail(fileId);
+    }
+
+    @GetMapping("/all")
+    public List<FileUploadDTO> getAllFiles() {
+        return fileUploadService.getAllFiles();
+    }
+
+    @GetMapping("/download/{fileId}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable Integer fileId) {
+        return fileUploadService.downloadFile(fileId);
     }
 }

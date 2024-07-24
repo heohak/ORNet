@@ -65,7 +65,7 @@ public class ClientController {
     public ClientDTO getClientById(@PathVariable Integer clientId) {
         return clientService.getClientById(clientId);
     }
-//
+
 //    @GetMapping("/search")
 //    public List<ClientDTO> searchClients(@RequestParam("q") String query) {
 //        return clientService.searchClients(query);

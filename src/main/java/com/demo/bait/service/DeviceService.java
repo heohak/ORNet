@@ -164,6 +164,7 @@ public class DeviceService {
             throw new EntityNotFoundException("Device with id " + deviceId + " not found");
         }
         Device device = deviceOpt.get();
+
         Set<FileUpload> uploadedFiles = fileUploadService.uploadFiles(files);
         device.getFiles().addAll(uploadedFiles);
         deviceRepo.save(device);
