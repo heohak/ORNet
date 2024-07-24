@@ -288,29 +288,50 @@ public class DeviceService {
         deviceRepo.saveAll(devices);
     }
 
-    public List<DeviceDTO> getDevicesByClassificatorId(Integer classificatorId) {
-//        return deviceMapper.toDtoList(deviceRepo.findByClassificatorId(classificatorId));
+//    public List<DeviceDTO> getDevicesByClassificatorId(Integer classificatorId) {
+////        return deviceMapper.toDtoList(deviceRepo.findByClassificatorId(classificatorId));
+//
+//        Specification<Device> spec = DeviceSpecification.hasClassificatorId(classificatorId);
+//        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
+//    }
+//
+//    public List<DeviceDTO> searchDevices(String searchTerm) {
+//        Specification<Device> spec = new DeviceSpecification(searchTerm);
+//        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
+//    }
+//
+//    public List<DeviceDTO> searchAndFilterDevices(String searchTerm, Integer deviceId) {
+//        Specification<Device> searchSpec = new DeviceSpecification(searchTerm);
+//        Specification<Device> statusSpec = DeviceSpecification.hasClassificatorId(deviceId);
+//        Specification<Device> combinedSpec = Specification.where(searchSpec).and(statusSpec);
+//        return deviceMapper.toDtoList(deviceRepo.findAll(combinedSpec));
+//    }
+//
+//    public List<DeviceDTO> getDevicesByClientIdAndClassificatorId(Integer clientId, Integer classificatorId) {
+//        Specification<Device> spec = Specification.where(DeviceSpecification.hasClientId(clientId))
+//                .and(DeviceSpecification.hasClassificatorId(classificatorId));
+//        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
+//    }
 
-        Specification<Device> spec = DeviceSpecification.hasClassificatorId(classificatorId);
-        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
-    }
+    public List<DeviceDTO> searchAndFilterDevices(String searchTerm, Integer classificatorId, Integer clientId) {
+        Specification<Device> combinedSpec = Specification.where(null);
 
-    public List<DeviceDTO> searchDevices(String searchTerm) {
-        Specification<Device> spec = new DeviceSpecification(searchTerm);
-        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
-    }
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            Specification<Device> searchSpec = new DeviceSpecification(searchTerm);
+            combinedSpec = combinedSpec.and(searchSpec);
+        }
 
-    public List<DeviceDTO> searchAndFilterDevices(String searchTerm, Integer deviceId) {
-        Specification<Device> searchSpec = new DeviceSpecification(searchTerm);
-        Specification<Device> statusSpec = DeviceSpecification.hasClassificatorId(deviceId);
-        Specification<Device> combinedSpec = Specification.where(searchSpec).and(statusSpec);
+        if (classificatorId != null) {
+            Specification<Device> classificatorSpec = DeviceSpecification.hasClassificatorId(classificatorId);
+            combinedSpec = combinedSpec.and(classificatorSpec);
+        }
+
+        if (clientId != null) {
+            Specification<Device> clientSpec = DeviceSpecification.hasClientId(clientId);
+            combinedSpec = combinedSpec.and(clientSpec);
+        }
+
         return deviceMapper.toDtoList(deviceRepo.findAll(combinedSpec));
-    }
-
-    public List<DeviceDTO> getDevicesByClientIdAndClassificatorId(Integer clientId, Integer classificatorId) {
-        Specification<Device> spec = Specification.where(DeviceSpecification.hasClientId(clientId))
-                .and(DeviceSpecification.hasClassificatorId(classificatorId));
-        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
     }
 
 

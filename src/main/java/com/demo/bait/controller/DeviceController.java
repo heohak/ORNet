@@ -100,27 +100,29 @@ public class DeviceController {
     }
 
 
-    @GetMapping("/classificator/{classificatorId}")
-    public List<DeviceDTO> getDevicesByClassificatorId(@PathVariable Integer classificatorId) {
-        return deviceService.getDevicesByClassificatorId(classificatorId);
-    }
+//    @GetMapping("/classificator/{classificatorId}")
+//    public List<DeviceDTO> getDevicesByClassificatorId(@PathVariable Integer classificatorId) {
+//        return deviceService.getDevicesByClassificatorId(classificatorId);
+//    }
+//
+//    @GetMapping("/search")
+//    public List<DeviceDTO> searchDevices(@RequestParam("q") String query) {
+//        return deviceService.searchDevices(query);
+//    }
 
     @GetMapping("/search")
-    public List<DeviceDTO> searchDevices(@RequestParam("q") String query) {
-        return deviceService.searchDevices(query);
+    public List<DeviceDTO> searchAndFilterDevices(
+            @RequestParam(value = "q", required = false) String query,
+            @RequestParam(value = "classificatorId", required = false) Integer classificatorId,
+            @RequestParam(value = "clientId", required = false) Integer clientId) {
+        return deviceService.searchAndFilterDevices(query, classificatorId, clientId);
     }
 
-    @GetMapping("/search/{classificatorId}")
-    public List<DeviceDTO> searchAndFilterDevices(@RequestParam("q") String query,
-                                                  @PathVariable Integer classificatorId) {
-        return deviceService.searchAndFilterDevices(query, classificatorId);
-    }
-
-    @GetMapping("/filter/{clientId}/{classificatorId}")
-    public List<DeviceDTO> filterDevicesByClientAndClassificator(@PathVariable Integer clientId,
-                                                                 @PathVariable Integer classificatorId) {
-        return deviceService.getDevicesByClientIdAndClassificatorId(clientId, classificatorId);
-    }
+//    @GetMapping("/filter/{clientId}/{classificatorId}")
+//    public List<DeviceDTO> filterDevicesByClientAndClassificator(@PathVariable Integer clientId,
+//                                                                 @PathVariable Integer classificatorId) {
+//        return deviceService.getDevicesByClientIdAndClassificatorId(clientId, classificatorId);
+//    }
 
     @PutMapping("/comment/{deviceId}")
     public ResponseDTO addCommentToDevice(@PathVariable Integer deviceId, @RequestParam("comment") String comment) {
