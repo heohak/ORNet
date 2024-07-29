@@ -46,6 +46,9 @@ public class TicketService {
     private CommentService commentService;
     private WorkTypeClassificatorRepo workTypeClassificatorRepo;
     private WorkTypeClassificatorMapper workTypeClassificatorMapper;
+    private PaidWorkService paidWorkService;
+    private PaidWorkMapper paidWorkMapper;
+    private PaidWorkRepo paidWorkRepo;
 
 
     @Transactional
@@ -595,5 +598,49 @@ public class TicketService {
         }
         Ticket ticket = ticketOpt.get();
         return workTypeClassificatorMapper.toDtoList(ticket.getWorkTypes().stream().toList());
+    }
+
+    @Transactional
+    public ResponseDTO changeTicketToPaidTicket(Integer ticketId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        if (ticket.getPaidWork() == null) {
+            PaidWork paidWork = paidWorkService.createPaidWork();
+            ticket.setPaidWork(paidWork);
+            ticketRepo.save(ticket);
+            return new ResponseDTO("Ticket changed to paid ticket successfully");
+        }
+        return new ResponseDTO("Ticket is already a paid ticket");
+    }
+
+    @Transactional
+    public ResponseDTO addTimeToTicketPaidWork(Integer ticketId, Integer hours, Integer minutes) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        PaidWork paidWork = ticket.getPaidWork();
+        if (paidWork != null) {
+            paidWorkService.addTimeToPaidWork(paidWork.getId(), hours, minutes);
+            return new ResponseDTO("Time added to paid ticket successfully");
+        }
+        return new ResponseDTO("Ticket is not a paid ticket");
+    }
+
+    public PaidWorkDTO getTicketPaidWork(Integer ticketId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        PaidWork paidWork = ticket.getPaidWork();
+        if (paidWork == null) {
+            throw new IllegalArgumentException("Ticket does not have paid work");
+        }
+        return paidWorkMapper.toDto(paidWork);
     }
 }

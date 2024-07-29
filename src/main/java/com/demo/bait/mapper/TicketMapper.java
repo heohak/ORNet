@@ -31,6 +31,7 @@ public interface TicketMapper {
     @Mapping(source = "location.id", target = "locationId")
     @Mapping(source = "status.id", target = "statusId")
     @Mapping(source = "baitWorker.id", target = "baitWorkerId")
+    @Mapping(source = "paidWork.id", target = "paidWorkId")
     @Mapping(target = "contactIds", expression = "java(mapContactsToIds(ticket.getContacts()))")
     @Mapping(target = "workTypeIds", expression = "java(mapWorkTypesToIds(ticket.getWorkTypes()))")
     @Mapping(target = "commentIds", expression = "java(mapCommentsToIds(ticket.getComments()))")

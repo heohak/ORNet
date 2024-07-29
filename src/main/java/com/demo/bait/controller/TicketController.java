@@ -168,4 +168,21 @@ public class TicketController {
     public List<WorkTypeClassificatorDTO> getTicketWorkTypes(@PathVariable Integer ticketId) {
         return ticketService.getTicketWorkTypes(ticketId);
     }
+
+    @PutMapping("/add/paid-work/{ticketId}")
+    public ResponseDTO addPaidWorkToTicket(@PathVariable Integer ticketId) {
+        return ticketService.changeTicketToPaidTicket(ticketId);
+    }
+
+    @PutMapping("/add/time/{ticketId}")
+    public ResponseDTO addTimeToPaidTicket(@PathVariable Integer ticketId,
+                                           @RequestParam(value = "hours", required = false) Integer hours,
+                                           @RequestParam(value = "minutes", required = false) Integer minutes) {
+        return ticketService.addTimeToTicketPaidWork(ticketId, hours, minutes);
+    }
+
+    @GetMapping("/paid-work/{ticketId}")
+    public PaidWorkDTO getTicketPaidWork(@PathVariable Integer ticketId) {
+        return ticketService.getTicketPaidWork(ticketId);
+    }
 }

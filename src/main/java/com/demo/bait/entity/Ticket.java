@@ -92,4 +92,8 @@ public class Ticket {
             inverseJoinColumns = @JoinColumn(name = "file_upload_id")
     )
     private Set<FileUpload> files = new HashSet<>();
+
+    @OneToOne
+    @JoinColumn(name = "paid_work_id", referencedColumnName = "id")
+    private PaidWork paidWork;
 }
