@@ -58,6 +58,8 @@ public class TicketService {
         Ticket ticket = new Ticket();
         ticket.setClient(clientOpt.get());
         ticket.setTitle(ticketDTO.title());
+        ticket.setBaitNumeration(ticketDTO.baitNumeration());
+        ticket.setClientNumeration(ticketDTO.clientNumeration());
         ticket.setDescription(ticketDTO.description());
 
         if (ticketDTO.mainTicketId() != null) {
