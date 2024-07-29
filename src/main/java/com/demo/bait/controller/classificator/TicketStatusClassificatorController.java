@@ -24,4 +24,9 @@ public class TicketStatusClassificatorController {
     public List<TicketStatusClassificatorDTO> getAllTicketStatuses() {
         return ticketStatusService.getAllTicketStatusClassificators();
     }
+
+    @GetMapping("/{statusId}")
+    public TicketStatusClassificatorDTO getTicketStatusClassificatorById(@PathVariable Integer statusId) {
+        return ticketStatusService.getTicketStatusClassificatorById(statusId);
+    }
 }

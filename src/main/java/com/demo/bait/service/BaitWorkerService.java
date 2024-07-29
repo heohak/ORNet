@@ -5,11 +5,13 @@ import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.BaitWorker;
 import com.demo.bait.mapper.BaitWorkerMapper;
 import com.demo.bait.repository.BaitWorkerRepo;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -37,5 +39,13 @@ public class BaitWorkerService {
     public ResponseDTO deleteBaitWorker(Integer baitWorkerId) {
         baitWorkerRepo.deleteById(baitWorkerId);
         return new ResponseDTO("Bait Worker deleted successfully");
+    }
+
+    public BaitWorkerDTO getBaitWorkerById(Integer workerId) {
+        Optional<BaitWorker> baitWorkerOpt = baitWorkerRepo.findById(workerId);
+        if (baitWorkerOpt.isEmpty()) {
+            throw new EntityNotFoundException("Bait worker with id " + workerId + " not found");
+        }
+        return baitWorkerMapper.toDto(baitWorkerOpt.get());
     }
 }

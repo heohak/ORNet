@@ -29,4 +29,9 @@ public class LocationController {
     public ResponseDTO deleteLocation(@PathVariable Integer locationId) {
         return locationService.deleteLocation(locationId);
     }
+
+    @GetMapping("/{locationId}")
+    public LocationDTO getLocationById(@PathVariable Integer locationId) {
+        return locationService.getLocationById(locationId);
+    }
 }
