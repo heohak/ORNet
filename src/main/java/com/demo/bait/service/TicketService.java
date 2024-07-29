@@ -1,6 +1,7 @@
 package com.demo.bait.service;
 
 import com.demo.bait.dto.*;
+import com.demo.bait.dto.classificator.WorkTypeClassificatorDTO;
 import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.TicketStatusClassificator;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
@@ -585,5 +586,14 @@ public class TicketService {
         }
         Ticket ticket = ticketOpt.get();
         return clientWorkerMapper.toDtoList(ticket.getContacts().stream().toList());
+    }
+
+    public List<WorkTypeClassificatorDTO> getTicketWorkTypes(Integer ticketId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        return workTypeClassificatorMapper.toDtoList(ticket.getWorkTypes().stream().toList());
     }
 }

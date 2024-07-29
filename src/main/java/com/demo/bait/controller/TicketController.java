@@ -1,6 +1,7 @@
 package com.demo.bait.controller;
 
 import com.demo.bait.dto.*;
+import com.demo.bait.dto.classificator.WorkTypeClassificatorDTO;
 import com.demo.bait.entity.ClientWorker;
 import com.demo.bait.service.TicketService;
 import lombok.AllArgsConstructor;
@@ -161,5 +162,10 @@ public class TicketController {
     @GetMapping("/contacts/{ticketId}")
     public List<ClientWorkerDTO> getTicketContacts(@PathVariable Integer ticketId) {
         return ticketService.getTicketContacts(ticketId);
+    }
+
+    @GetMapping("/work-types/{ticketId}")
+    public List<WorkTypeClassificatorDTO> getTicketWorkTypes(@PathVariable Integer ticketId) {
+        return ticketService.getTicketWorkTypes(ticketId);
     }
 }
