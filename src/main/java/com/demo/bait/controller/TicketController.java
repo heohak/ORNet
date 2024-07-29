@@ -1,9 +1,8 @@
 package com.demo.bait.controller;
 
-import com.demo.bait.dto.CommentDTO;
-import com.demo.bait.dto.MaintenanceDTO;
-import com.demo.bait.dto.ResponseDTO;
-import com.demo.bait.dto.TicketDTO;
+import com.demo.bait.dto.*;
+import com.demo.bait.dto.classificator.WorkTypeClassificatorDTO;
+import com.demo.bait.entity.ClientWorker;
 import com.demo.bait.service.TicketService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -75,14 +74,28 @@ public class TicketController {
         return ticketService.getTicketsByStatusId(statusId);
     }
 
-    @GetMapping("/search/{statusId}")
-    public List<TicketDTO> searchAndFilterTickets(@RequestParam("q") String query, @PathVariable Integer statusId) {
-        return ticketService.searchAndFilterTickets(query, statusId);
-    }
+//    @GetMapping("/search/{statusId}")
+//    public List<TicketDTO> searchAndFilterTickets(@RequestParam("q") String query, @PathVariable Integer statusId) {
+//        return ticketService.searchAndFilterTickets(query, statusId);
+//    }
+//
+//    @GetMapping("/search")
+//    public List<TicketDTO> searchTickets(@RequestParam("q") String query) {
+//        return ticketService.searchTickets(query);
+//    }
+//
+//    @GetMapping("/search/crisis/{statusId}")
+//    public List<TicketDTO> searchAndFilterCrisisTickets(@RequestParam("q") String query, @PathVariable Integer statusId,
+//                                                        @RequestParam("crisis") Boolean crisis) {
+//        return ticketService.searchAndFilterCrisisTickets(query, statusId, crisis);
+//    }
 
     @GetMapping("/search")
-    public List<TicketDTO> searchTickets(@RequestParam("q") String query) {
-        return ticketService.searchTickets(query);
+    public List<TicketDTO> getTickets(
+            @RequestParam(value = "searchTerm", required = false) String searchTerm,
+            @RequestParam(value = "statusId", required = false) Integer statusId,
+            @RequestParam(value = "crisis", required = false) Boolean crisis) {
+        return ticketService.searchAndFilterTickets(searchTerm, statusId, crisis);
     }
 
     @PutMapping("/maintenance/{ticketId}/{maintenanceId}")
@@ -134,5 +147,42 @@ public class TicketController {
     @GetMapping("/comment/{ticketId}")
     public List<CommentDTO> getTicketComments(@PathVariable Integer ticketId) {
         return ticketService.getTicketComments(ticketId);
+    }
+
+    @PutMapping("/update/whole/{ticketId}")
+    public ResponseDTO updateWholeTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
+        return ticketService.updateWholeTicket(ticketId, ticketDTO);
+    }
+
+    @GetMapping("/files/{ticketId}")
+    public List<FileUploadDTO> getTicketFiles(@PathVariable Integer ticketId) {
+        return ticketService.getTicketFiles(ticketId);
+    }
+
+    @GetMapping("/contacts/{ticketId}")
+    public List<ClientWorkerDTO> getTicketContacts(@PathVariable Integer ticketId) {
+        return ticketService.getTicketContacts(ticketId);
+    }
+
+    @GetMapping("/work-types/{ticketId}")
+    public List<WorkTypeClassificatorDTO> getTicketWorkTypes(@PathVariable Integer ticketId) {
+        return ticketService.getTicketWorkTypes(ticketId);
+    }
+
+    @PutMapping("/add/paid-work/{ticketId}")
+    public ResponseDTO addPaidWorkToTicket(@PathVariable Integer ticketId) {
+        return ticketService.changeTicketToPaidTicket(ticketId);
+    }
+
+    @PutMapping("/add/time/{ticketId}")
+    public ResponseDTO addTimeToPaidTicket(@PathVariable Integer ticketId,
+                                           @RequestParam(value = "hours", required = false) Integer hours,
+                                           @RequestParam(value = "minutes", required = false) Integer minutes) {
+        return ticketService.addTimeToTicketPaidWork(ticketId, hours, minutes);
+    }
+
+    @GetMapping("/paid-work/{ticketId}")
+    public PaidWorkDTO getTicketPaidWork(@PathVariable Integer ticketId) {
+        return ticketService.getTicketPaidWork(ticketId);
     }
 }

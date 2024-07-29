@@ -1,9 +1,11 @@
 package com.demo.bait.service;
 
+import com.demo.bait.dto.FileUploadDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.FileUpload;
 import com.demo.bait.entity.Maintenance;
+import com.demo.bait.mapper.FileUploadMapper;
 import com.demo.bait.mapper.MaintenanceMapper;
 import com.demo.bait.repository.FileUploadRepo;
 import com.demo.bait.repository.MaintenanceRepo;
@@ -29,7 +31,9 @@ public class MaintenanceService {
     private MaintenanceMapper maintenanceMapper;
     private FileUploadRepo fileUploadRepo;
     private FileUploadService fileUploadService;
+    private FileUploadMapper fileUploadMapper;
 
+    @Transactional
     public ResponseDTO addMaintenance(MaintenanceDTO maintenanceDTO) {
         Maintenance maintenance = new Maintenance();
         maintenance.setMaintenanceName(maintenanceDTO.maintenanceName());
@@ -64,5 +68,14 @@ public class MaintenanceService {
         maintenance.getFiles().addAll(uploadedFiles);
         maintenanceRepo.save(maintenance);
         return new ResponseDTO("Files uploaded successfully to maintenance");
+    }
+
+    public List<FileUploadDTO> getMaintenanceFiles(Integer maintenanceId) {
+        Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
+        if (maintenanceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found");
+        }
+        Maintenance maintenance = maintenanceOpt.get();
+        return fileUploadMapper.toDtoList(maintenance.getFiles().stream().toList());
     }
 }

@@ -29,4 +29,9 @@ public class BaitWorkerController {
     public ResponseDTO deleteWorker(@PathVariable Integer workerId) {
         return baitWorkerService.deleteBaitWorker(workerId);
     }
+
+    @GetMapping("/{workerId}")
+    public BaitWorkerDTO getBaitWorkerById(@PathVariable Integer workerId) {
+        return baitWorkerService.getBaitWorkerById(workerId);
+    }
 }

@@ -1,10 +1,7 @@
 package com.demo.bait.service;
 
 import com.demo.bait.dto.*;
-import com.demo.bait.entity.Client;
-import com.demo.bait.entity.Location;
-import com.demo.bait.entity.Maintenance;
-import com.demo.bait.entity.ThirdPartyIT;
+import com.demo.bait.entity.*;
 import com.demo.bait.mapper.ClientMapper;
 import com.demo.bait.mapper.LocationMapper;
 import com.demo.bait.mapper.MaintenanceMapper;
@@ -14,6 +11,7 @@ import com.demo.bait.repository.LocationRepo;
 import com.demo.bait.repository.MaintenanceRepo;
 import com.demo.bait.repository.ThirdPartyITRepo;
 import com.demo.bait.specification.ClientSpecification;
+import com.demo.bait.specification.TicketSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -207,13 +205,36 @@ public class ClientService {
         return clientMapper.toDto(clientOpt.get());
     }
 
-    public List<ClientDTO> searchClients(String searchTerm) {
-        Specification<Client> spec = new ClientSpecification(searchTerm);
-        return clientMapper.toDtoList(clientRepo.findAll(spec));
-    }
+//    public List<ClientDTO> searchClients(String searchTerm) {
+//        Specification<Client> spec = new ClientSpecification(searchTerm);
+//        return clientMapper.toDtoList(clientRepo.findAll(spec));
+//    }
+//
+//    public List<ClientDTO> findClientsByType(String clientType) {
+//        Specification<Client> spec = ClientSpecification.hasClientType(clientType);
+//        return clientMapper.toDtoList(clientRepo.findAll(spec));
+//    }
+//
+//    public List<ClientDTO> searchAndFilterClients(String searchTerm, String clientType) {
+//        Specification<Client> searchSpec = new ClientSpecification(searchTerm);
+//        Specification<Client> statusSpec = ClientSpecification.hasClientType(clientType);
+//        Specification<Client> combinedSpec = Specification.where(searchSpec).and(statusSpec);
+//        return clientMapper.toDtoList(clientRepo.findAll(combinedSpec));
+//    }
 
-    public List<ClientDTO> findClientsByType(String clientType) {
-        Specification<Client> spec = ClientSpecification.hasClientType(clientType);
-        return clientMapper.toDtoList(clientRepo.findAll(spec));
+    public List<ClientDTO> searchAndFilterClients(String searchTerm, String clientType) {
+        Specification<Client> combinedSpec = Specification.where(null);
+
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            Specification<Client> searchSpec = new ClientSpecification(searchTerm);
+            combinedSpec = combinedSpec.and(searchSpec);
+        }
+
+        if (clientType != null && !clientType.trim().isEmpty()) {
+            Specification<Client> typeSpec = ClientSpecification.hasClientType(clientType);
+            combinedSpec = combinedSpec.and(typeSpec);
+        }
+
+        return clientMapper.toDtoList(clientRepo.findAll(combinedSpec));
     }
 }

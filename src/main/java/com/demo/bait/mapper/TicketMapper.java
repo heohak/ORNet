@@ -2,6 +2,7 @@ package com.demo.bait.mapper;
 
 import com.demo.bait.dto.TicketDTO;
 import com.demo.bait.entity.*;
+import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
@@ -30,7 +31,9 @@ public interface TicketMapper {
     @Mapping(source = "location.id", target = "locationId")
     @Mapping(source = "status.id", target = "statusId")
     @Mapping(source = "baitWorker.id", target = "baitWorkerId")
+    @Mapping(source = "paidWork.id", target = "paidWorkId")
     @Mapping(target = "contactIds", expression = "java(mapContactsToIds(ticket.getContacts()))")
+    @Mapping(target = "workTypeIds", expression = "java(mapWorkTypesToIds(ticket.getWorkTypes()))")
     @Mapping(target = "commentIds", expression = "java(mapCommentsToIds(ticket.getComments()))")
     @Mapping(target = "maintenanceIds", expression = "java(mapMaintenancesToIds(ticket.getMaintenances()))")
     @Mapping(target = "fileIds", expression = "java(mapFilesToIds(ticket.getFiles()))")
@@ -57,6 +60,12 @@ public interface TicketMapper {
     default List<Integer> mapCommentsToIds(Set<Comment> comments) {
         return comments.stream()
                 .map(Comment::getId)
+                .collect(Collectors.toList());
+    }
+
+    default List<Integer> mapWorkTypesToIds(Set<WorkTypeClassificator> workTypes) {
+        return workTypes.stream()
+                .map(WorkTypeClassificator::getId)
                 .collect(Collectors.toList());
     }
 }

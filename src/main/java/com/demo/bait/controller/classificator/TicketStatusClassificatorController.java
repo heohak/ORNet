@@ -1,4 +1,4 @@
-package com.demo.bait.controller.classificatro;
+package com.demo.bait.controller.classificator;
 
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.TicketStatusClassificatorDTO;
@@ -23,5 +23,10 @@ public class TicketStatusClassificatorController {
     @GetMapping("/all")
     public List<TicketStatusClassificatorDTO> getAllTicketStatuses() {
         return ticketStatusService.getAllTicketStatusClassificators();
+    }
+
+    @GetMapping("/{statusId}")
+    public TicketStatusClassificatorDTO getTicketStatusClassificatorById(@PathVariable Integer statusId) {
+        return ticketStatusService.getTicketStatusClassificatorById(statusId);
     }
 }

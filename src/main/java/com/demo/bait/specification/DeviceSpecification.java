@@ -12,17 +12,17 @@ public class DeviceSpecification implements Specification<Device>{
 
     private String searchTerm;
 
-    public static Specification<Device> hasClassificatorId(Integer deviceId) {
+    public static Specification<Device> hasClassificatorId(Integer classificatorId) {
         return (root, query, criteriaBuilder) -> {
             Join<Device, DeviceClassificator> classificatorJoin = root.join("classificator");
-            return criteriaBuilder.equal(classificatorJoin.get("id"), deviceId);
+            return criteriaBuilder.equal(classificatorJoin.get("id"), classificatorId);
         };
     }
 
-    public static Specification<Device> hasClientId(Integer deviceId) {
+    public static Specification<Device> hasClientId(Integer clientId) {
         return (root, query, criteriaBuilder) -> {
             Join<Device, Client> clientJoin = root.join("client");
-            return criteriaBuilder.equal(clientJoin.get("id"), deviceId);
+            return criteriaBuilder.equal(clientJoin.get("id"), clientId);
         };
     }
 
@@ -34,7 +34,7 @@ public class DeviceSpecification implements Specification<Device>{
         String likePattern = "%" + searchTerm.toLowerCase() + "%";
         Predicate titlePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("deviceName")), likePattern);
         Predicate descriptionPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("department")), likePattern);
-        Predicate workTypePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("comment")), likePattern);
+        Predicate workTypePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("room")), likePattern);
         return criteriaBuilder.or(titlePredicate, descriptionPredicate, workTypePredicate);
     }
 }

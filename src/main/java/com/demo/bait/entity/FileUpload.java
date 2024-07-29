@@ -1,12 +1,14 @@
 package com.demo.bait.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
+
+import java.sql.Timestamp;
+
 
 @Getter
 @Setter
@@ -21,5 +23,12 @@ public class FileUpload {
     private String fileName;
     private String filePath;
     private Long fileSize;
+    private String fileType;
+
+    @Lob
+    private byte[] thumbnail;
+
+//    @CreationTimestamp
+//    private Timestamp uploadTime;
 
 }

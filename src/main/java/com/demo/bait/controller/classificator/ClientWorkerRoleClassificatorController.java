@@ -1,4 +1,4 @@
-package com.demo.bait.controller.classificatro;
+package com.demo.bait.controller.classificator;
 
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.ClientWorkerRoleClassificatorDTO;

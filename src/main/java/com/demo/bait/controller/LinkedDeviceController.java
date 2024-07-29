@@ -64,4 +64,9 @@ public class LinkedDeviceController {
     public List<CommentDTO> getLinkedDeviceComments(@PathVariable Integer linkedDeviceId) {
         return linkedDeviceService.getLinkedDeviceComments(linkedDeviceId);
     }
+
+    @GetMapping("/not-used")
+    public List<LinkedDeviceDTO> getNotUsedLinkedDevices() {
+        return linkedDeviceService.getNotUsedLinkedDevices();
+    }
 }

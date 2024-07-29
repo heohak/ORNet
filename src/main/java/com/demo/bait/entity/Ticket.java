@@ -1,6 +1,7 @@
 package com.demo.bait.entity;
 
 import com.demo.bait.entity.classificator.TicketStatusClassificator;
+import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,8 @@ public class Ticket {
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client client;
     private String title;
+    private String baitNumeration;
+    private String clientNumeration;
     private String description;
 
     @ManyToOne
@@ -44,7 +47,14 @@ public class Ticket {
     )
     private Set<ClientWorker> contacts = new HashSet<>();
 
-    private String workType;  // enum?? classificator?? piisab maintenance-ga sidumisest??
+//    private String workType;  // enum?? classificator?? piisab maintenance-ga sidumisest??
+    @ManyToMany
+    @JoinTable(
+            name = "ticket_work_type_classificator",
+            joinColumns = @JoinColumn(name = "ticket_id"),
+            inverseJoinColumns = @JoinColumn(name = "work_type_id")
+    )
+    private Set<WorkTypeClassificator> workTypes = new HashSet<>();
     private Boolean remote;
     private Boolean crisis;
     @ManyToOne
@@ -82,4 +92,8 @@ public class Ticket {
             inverseJoinColumns = @JoinColumn(name = "file_upload_id")
     )
     private Set<FileUpload> files = new HashSet<>();
+
+    @OneToOne
+    @JoinColumn(name = "paid_work_id", referencedColumnName = "id")
+    private PaidWork paidWork;
 }
