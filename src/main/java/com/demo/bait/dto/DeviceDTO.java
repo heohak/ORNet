@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Builder
 public record DeviceDTO(Integer id, Integer clientId, Integer locationId, String deviceName, Integer classificatorId,
-                        String department, String room, Integer serialNumber, String licenseNumber, String version,
+                        String department, String room, String serialNumber, String licenseNumber, String version,
                         LocalDate versionUpdateDate, List<Integer> maintenanceIds, String firstIPAddress,
                         String secondIPAddress, String subnetMask, String softwareKey, LocalDate introducedDate,
                         LocalDate writtenOffDate, List<Integer> commentIds, List<Integer> fileIds,

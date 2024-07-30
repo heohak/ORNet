@@ -509,6 +509,11 @@ public class TicketService {
         addRootCauseToTicket(ticketId, ticketDTO);
         updateTicketDescription(ticketId, ticketDTO);
         updateTicketResponseAndInsideInfo(ticketId, ticketDTO);
+        if (ticketDTO.contactIds() != null) {
+            for (Integer contactId : ticketDTO.contactIds()) {
+                addContactToTicket(ticketId, contactId);
+            }
+        }
         return new ResponseDTO("Whole ticket updated successfully");
     }
 

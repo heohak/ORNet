@@ -36,7 +36,7 @@ public class Device {
     private DeviceClassificator classificator;
     private String department;
     private String room;
-    private Integer serialNumber;
+    private String serialNumber;
     private String licenseNumber;
     private String version;
     private LocalDate versionUpdateDate;
