@@ -176,4 +176,25 @@ public class ClientWorkerService {
                 .and(ClientWorkerSpecification.hasRoleId(roleId));
         return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll(spec));
     }
+
+    public List<ClientWorkerDTO> searchAndFilterClientWorkers(String searchTerm, Integer roleId, Integer clientId) {
+        Specification<ClientWorker> combinedSpec = Specification.where(null);
+
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            Specification<ClientWorker> searchSpec = new ClientWorkerSpecification(searchTerm);
+            combinedSpec = combinedSpec.and(searchSpec);
+        }
+
+        if (roleId != null) {
+            Specification<ClientWorker> roleSpec = ClientWorkerSpecification.hasRoleId(roleId);
+            combinedSpec = combinedSpec.and(roleSpec);
+        }
+
+        if (clientId != null) {
+            Specification<ClientWorker> clientSpec = ClientWorkerSpecification.hasClientId(clientId);
+            combinedSpec = combinedSpec.and(clientSpec);
+        }
+
+        return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll(combinedSpec));
+    }
 }

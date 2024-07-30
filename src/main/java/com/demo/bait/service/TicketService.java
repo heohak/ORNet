@@ -551,7 +551,8 @@ public class TicketService {
 //        return ticketMapper.toDtoList(ticketRepo.findAll(combinedSpec));
 //    }
 
-    public List<TicketDTO> searchAndFilterTickets(String searchTerm, Integer statusId, Boolean crisis) {
+    public List<TicketDTO> searchAndFilterTickets(String searchTerm, Integer statusId, Boolean crisis, Boolean paid,
+                                                  Integer workTypeId) {
         Specification<Ticket> combinedSpec = Specification.where(null);
 
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
@@ -567,6 +568,16 @@ public class TicketService {
         if (crisis != null) {
             Specification<Ticket> crisisSpec = TicketSpecification.isCrisis(crisis);
             combinedSpec = combinedSpec.and(crisisSpec);
+        }
+
+        if (paid != null) {
+            Specification<Ticket> paidSpec = TicketSpecification.isPaidWork(paid);
+            combinedSpec = combinedSpec.and(paidSpec);
+        }
+
+        if (workTypeId != null) {
+            Specification<Ticket> workTypeSpec = TicketSpecification.hasWorkTypeId(workTypeId);
+            combinedSpec = combinedSpec.and(workTypeSpec);
         }
 
         return ticketMapper.toDtoList(ticketRepo.findAll(combinedSpec));

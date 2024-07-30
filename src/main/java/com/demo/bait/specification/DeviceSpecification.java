@@ -56,11 +56,14 @@ public class DeviceSpecification implements Specification<Device>{
         Join<Device, FileUpload> fileUploadJoin = root.join("files", JoinType.LEFT);
         Predicate fileUploadPredicate = criteriaBuilder.like(criteriaBuilder.lower(fileUploadJoin.get("fileName")), likePattern);
 
+        Join<Device, Maintenance> maintenanceJoin = root.join("maintenances", JoinType.LEFT);
+        Predicate maintenancePredicate = criteriaBuilder.like(criteriaBuilder.lower(maintenanceJoin.get("maintenanceName")), likePattern);
 
         return criteriaBuilder.or(
                 deviceNamePredicate, departmentPredicate, roomPredicate, serialNumberPredicate, licenseNumberPredicate,
                 versionPredicate, firstIPAddressPredicate, secondIPAddressPredicate, subnetMaskPredicate, softwareKeyPredicate,
-                clientFullNamePredicate, clientShortNamePredicate, locationPredicate, commentPredicate, fileUploadPredicate
+                clientFullNamePredicate, clientShortNamePredicate, locationPredicate, commentPredicate, fileUploadPredicate,
+                maintenancePredicate
         );
     }
 }

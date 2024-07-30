@@ -80,7 +80,9 @@ public class ClientController {
 
     // clientType = "pathology" or "surgery" or "editor"
     @GetMapping("/search")
-    public List<ClientDTO> searchAndFilterClients(@RequestParam("q") String query, @RequestParam String clientType) {
+    public List<ClientDTO> searchAndFilterClients(
+            @RequestParam(value = "q", required = false) String query,
+            @RequestParam(value = "clientType", required = false) String clientType) {
         return clientService.searchAndFilterClients(query, clientType);
     }
 }

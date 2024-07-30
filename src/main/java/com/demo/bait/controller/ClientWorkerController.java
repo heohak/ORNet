@@ -72,4 +72,12 @@ public class ClientWorkerController {
                                                               @PathVariable Integer roleId) {
         return clientWorkerService.getWorkersByClientAndRole(clientId, roleId);
     }
+
+    @GetMapping("/search")
+    public List<ClientWorkerDTO> searchAndFilterClientWorkers(
+            @RequestParam(value = "q", required = false) String query,
+            @RequestParam(value = "roleId", required = false) Integer roleId,
+            @RequestParam(value = "clientId", required = false) Integer clientId) {
+        return clientWorkerService.searchAndFilterClientWorkers(query, roleId, clientId);
+    }
 }
