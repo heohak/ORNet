@@ -673,4 +673,15 @@ public class TicketService {
         }
         return paidWorkMapper.toDto(paidWork);
     }
+
+    @Transactional
+    public ResponseDTO settleTicketPaidWork(Integer ticketId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        PaidWork paidWork = ticket.getPaidWork();
+        return paidWorkService.setPaidWorkSettled(paidWork.getId());
+    }
 }

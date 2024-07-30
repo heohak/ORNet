@@ -187,4 +187,9 @@ public class TicketController {
     public PaidWorkDTO getTicketPaidWork(@PathVariable Integer ticketId) {
         return ticketService.getTicketPaidWork(ticketId);
     }
+
+    @PutMapping("/settle/{ticketId}")
+    public ResponseDTO settleTicketPaidWork(@PathVariable Integer ticketId) {
+        return ticketService.settleTicketPaidWork(ticketId);
+    }
 }
