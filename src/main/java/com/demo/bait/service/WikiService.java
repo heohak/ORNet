@@ -2,12 +2,16 @@ package com.demo.bait.service;
 
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.WikiDTO;
+import com.demo.bait.entity.Device;
 import com.demo.bait.entity.Wiki;
 import com.demo.bait.mapper.WikiMapper;
 import com.demo.bait.repository.WikiRepo;
+import com.demo.bait.specification.DeviceSpecification;
+import com.demo.bait.specification.WikiSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,5 +49,15 @@ public class WikiService {
             throw new EntityNotFoundException("Wiki with id " + id + " not found");
         }
         return wikiMapper.toDto(wikiOpt.get());
+    }
+
+    public List<WikiDTO> searchWiki(String searchTerm) {
+        Specification<Wiki> combinedSpec = Specification.where(null);
+
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            Specification<Wiki> searchSpec = new WikiSpecification(searchTerm);
+            combinedSpec = combinedSpec.and(searchSpec);
+        }
+        return wikiMapper.toDtoList(wikiRepo.findAll(combinedSpec));
     }
 }
