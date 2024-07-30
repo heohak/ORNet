@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -160,6 +161,7 @@ public class TicketService {
         }
 
         ticketRepo.save(ticket);
+        setTicketUpdateTime(ticket.getId());
         return new ResponseDTO("Ticket added successfully");
     }
 
@@ -495,6 +497,17 @@ public class TicketService {
     }
 
     @Transactional
+    public void setTicketUpdateTime(Integer ticketId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        ticket.setUpdateDateTime(LocalDateTime.now());
+        ticketRepo.save(ticket);
+    }
+
+    @Transactional
     public ResponseDTO updateWholeTicket(Integer ticketId, TicketDTO ticketDTO) {
         addResponseDateToTicket(ticketId, ticketDTO);
         // endDateTime??
@@ -514,6 +527,7 @@ public class TicketService {
                 addContactToTicket(ticketId, contactId);
             }
         }
+        setTicketUpdateTime(ticketId);
         return new ResponseDTO("Whole ticket updated successfully");
     }
 
