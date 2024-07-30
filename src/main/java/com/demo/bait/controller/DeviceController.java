@@ -138,4 +138,14 @@ public class DeviceController {
     public List<FileUploadDTO> getDeviceFiles(@PathVariable Integer deviceId) {
         return deviceService.getDeviceFiles(deviceId);
     }
+
+    @GetMapping("/summary")
+    public Map<String, Integer> getDevicesSummary() {
+        return deviceService.getDevicesSummary();
+    }
+
+    @GetMapping("/client/summary/{clientId}")
+    public Map<String, Integer> getClientDevicesSummary(@PathVariable Integer clientId) {
+        return deviceService.getClientDevicesSummary(clientId);
+    }
 }
