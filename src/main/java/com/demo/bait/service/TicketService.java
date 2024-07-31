@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -160,6 +161,7 @@ public class TicketService {
         }
 
         ticketRepo.save(ticket);
+        setTicketUpdateTime(ticket.getId());
         return new ResponseDTO("Ticket added successfully");
     }
 
@@ -495,6 +497,17 @@ public class TicketService {
     }
 
     @Transactional
+    public void setTicketUpdateTime(Integer ticketId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        ticket.setUpdateDateTime(LocalDateTime.now());
+        ticketRepo.save(ticket);
+    }
+
+    @Transactional
     public ResponseDTO updateWholeTicket(Integer ticketId, TicketDTO ticketDTO) {
         addResponseDateToTicket(ticketId, ticketDTO);
         // endDateTime??
@@ -509,6 +522,12 @@ public class TicketService {
         addRootCauseToTicket(ticketId, ticketDTO);
         updateTicketDescription(ticketId, ticketDTO);
         updateTicketResponseAndInsideInfo(ticketId, ticketDTO);
+        if (ticketDTO.contactIds() != null) {
+            for (Integer contactId : ticketDTO.contactIds()) {
+                addContactToTicket(ticketId, contactId);
+            }
+        }
+        setTicketUpdateTime(ticketId);
         return new ResponseDTO("Whole ticket updated successfully");
     }
 
@@ -532,7 +551,8 @@ public class TicketService {
 //        return ticketMapper.toDtoList(ticketRepo.findAll(combinedSpec));
 //    }
 
-    public List<TicketDTO> searchAndFilterTickets(String searchTerm, Integer statusId, Boolean crisis) {
+    public List<TicketDTO> searchAndFilterTickets(String searchTerm, Integer statusId, Boolean crisis, Boolean paid,
+                                                  Integer workTypeId) {
         Specification<Ticket> combinedSpec = Specification.where(null);
 
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
@@ -548,6 +568,16 @@ public class TicketService {
         if (crisis != null) {
             Specification<Ticket> crisisSpec = TicketSpecification.isCrisis(crisis);
             combinedSpec = combinedSpec.and(crisisSpec);
+        }
+
+        if (paid != null) {
+            Specification<Ticket> paidSpec = TicketSpecification.isPaidWork(paid);
+            combinedSpec = combinedSpec.and(paidSpec);
+        }
+
+        if (workTypeId != null) {
+            Specification<Ticket> workTypeSpec = TicketSpecification.hasWorkTypeId(workTypeId);
+            combinedSpec = combinedSpec.and(workTypeSpec);
         }
 
         return ticketMapper.toDtoList(ticketRepo.findAll(combinedSpec));
@@ -642,5 +672,16 @@ public class TicketService {
             throw new IllegalArgumentException("Ticket does not have paid work");
         }
         return paidWorkMapper.toDto(paidWork);
+    }
+
+    @Transactional
+    public ResponseDTO settleTicketPaidWork(Integer ticketId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        PaidWork paidWork = ticket.getPaidWork();
+        return paidWorkService.setPaidWorkSettled(paidWork.getId());
     }
 }

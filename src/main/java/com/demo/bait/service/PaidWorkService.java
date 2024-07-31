@@ -51,4 +51,15 @@ public class PaidWorkService {
         paidWorkRepo.save(paidWork);
         return paidWorkMapper.toDto(paidWork);
     }
+
+    public ResponseDTO setPaidWorkSettled(Integer paidWorkId) {
+        Optional<PaidWork> paidWorkOpt = paidWorkRepo.findById(paidWorkId);
+        if (paidWorkOpt.isEmpty()) {
+            throw new EntityNotFoundException("Paid work with id " + paidWorkId + " not found");
+        }
+        PaidWork paidWork = paidWorkOpt.get();
+        paidWork.setSettled(true);
+        paidWorkRepo.save(paidWork);
+        return new ResponseDTO("Paid Work is settled successfully");
+    }
 }

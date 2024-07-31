@@ -67,6 +67,7 @@ public class Ticket {
     private String response;  // vastukirja sisu vastavalt vajadusele ehk vb vaja midagi muud kui string
     private String insideInfo;  // siseinfo mis ei lahe raportisse
     private LocalDateTime endDateTime;
+    private LocalDateTime updateDateTime;
     private String rootCause;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

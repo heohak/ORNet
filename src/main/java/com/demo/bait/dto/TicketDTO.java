@@ -10,7 +10,7 @@ public record TicketDTO(Integer id, Integer clientId, String title, String baitN
                         String description, Integer mainTicketId, LocalDateTime startDateTime, Integer locationId,
                         List<Integer> contactIds, List<Integer> workTypeIds, Boolean remote, Boolean crisis,
                         Integer statusId, Integer baitWorkerId, LocalDateTime responseDateTime, String response,
-                        String insideInfo, LocalDateTime endDateTime, String rootCause, String clientName,
-                        List<Integer> commentIds, List<Integer> maintenanceIds, List<Integer> fileIds,
-                        Integer paidWorkId) {
+                        String insideInfo, LocalDateTime endDateTime, LocalDateTime updateDateTime, String rootCause,
+                        String clientName, List<Integer> commentIds, List<Integer> maintenanceIds,
+                        List<Integer> fileIds, Integer paidWorkId) {
 }

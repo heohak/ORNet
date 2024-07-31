@@ -94,8 +94,10 @@ public class TicketController {
     public List<TicketDTO> getTickets(
             @RequestParam(value = "searchTerm", required = false) String searchTerm,
             @RequestParam(value = "statusId", required = false) Integer statusId,
-            @RequestParam(value = "crisis", required = false) Boolean crisis) {
-        return ticketService.searchAndFilterTickets(searchTerm, statusId, crisis);
+            @RequestParam(value = "crisis", required = false) Boolean crisis,
+            @RequestParam(value = "paidWork", required = false) Boolean paidWork,
+            @RequestParam(value = "workTypeId", required = false) Integer workTypeId) {
+        return ticketService.searchAndFilterTickets(searchTerm, statusId, crisis, paidWork, workTypeId);
     }
 
     @PutMapping("/maintenance/{ticketId}/{maintenanceId}")
@@ -184,5 +186,10 @@ public class TicketController {
     @GetMapping("/paid-work/{ticketId}")
     public PaidWorkDTO getTicketPaidWork(@PathVariable Integer ticketId) {
         return ticketService.getTicketPaidWork(ticketId);
+    }
+
+    @PutMapping("/settle/{ticketId}")
+    public ResponseDTO settleTicketPaidWork(@PathVariable Integer ticketId) {
+        return ticketService.settleTicketPaidWork(ticketId);
     }
 }
