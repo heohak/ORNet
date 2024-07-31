@@ -1,3 +1,4 @@
+version: '3.8'
 
 services:
   postgres:
@@ -12,8 +13,10 @@ services:
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
 
-  app:
-    image: bait:latest
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
     depends_on:
       - postgres
     ports:
@@ -24,3 +27,11 @@ services:
       SPRING_DATASOURCE_PASSWORD: mysecretpassword
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+
+  frontend:
+    build:
+      context: C:/Users/ohakh/WebstormProjects/ornet-frontend
+    ports:
+      - '3000:80'
+    depends_on:
+      - backend
