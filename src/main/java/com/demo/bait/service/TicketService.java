@@ -325,6 +325,26 @@ public class TicketService {
     }
 
     @Transactional
+    public ResponseDTO addContactsToTicket(Integer ticketId, TicketDTO ticketDTO) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        if (ticketDTO.contactIds() != null) {
+            Set<ClientWorker> contacts = new HashSet<>();
+            for (Integer id : ticketDTO.contactIds()) {
+                ClientWorker contact = clientWorkerRepo.findById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid worker ID: " + id));
+                contacts.add(contact);
+            }
+            ticket.setContacts(contacts);
+        }
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Contacts added to ticket");
+    }
+
+    @Transactional
     public ResponseDTO addMaintenanceToTicket(Integer ticketId, Integer maintenanceId) {
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
@@ -522,11 +542,7 @@ public class TicketService {
         addRootCauseToTicket(ticketId, ticketDTO);
         updateTicketDescription(ticketId, ticketDTO);
         updateTicketResponseAndInsideInfo(ticketId, ticketDTO);
-        if (ticketDTO.contactIds() != null) {
-            for (Integer contactId : ticketDTO.contactIds()) {
-                addContactToTicket(ticketId, contactId);
-            }
-        }
+        addContactsToTicket(ticketId, ticketDTO);
         setTicketUpdateTime(ticketId);
         return new ResponseDTO("Whole ticket updated successfully");
     }
