@@ -1,13 +1,11 @@
 package com.demo.bait.service;
 
-import com.demo.bait.dto.CommentDTO;
-import com.demo.bait.dto.DeviceDTO;
-import com.demo.bait.dto.MaintenanceDTO;
-import com.demo.bait.dto.ResponseDTO;
+import com.demo.bait.dto.*;
 import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.DeviceClassificator;
 import com.demo.bait.mapper.CommentMapper;
 import com.demo.bait.mapper.DeviceMapper;
+import com.demo.bait.mapper.FileUploadMapper;
 import com.demo.bait.mapper.MaintenanceMapper;
 import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.DeviceClassificatorRepo;
@@ -18,12 +16,16 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -37,6 +39,7 @@ public class DeviceService {
     private MaintenanceRepo maintenanceRepo;
     private FileUploadRepo fileUploadRepo;
     private FileUploadService fileUploadService;
+    private FileUploadMapper fileUploadMapper;
     private MaintenanceMapper maintenanceMapper;
     private DeviceClassificatorRepo deviceClassificatorRepo;
     private CommentRepo commentRepo;
@@ -285,29 +288,50 @@ public class DeviceService {
         deviceRepo.saveAll(devices);
     }
 
-    public List<DeviceDTO> getDevicesByClassificatorId(Integer classificatorId) {
-//        return deviceMapper.toDtoList(deviceRepo.findByClassificatorId(classificatorId));
+//    public List<DeviceDTO> getDevicesByClassificatorId(Integer classificatorId) {
+////        return deviceMapper.toDtoList(deviceRepo.findByClassificatorId(classificatorId));
+//
+//        Specification<Device> spec = DeviceSpecification.hasClassificatorId(classificatorId);
+//        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
+//    }
+//
+//    public List<DeviceDTO> searchDevices(String searchTerm) {
+//        Specification<Device> spec = new DeviceSpecification(searchTerm);
+//        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
+//    }
+//
+//    public List<DeviceDTO> searchAndFilterDevices(String searchTerm, Integer deviceId) {
+//        Specification<Device> searchSpec = new DeviceSpecification(searchTerm);
+//        Specification<Device> statusSpec = DeviceSpecification.hasClassificatorId(deviceId);
+//        Specification<Device> combinedSpec = Specification.where(searchSpec).and(statusSpec);
+//        return deviceMapper.toDtoList(deviceRepo.findAll(combinedSpec));
+//    }
+//
+//    public List<DeviceDTO> getDevicesByClientIdAndClassificatorId(Integer clientId, Integer classificatorId) {
+//        Specification<Device> spec = Specification.where(DeviceSpecification.hasClientId(clientId))
+//                .and(DeviceSpecification.hasClassificatorId(classificatorId));
+//        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
+//    }
 
-        Specification<Device> spec = DeviceSpecification.hasClassificatorId(classificatorId);
-        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
-    }
+    public List<DeviceDTO> searchAndFilterDevices(String searchTerm, Integer classificatorId, Integer clientId) {
+        Specification<Device> combinedSpec = Specification.where(null);
 
-    public List<DeviceDTO> searchDevices(String searchTerm) {
-        Specification<Device> spec = new DeviceSpecification(searchTerm);
-        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
-    }
+        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            Specification<Device> searchSpec = new DeviceSpecification(searchTerm);
+            combinedSpec = combinedSpec.and(searchSpec);
+        }
 
-    public List<DeviceDTO> searchAndFilterDevices(String searchTerm, Integer deviceId) {
-        Specification<Device> searchSpec = new DeviceSpecification(searchTerm);
-        Specification<Device> statusSpec = DeviceSpecification.hasClassificatorId(deviceId);
-        Specification<Device> combinedSpec = Specification.where(searchSpec).and(statusSpec);
+        if (classificatorId != null) {
+            Specification<Device> classificatorSpec = DeviceSpecification.hasClassificatorId(classificatorId);
+            combinedSpec = combinedSpec.and(classificatorSpec);
+        }
+
+        if (clientId != null) {
+            Specification<Device> clientSpec = DeviceSpecification.hasClientId(clientId);
+            combinedSpec = combinedSpec.and(clientSpec);
+        }
+
         return deviceMapper.toDtoList(deviceRepo.findAll(combinedSpec));
-    }
-
-    public List<DeviceDTO> getDevicesByClientIdAndClassificatorId(Integer clientId, Integer classificatorId) {
-        Specification<Device> spec = Specification.where(DeviceSpecification.hasClientId(clientId))
-                .and(DeviceSpecification.hasClassificatorId(classificatorId));
-        return deviceMapper.toDtoList(deviceRepo.findAll(spec));
     }
 
 
@@ -323,5 +347,50 @@ public class DeviceService {
         device.setWrittenOffDate(deviceDTO.writtenOffDate());
         deviceRepo.save(device);
         return new ResponseDTO("Written off date added successfully");
+    }
+
+    public List<FileUploadDTO> getDeviceFiles(Integer deviceId) {
+        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+
+        if (deviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        }
+
+        Device device = deviceOpt.get();
+        return fileUploadMapper.toDtoList(device.getFiles().stream().toList());
+    }
+
+    public Map<String, Integer> getDevicesSummary() {
+        Map<String, Integer> summaryMap = new HashMap<>();
+
+        Integer allDevices = Math.toIntExact(deviceRepo.count());
+        summaryMap.put("All Devices", allDevices);
+
+        for (DeviceClassificator classificator : deviceClassificatorRepo.findAll()) {
+            Specification<Device> classificatorSpec = DeviceSpecification.hasClassificatorId(classificator.getId());
+            Integer sum = deviceRepo.findAll(classificatorSpec).size();
+
+            summaryMap.put(classificator.getName(), sum);
+        }
+
+        return summaryMap;
+    }
+
+    public Map<String, Integer> getClientDevicesSummary(Integer clientId) {
+        Map<String, Integer> clientSummaryMap = new HashMap<>();
+
+        Specification<Device> clientSpec = DeviceSpecification.hasClientId(clientId);
+        List<Device> allClientDevices = deviceRepo.findAll(clientSpec);
+        clientSummaryMap.put("All Client Devices", allClientDevices.size());
+
+        for (DeviceClassificator classificator : deviceClassificatorRepo.findAll()) {
+            Specification<Device> classificatorSpec = DeviceSpecification.hasClassificatorId(classificator.getId());
+            Specification<Device> combinedSpec = clientSpec.and(classificatorSpec);
+            Integer sum = deviceRepo.findAll(combinedSpec).size();
+
+            clientSummaryMap.put(classificator.getName(), sum);
+        }
+
+        return clientSummaryMap;
     }
 }

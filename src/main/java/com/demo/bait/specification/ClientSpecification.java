@@ -1,10 +1,10 @@
 package com.demo.bait.specification;
 
 import com.demo.bait.entity.Client;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import com.demo.bait.entity.Device;
+import com.demo.bait.entity.Location;
+import com.demo.bait.entity.ThirdPartyIT;
+import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -38,6 +38,13 @@ public class ClientSpecification implements Specification<Client> {
         Predicate titlePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("fullName")), likePattern);
         Predicate descriptionPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("shortName")), likePattern);
         Predicate workTypePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("otherMedicalInformation")), likePattern);
-        return criteriaBuilder.or(titlePredicate, descriptionPredicate, workTypePredicate);
+
+        Join<Client, Location> locationJoin = root.join("locations", JoinType.LEFT);
+        Predicate locationPredicate = criteriaBuilder.like(criteriaBuilder.lower(locationJoin.get("name")), likePattern);
+
+        Join<Client, ThirdPartyIT> thirdPartyITJoin = root.join("thirdPartyITs", JoinType.LEFT);
+        Predicate thirdPartyITPredicate = criteriaBuilder.like(criteriaBuilder.lower(thirdPartyITJoin.get("name")), likePattern);
+
+        return criteriaBuilder.or(titlePredicate, descriptionPredicate, workTypePredicate, locationPredicate, thirdPartyITPredicate);
     }
 }

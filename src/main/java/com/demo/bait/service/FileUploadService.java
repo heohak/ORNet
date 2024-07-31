@@ -39,7 +39,7 @@ public class FileUploadService {
     private FileUploadRepo fileUploadRepo;
     private FileUploadMapper fileUploadMapper;
 
-    private static final String UPLOAD_DIR = "uploads/";
+    private static final String UPLOAD_DIR = "uploads";
 
     @Transactional
     public Set<FileUpload> uploadFiles(List<MultipartFile> files) throws IOException {

@@ -1,9 +1,8 @@
 package com.demo.bait.controller;
 
-import com.demo.bait.dto.CommentDTO;
-import com.demo.bait.dto.MaintenanceDTO;
-import com.demo.bait.dto.ResponseDTO;
-import com.demo.bait.dto.TicketDTO;
+import com.demo.bait.dto.*;
+import com.demo.bait.dto.classificator.WorkTypeClassificatorDTO;
+import com.demo.bait.entity.ClientWorker;
 import com.demo.bait.service.TicketService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -95,8 +94,10 @@ public class TicketController {
     public List<TicketDTO> getTickets(
             @RequestParam(value = "searchTerm", required = false) String searchTerm,
             @RequestParam(value = "statusId", required = false) Integer statusId,
-            @RequestParam(value = "crisis", required = false) Boolean crisis) {
-        return ticketService.searchAndFilterTickets(searchTerm, statusId, crisis);
+            @RequestParam(value = "crisis", required = false) Boolean crisis,
+            @RequestParam(value = "paidWork", required = false) Boolean paidWork,
+            @RequestParam(value = "workTypeId", required = false) Integer workTypeId) {
+        return ticketService.searchAndFilterTickets(searchTerm, statusId, crisis, paidWork, workTypeId);
     }
 
     @PutMapping("/maintenance/{ticketId}/{maintenanceId}")
@@ -153,5 +154,42 @@ public class TicketController {
     @PutMapping("/update/whole/{ticketId}")
     public ResponseDTO updateWholeTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
         return ticketService.updateWholeTicket(ticketId, ticketDTO);
+    }
+
+    @GetMapping("/files/{ticketId}")
+    public List<FileUploadDTO> getTicketFiles(@PathVariable Integer ticketId) {
+        return ticketService.getTicketFiles(ticketId);
+    }
+
+    @GetMapping("/contacts/{ticketId}")
+    public List<ClientWorkerDTO> getTicketContacts(@PathVariable Integer ticketId) {
+        return ticketService.getTicketContacts(ticketId);
+    }
+
+    @GetMapping("/work-types/{ticketId}")
+    public List<WorkTypeClassificatorDTO> getTicketWorkTypes(@PathVariable Integer ticketId) {
+        return ticketService.getTicketWorkTypes(ticketId);
+    }
+
+    @PutMapping("/add/paid-work/{ticketId}")
+    public ResponseDTO addPaidWorkToTicket(@PathVariable Integer ticketId) {
+        return ticketService.changeTicketToPaidTicket(ticketId);
+    }
+
+    @PutMapping("/add/time/{ticketId}")
+    public ResponseDTO addTimeToPaidTicket(@PathVariable Integer ticketId,
+                                           @RequestParam(value = "hours", required = false) Integer hours,
+                                           @RequestParam(value = "minutes", required = false) Integer minutes) {
+        return ticketService.addTimeToTicketPaidWork(ticketId, hours, minutes);
+    }
+
+    @GetMapping("/paid-work/{ticketId}")
+    public PaidWorkDTO getTicketPaidWork(@PathVariable Integer ticketId) {
+        return ticketService.getTicketPaidWork(ticketId);
+    }
+
+    @PutMapping("/settle/{ticketId}")
+    public ResponseDTO settleTicketPaidWork(@PathVariable Integer ticketId) {
+        return ticketService.settleTicketPaidWork(ticketId);
     }
 }

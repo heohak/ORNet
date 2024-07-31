@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 
 import java.sql.Timestamp;
 
@@ -25,7 +26,6 @@ public class FileUpload {
     private String fileType;
 
     @Lob
-    @Basic(fetch = FetchType.LAZY)
     private byte[] thumbnail;
 
 //    @CreationTimestamp

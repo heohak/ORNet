@@ -35,4 +35,9 @@ public class WikiController {
     public WikiDTO getWikiById(@PathVariable Integer wikiId) {
         return wikiService.getWikiById(wikiId);
     }
+
+    @GetMapping("/search")
+    public List<WikiDTO> searchWiki(@RequestParam(value = "q", required = false) String query) {
+        return wikiService.searchWiki(query);
+    }
 }
