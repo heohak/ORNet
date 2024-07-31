@@ -9,7 +9,9 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -29,5 +31,15 @@ public class ClientWorkerRoleClassificatorService {
 
     public List<ClientWorkerRoleClassificatorDTO> getAllWorkerRoleClassificators() {
         return workerRoleClassificatorMapper.toDtoList(workerRoleClassificatorRepo.findAll());
+    }
+
+    public Set<ClientWorkerRoleClassificator> roleIdsToRolesSet(List<Integer> roleIds) {
+        Set<ClientWorkerRoleClassificator> roles = new HashSet<>();
+        for (Integer roleId : roleIds) {
+            ClientWorkerRoleClassificator role = workerRoleClassificatorRepo.findById(roleId)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid client worker role ID " + roleId));
+            roles.add(role);
+        }
+        return roles;
     }
 }
