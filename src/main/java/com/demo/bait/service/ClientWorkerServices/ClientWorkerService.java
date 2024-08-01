@@ -53,10 +53,15 @@ public class ClientWorkerService {
         worker.setPhoneNumber(workerDTO.phoneNumber());
         worker.setTitle(workerDTO.title());
 
-        Optional<Client> clientOpt = clientRepo.findById(workerDTO.clientId());
-        Optional<Location> locationOpt = locationRepo.findById(workerDTO.locationId());
-        clientOpt.ifPresent(worker::setClient);
-        locationOpt.ifPresent(worker::setLocation);
+        if (workerDTO.clientId() != null) {
+            Optional<Client> clientOpt = clientRepo.findById(workerDTO.clientId());
+            clientOpt.ifPresent(worker::setClient);
+        }
+
+        if (workerDTO.locationId() != null) {
+            Optional<Location> locationOpt = locationRepo.findById(workerDTO.locationId());
+            locationOpt.ifPresent(worker::setLocation);
+        }
 
         if(workerDTO.roleIds() != null) {
             Set<ClientWorkerRoleClassificator> roles = clientWorkerRoleClassificatorService.roleIdsToRolesSet(workerDTO.roleIds());
