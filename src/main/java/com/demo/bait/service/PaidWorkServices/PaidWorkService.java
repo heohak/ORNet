@@ -26,7 +26,7 @@ public class PaidWorkService {
     @Transactional
     public PaidWork createPaidWork() {
         PaidWork paidWork = new PaidWork();
-        paidWork.setStartTime(LocalDateTime.now());
+        paidWork.setStartTime(LocalDateTime.now().withNano(0));
         paidWork.setSettled(false);
         paidWorkRepo.save(paidWork);
         return paidWork;
