@@ -2,6 +2,10 @@ package com.demo.bait.repository;
 
 import com.demo.bait.entity.Client;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
-public interface ClientRepo extends JpaRepository<Client, Integer> {
+import java.util.List;
+
+public interface ClientRepo extends JpaRepository<Client, Integer>, JpaSpecificationExecutor<Client> {
+
 }

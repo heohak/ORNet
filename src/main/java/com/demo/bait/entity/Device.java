@@ -36,7 +36,7 @@ public class Device {
     private DeviceClassificator classificator;
     private String department;
     private String room;
-    private Integer serialNumber;
+    private String serialNumber;
     private String licenseNumber;
     private String version;
     private LocalDate versionUpdateDate;
@@ -55,7 +55,15 @@ public class Device {
     private String softwareKey; // kui null siis ei ole olemas seda ehk ei ole vaja
     private LocalDate introducedDate;
     private LocalDate writtenOffDate;
-    private String comment; // vaba + vajaduesl failid
+//    private String comment; // vaba + vajaduesl failid
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "device_comment",
+            joinColumns = @JoinColumn(name = "device_id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id")
+    )
+    private Set<Comment> comments = new HashSet<>();
+
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name = "device_file_upload",
