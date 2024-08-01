@@ -25,8 +25,7 @@ public class LinkedDevice {
     private String name;
     private String manufacturer;
     private String productCode;
-    private Integer serialNumber;
-//    private String comment;
+    private String serialNumber;
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name = "linked_device_comment",
