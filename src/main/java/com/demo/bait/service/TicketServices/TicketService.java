@@ -329,7 +329,7 @@ public class TicketService {
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
         Ticket ticket = ticketOpt.get();
-        ticket.setUpdateDateTime(LocalDateTime.now());
+        ticket.setUpdateDateTime(LocalDateTime.now().withNano(0));
         ticketRepo.save(ticket);
     }
 
