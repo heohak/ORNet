@@ -35,10 +35,15 @@ public class DeviceService {
     public ResponseDTO addDevice(DeviceDTO deviceDTO) {
         Device device = new Device();
 
-        Optional<Client> clientOpt = clientRepo.findById(deviceDTO.clientId());
-        Optional<Location> locationOpt = locationRepo.findById(deviceDTO.locationId());
-        clientOpt.ifPresent(device::setClient);
-        locationOpt.ifPresent(device::setLocation);
+        if (deviceDTO.clientId() != null) {
+            Optional<Client> clientOpt = clientRepo.findById(deviceDTO.clientId());
+            clientOpt.ifPresent(device::setClient);
+        }
+
+        if (deviceDTO.locationId() != null) {
+            Optional<Location> locationOpt = locationRepo.findById(deviceDTO.locationId());
+            locationOpt.ifPresent(device::setLocation);
+        }
 
         device.setDeviceName(deviceDTO.deviceName());
         device.setDepartment(deviceDTO.department());

@@ -7,5 +7,5 @@ import java.util.Map;
 
 @Builder
 public record LinkedDeviceDTO(Integer id, Integer deviceId, String name, String manufacturer, String productCode,
-                              Integer serialNumber, List<Integer> commentIds, Map<String, Object> attributes) {
+                              String serialNumber, List<Integer> commentIds, Map<String, Object> attributes) {
 }
