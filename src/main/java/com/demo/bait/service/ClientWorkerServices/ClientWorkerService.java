@@ -64,7 +64,8 @@ public class ClientWorkerService {
         }
 
         if(workerDTO.roleIds() != null) {
-            Set<ClientWorkerRoleClassificator> roles = clientWorkerRoleClassificatorService.roleIdsToRolesSet(workerDTO.roleIds());
+            Set<ClientWorkerRoleClassificator> roles = clientWorkerRoleClassificatorService
+                    .roleIdsToRolesSet(workerDTO.roleIds());
             worker.setRoles(roles);
         }
 
