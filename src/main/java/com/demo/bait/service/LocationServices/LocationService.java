@@ -30,8 +30,8 @@ public class LocationService {
         location.setName(locationDTO.name());
         location.setAddress(locationDTO.address());
         location.setPhone(locationDTO.phone());
-        Location savedLocation = locationRepo.save(location);
-        return locationMapper.toDto(savedLocation);
+        locationRepo.save(location);
+        return locationMapper.toDto(location);
     }
 
     @Transactional
