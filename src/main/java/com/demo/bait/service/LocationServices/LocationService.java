@@ -25,13 +25,13 @@ public class LocationService {
     private LocationMapper locationMapper;
 
     @Transactional
-    public ResponseDTO addLocation(LocationDTO locationDTO) {
+    public LocationDTO addLocation(LocationDTO locationDTO) {
         Location location = new Location();
         location.setName(locationDTO.name());
         location.setAddress(locationDTO.address());
         location.setPhone(locationDTO.phone());
-        locationRepo.save(location);
-        return new ResponseDTO("Location added successfully");
+        Location savedLocation = locationRepo.save(location);
+        return locationMapper.toDto(savedLocation);
     }
 
     @Transactional
