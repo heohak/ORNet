@@ -32,6 +32,7 @@ public class ClientService {
     private LocationService locationService;
     private ThirdPartyITService thirdPartyITService;
 
+    @Transactional
     public ResponseDTO addClient(ClientDTO clientDTO) {
         Client client = new Client();
         client.setFullName(clientDTO.fullName());
