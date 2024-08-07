@@ -33,9 +33,11 @@ public class LinkedDeviceService {
     @Transactional
     public ResponseDTO addLinkedDevice(LinkedDeviceDTO linkedDeviceDTO) {
         LinkedDevice linkedDevice = new LinkedDevice();
-        if (linkedDeviceDTO.deviceId() != null && deviceRepo.findById(linkedDeviceDTO.deviceId()).isPresent()) {
-            linkedDevice.setDevice(deviceRepo.getReferenceById(linkedDeviceDTO.deviceId()));
-        }
+//        if (linkedDeviceDTO.deviceId() != null && deviceRepo.findById(linkedDeviceDTO.deviceId()).isPresent()) {
+//            linkedDevice.setDevice(deviceRepo.getReferenceById(linkedDeviceDTO.deviceId()));
+//        }
+        updateDevice(linkedDevice, linkedDeviceDTO);
+
         linkedDevice.setName(linkedDeviceDTO.name());
         linkedDevice.setManufacturer(linkedDeviceDTO.manufacturer());
         linkedDevice.setProductCode(linkedDeviceDTO.productCode());
@@ -89,7 +91,7 @@ public class LinkedDeviceService {
         }
         LinkedDevice linkedDevice = linkedDeviceOpt.get();
 
-        updateDeviceId(linkedDevice, linkedDeviceDTO);
+        updateDevice(linkedDevice, linkedDeviceDTO);
         updateName(linkedDevice, linkedDeviceDTO);
         updateManufacturer(linkedDevice, linkedDeviceDTO);
         updateProductCode(linkedDevice, linkedDeviceDTO);
@@ -98,14 +100,10 @@ public class LinkedDeviceService {
         return new ResponseDTO("Linked Device updated successfully");
     }
 
-    public void updateDeviceId(LinkedDevice linkedDevice, LinkedDeviceDTO linkedDeviceDTO) {
+    public void updateDevice(LinkedDevice linkedDevice, LinkedDeviceDTO linkedDeviceDTO) {
         if (linkedDeviceDTO.deviceId() != null) {
             Optional<Device> deviceOpt = deviceRepo.findById(linkedDeviceDTO.deviceId());
-            if (deviceOpt.isEmpty()) {
-                throw new EntityNotFoundException("Device with id " + linkedDeviceDTO.deviceId() + " not found");
-            }
-            Device device = deviceOpt.get();
-            linkedDevice.setDevice(device);
+            deviceOpt.ifPresent(linkedDevice::setDevice);
         }
     }
 

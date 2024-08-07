@@ -34,4 +34,10 @@ public class ClientWorkerPutController {
     public ResponseDTO addRoles(@PathVariable Integer workerId, @RequestBody ClientWorkerDTO clientWorkerDTO) {
         return clientWorkerRoleService.addRolesToWorker(workerId, clientWorkerDTO);
     }
+
+    @PutMapping("/update/{workerId}")
+    public ResponseDTO updateClientWorker(@PathVariable Integer workerId,
+                                          @RequestBody ClientWorkerDTO clientWorkerDTO) {
+        return clientWorkerService.updateClientWorker(workerId, clientWorkerDTO);
+    }
 }
