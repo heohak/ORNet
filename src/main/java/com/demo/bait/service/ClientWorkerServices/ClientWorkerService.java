@@ -53,20 +53,9 @@ public class ClientWorkerService {
         worker.setPhoneNumber(workerDTO.phoneNumber());
         worker.setTitle(workerDTO.title());
 
-        if (workerDTO.clientId() != null) {
-            Optional<Client> clientOpt = clientRepo.findById(workerDTO.clientId());
-            clientOpt.ifPresent(worker::setClient);
-        }
-
-        if (workerDTO.locationId() != null) {
-            Optional<Location> locationOpt = locationRepo.findById(workerDTO.locationId());
-            locationOpt.ifPresent(worker::setLocation);
-        }
-
-        if(workerDTO.roleIds() != null) {
-            Set<ClientWorkerRoleClassificator> roles = clientWorkerRoleClassificatorService.roleIdsToRolesSet(workerDTO.roleIds());
-            worker.setRoles(roles);
-        }
+        updateClient(worker, workerDTO);
+        updateLocation(worker, workerDTO);
+        updateRoles(worker, workerDTO);
 
         clientWorkerRepo.save(worker);
         return new ResponseDTO(worker.getId().toString());
@@ -114,6 +103,78 @@ public class ClientWorkerService {
     public ResponseDTO deleteWorker(Integer workerId) {
         clientWorkerRepo.deleteById(workerId);
         return new ResponseDTO("Worker deleted successfully");
+    }
+
+    @Transactional
+    public ResponseDTO updateClientWorker(Integer workerId, ClientWorkerDTO clientWorkerDTO) {
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        if (workerOpt.isEmpty()) {
+            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        }
+        ClientWorker worker = workerOpt.get();
+
+        updateFirstName(worker, clientWorkerDTO);
+        updateLastName(worker, clientWorkerDTO);
+        updateEmail(worker, clientWorkerDTO);
+        updatePhoneNumber(worker, clientWorkerDTO);
+        updateTitle(worker, clientWorkerDTO);
+        updateClient(worker, clientWorkerDTO);
+        updateLocation(worker, clientWorkerDTO);
+        updateRoles(worker, clientWorkerDTO);
+        clientWorkerRepo.save(worker);
+        return new ResponseDTO("Client worker updated successfully");
+    }
+
+    public void updateFirstName(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
+        if (clientWorkerDTO.firstName() != null) {
+            worker.setFirstName(clientWorkerDTO.firstName());
+        }
+    }
+
+    public void updateLastName(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
+        if (clientWorkerDTO.lastName() != null) {
+            worker.setLastName(clientWorkerDTO.lastName());
+        }
+    }
+
+    public void updateEmail(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
+        if (clientWorkerDTO.email() != null) {
+            worker.setEmail(clientWorkerDTO.email());
+        }
+    }
+
+    public void updatePhoneNumber(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
+        if (clientWorkerDTO.phoneNumber() != null) {
+            worker.setPhoneNumber(clientWorkerDTO.phoneNumber());
+        }
+    }
+
+    public void updateTitle(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
+        if (clientWorkerDTO.title() != null) {
+            worker.setTitle(clientWorkerDTO.title());
+        }
+    }
+
+    public void updateClient(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
+        if (clientWorkerDTO.clientId() != null) {
+            Optional<Client> clientOpt = clientRepo.findById(clientWorkerDTO.clientId());
+            clientOpt.ifPresent(worker::setClient);
+        }
+    }
+
+    public void updateLocation(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
+        if (clientWorkerDTO.locationId() != null) {
+            Optional<Location> locationOpt = locationRepo.findById(clientWorkerDTO.locationId());
+            locationOpt.ifPresent(worker::setLocation);
+        }
+    }
+
+    public void updateRoles(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
+        if (clientWorkerDTO.roleIds() != null) {
+            Set<ClientWorkerRoleClassificator> roles = clientWorkerRoleClassificatorService
+                    .roleIdsToRolesSet(clientWorkerDTO.roleIds());
+            worker.setRoles(roles);
+        }
     }
 
     public List<ClientWorkerDTO> getAllWorkers() {

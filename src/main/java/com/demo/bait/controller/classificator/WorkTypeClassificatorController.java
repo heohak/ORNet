@@ -24,4 +24,10 @@ public class WorkTypeClassificatorController {
     public List<WorkTypeClassificatorDTO> getAllWorkTypes() {
         return workTypeClassificatorService.getAllWorkTypes();
     }
+
+    @PutMapping("/update/{workTypeId}")
+    public ResponseDTO updateWorkTypeClassificator(@PathVariable Integer workTypeId,
+                                                   @RequestBody WorkTypeClassificatorDTO workTypeClassificatorDTO) {
+        return workTypeClassificatorService.updateWorkTypeClassificator(workTypeId, workTypeClassificatorDTO);
+    }
 }

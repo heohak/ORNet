@@ -27,23 +27,16 @@ public class DeviceService {
     private ClientRepo clientRepo;
     private LocationRepo locationRepo;
     private DeviceClassificatorRepo deviceClassificatorRepo;
-    private MaintenanceService maintenanceService;
     private FileUploadService fileUploadService;
     private CommentService commentService;
+    private DeviceMaintenanceService deviceMaintenanceService;
 
     @Transactional
     public ResponseDTO addDevice(DeviceDTO deviceDTO) {
         Device device = new Device();
 
-        if (deviceDTO.clientId() != null) {
-            Optional<Client> clientOpt = clientRepo.findById(deviceDTO.clientId());
-            clientOpt.ifPresent(device::setClient);
-        }
-
-        if (deviceDTO.locationId() != null) {
-            Optional<Location> locationOpt = locationRepo.findById(deviceDTO.locationId());
-            locationOpt.ifPresent(device::setLocation);
-        }
+        updateClient(device, deviceDTO);
+        updateLocation(device, deviceDTO);
 
         device.setDeviceName(deviceDTO.deviceName());
         device.setDepartment(deviceDTO.department());
@@ -53,10 +46,7 @@ public class DeviceService {
         device.setVersion(deviceDTO.version());
         device.setVersionUpdateDate(deviceDTO.versionUpdateDate());
 
-        if (deviceDTO.maintenanceIds() != null) {
-            Set<Maintenance> maintenances = maintenanceService.maintenanceIdsToMaintenancesSet(deviceDTO.maintenanceIds());
-            device.setMaintenances(maintenances);
-        }
+        deviceMaintenanceService.updateMaintenances(device, deviceDTO);
 
         device.setFirstIPAddress(deviceDTO.firstIPAddress());
         device.setSecondIPAddress(deviceDTO.secondIPAddress());
@@ -80,6 +70,8 @@ public class DeviceService {
         } else {
             device.setAttributes(new HashMap<>());
         }
+
+        updateDeviceClassificator(device, deviceDTO);
 
         deviceRepo.save(device);
         return new ResponseDTO(device.getId().toString());
@@ -160,6 +152,137 @@ public class DeviceService {
     public ResponseDTO deleteDevice(Integer deviceId) {
         deviceRepo.deleteById(deviceId);
         return new ResponseDTO("Device deleted successfully");
+    }
+
+    @Transactional
+    public ResponseDTO updateDevice(Integer deviceId, DeviceDTO deviceDTO) {
+        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+        if (deviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        }
+        Device device = deviceOpt.get();
+
+        updateClient(device, deviceDTO);
+        updateLocation(device, deviceDTO);
+        updateDeviceName(device, deviceDTO);
+        updateDepartment(device, deviceDTO);
+        updateRoom(device, deviceDTO);
+        updateSerialNumber(device, deviceDTO);
+        updateLicenceNumber(device, deviceDTO);
+        updateVersion(device, deviceDTO);
+        updateVersionUpdateDate(device, deviceDTO);
+        deviceMaintenanceService.updateMaintenances(device, deviceDTO);
+        updateFirstIPAddress(device, deviceDTO);
+        updateSecondIPAddress(device, deviceDTO);
+        updateSubnetMask(device, deviceDTO);
+        updateSoftwareKey(device, deviceDTO);
+        updateIntroducedDate(device, deviceDTO);
+        updateWrittenOffDate(device, deviceDTO);
+
+        updateDeviceClassificator(device, deviceDTO);
+
+        deviceRepo.save(device);
+        return new ResponseDTO("Device updated successfully");
+    }
+
+    public void updateClient(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.clientId() != null) {
+            Optional<Client> clientOpt = clientRepo.findById(deviceDTO.clientId());
+            clientOpt.ifPresent(device::setClient);
+        }
+    }
+
+    public void updateLocation(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.locationId() != null) {
+            Optional<Location> locationOpt = locationRepo.findById(deviceDTO.locationId());
+            locationOpt.ifPresent(device::setLocation);
+        }
+    }
+
+    public void updateDeviceName(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.deviceName() != null) {
+            device.setDeviceName(deviceDTO.deviceName());
+        }
+    }
+
+    public void updateDepartment(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.department() != null) {
+            device.setDepartment(deviceDTO.department());
+        }
+    }
+
+    public void updateRoom(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.room() != null) {
+            device.setRoom(deviceDTO.room());
+        }
+    }
+
+    public void updateSerialNumber(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.serialNumber() != null) {
+            device.setSerialNumber(deviceDTO.serialNumber());
+        }
+    }
+
+    public void updateLicenceNumber(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.licenseNumber() != null) {
+            device.setLicenseNumber(deviceDTO.licenseNumber());
+        }
+    }
+
+    public void updateVersion(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.version() != null) {
+            device.setVersion(deviceDTO.version());
+        }
+    }
+
+    public void updateVersionUpdateDate(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.versionUpdateDate() != null) {
+            device.setVersionUpdateDate(deviceDTO.versionUpdateDate());
+        }
+    }
+
+    public void updateFirstIPAddress(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.firstIPAddress() != null) {
+            device.setFirstIPAddress(deviceDTO.firstIPAddress());
+        }
+    }
+
+    public void updateSecondIPAddress(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.secondIPAddress() != null) {
+            device.setSecondIPAddress(deviceDTO.secondIPAddress());
+        }
+    }
+
+    public void updateSubnetMask(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.subnetMask() != null) {
+            device.setSubnetMask(deviceDTO.subnetMask());
+        }
+    }
+
+    public void updateSoftwareKey(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.softwareKey() != null) {
+            device.setSoftwareKey(deviceDTO.softwareKey());
+        }
+    }
+
+    public void updateIntroducedDate(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.introducedDate() != null) {
+            device.setIntroducedDate(deviceDTO.introducedDate());
+        }
+    }
+
+    public void updateWrittenOffDate(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.writtenOffDate() != null) {
+            device.setWrittenOffDate(deviceDTO.writtenOffDate());
+        }
+    }
+
+    public void updateDeviceClassificator(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.classificatorId() != null) {
+            Optional<DeviceClassificator> deviceClassificatorOpt = deviceClassificatorRepo
+                    .findById(deviceDTO.classificatorId());
+            deviceClassificatorOpt.ifPresent(device::setClassificator);
+        }
     }
 
     public List<DeviceDTO> getDevicesByClientId(Integer clientId) {

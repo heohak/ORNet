@@ -30,17 +30,12 @@ public class TicketContactsService {
     private ClientWorkerService clientWorkerService;
 
     @Transactional
-    public void addContactsToTicket(Integer ticketId, TicketDTO ticketDTO) {
-        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
-        if (ticketOpt.isEmpty()) {
-            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
-        }
-        Ticket ticket = ticketOpt.get();
+    public void addContactsToTicket(Ticket ticket, TicketDTO ticketDTO) {
         if (ticketDTO.contactIds() != null) {
             Set<ClientWorker> contacts = clientWorkerService.contactIdsToClientWorkersSet(ticketDTO.contactIds());
             ticket.setContacts(contacts);
+            ticketRepo.save(ticket);
         }
-        ticketRepo.save(ticket);
     }
 
     public List<ClientWorkerDTO> getTicketContacts(Integer ticketId) {
