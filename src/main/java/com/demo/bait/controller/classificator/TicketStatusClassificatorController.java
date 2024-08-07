@@ -29,4 +29,10 @@ public class TicketStatusClassificatorController {
     public TicketStatusClassificatorDTO getTicketStatusClassificatorById(@PathVariable Integer statusId) {
         return ticketStatusService.getTicketStatusClassificatorById(statusId);
     }
+
+    @PutMapping("/update/{statusId}")
+    public ResponseDTO updateTicketStatusClassificator(@PathVariable Integer statusId,
+                                                       @RequestBody TicketStatusClassificatorDTO statusDTO) {
+        return ticketStatusService.updateTicketStatus(statusId, statusDTO);
+    }
 }
