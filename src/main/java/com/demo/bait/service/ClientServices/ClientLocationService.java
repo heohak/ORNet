@@ -1,5 +1,6 @@
 package com.demo.bait.service.ClientServices;
 
+import com.demo.bait.dto.ClientDTO;
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.Client;
@@ -7,6 +8,7 @@ import com.demo.bait.entity.Location;
 import com.demo.bait.mapper.LocationMapper;
 import com.demo.bait.repository.ClientRepo;
 import com.demo.bait.repository.LocationRepo;
+import com.demo.bait.service.LocationServices.LocationService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -24,6 +27,7 @@ public class ClientLocationService {
     private ClientRepo clientRepo;
     private LocationRepo locationRepo;
     private LocationMapper locationMapper;
+    private LocationService locationService;
 
     @Transactional
     public ResponseDTO addLocationToClient(Integer clientId, Integer locationId) {
@@ -52,5 +56,12 @@ public class ClientLocationService {
 
         Client client = clientOpt.get();
         return locationMapper.toDtoList(client.getLocations().stream().toList());
+    }
+
+    public void updateLocations(Client client, ClientDTO clientDTO) {
+        if (clientDTO.locationIds() != null) {
+            Set<Location> locations = locationService.locationIdsToLocationsSet(clientDTO.locationIds());
+            client.setLocations(locations);
+        }
     }
 }
