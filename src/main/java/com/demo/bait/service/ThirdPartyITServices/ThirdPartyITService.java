@@ -5,6 +5,7 @@ import com.demo.bait.dto.ThirdPartyITDTO;
 import com.demo.bait.entity.ThirdPartyIT;
 import com.demo.bait.mapper.ThirdPartyITMapper;
 import com.demo.bait.repository.ThirdPartyITRepo;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -36,6 +38,39 @@ public class ThirdPartyITService {
     public ResponseDTO deleteThirdPartyIT(Integer id) {
         thirdPartyITRepo.deleteById(id);
         return new ResponseDTO("Third party IT deleted successfully");
+    }
+
+    @Transactional
+    public ResponseDTO updateThirdPartyIT(Integer thirdPartyId, ThirdPartyITDTO thirdPartyITDTO) {
+        Optional<ThirdPartyIT> thirdPartyITOpt = thirdPartyITRepo.findById(thirdPartyId);
+        if (thirdPartyITOpt.isEmpty()) {
+            throw new EntityNotFoundException("Third Party IT with id " + thirdPartyId + " not found");
+        }
+        ThirdPartyIT thirdPartyIT = thirdPartyITOpt.get();
+
+        updateName(thirdPartyIT, thirdPartyITDTO);
+        updateEmail(thirdPartyIT, thirdPartyITDTO);
+        updatePhone(thirdPartyIT, thirdPartyITDTO);
+        thirdPartyITRepo.save(thirdPartyIT);
+        return new ResponseDTO("Third party IT updated successfully");
+    }
+
+    public void updateName(ThirdPartyIT thirdPartyIT, ThirdPartyITDTO thirdPartyITDTO) {
+        if (thirdPartyITDTO.name() != null) {
+            thirdPartyIT.setName(thirdPartyITDTO.name());
+        }
+    }
+
+    public void updateEmail(ThirdPartyIT thirdPartyIT, ThirdPartyITDTO thirdPartyITDTO) {
+        if (thirdPartyITDTO.email() != null) {
+            thirdPartyIT.setEmail(thirdPartyITDTO.email());
+        }
+    }
+
+    public void updatePhone(ThirdPartyIT thirdPartyIT, ThirdPartyITDTO thirdPartyITDTO) {
+        if (thirdPartyITDTO.phone() != null) {
+            thirdPartyIT.setPhone(thirdPartyITDTO.phone());
+        }
     }
 
     public List<ThirdPartyITDTO> getAllThirdParties() {

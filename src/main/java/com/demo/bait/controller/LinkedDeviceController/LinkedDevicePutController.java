@@ -1,5 +1,6 @@
 package com.demo.bait.controller.LinkedDeviceController;
 
+import com.demo.bait.dto.LinkedDeviceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceAttributeService;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceCommentService;
@@ -33,5 +34,11 @@ public class LinkedDevicePutController {
     public ResponseDTO addCommentToLinkedDevice(@PathVariable Integer linkedDeviceId,
                                                 @RequestParam("comment") String comment) {
         return linkedDeviceCommentService.addCommentToLinkedDevice(linkedDeviceId, comment);
+    }
+
+    @PutMapping("/update/{linkedDeviceId}")
+    public ResponseDTO updateLinkedDevice(@PathVariable Integer linkedDeviceId,
+                                          @RequestBody LinkedDeviceDTO linkedDeviceDTO) {
+        return linkedDeviceService.updateLinkedDevice(linkedDeviceId, linkedDeviceDTO);
     }
 }

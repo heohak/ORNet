@@ -40,6 +40,39 @@ public class LocationService {
         return new ResponseDTO("Location deleted successfully");
     }
 
+    @Transactional
+    public ResponseDTO updateLocation(Integer locationId, LocationDTO locationDTO) {
+        Optional<Location> locationOpt = locationRepo.findById(locationId);
+        if (locationOpt.isEmpty()) {
+            throw new EntityNotFoundException("Location with id " + locationId + " not found");
+        }
+        Location location = locationOpt.get();
+
+        updateName(location, locationDTO);
+        updateAddress(location, locationDTO);
+        updatePhone(location, locationDTO);
+        locationRepo.save(location);
+        return new ResponseDTO("Location updated successfully");
+    }
+
+    public void updateName(Location location, LocationDTO locationDTO) {
+        if (locationDTO.name() != null) {
+            location.setName(locationDTO.name());
+        }
+    }
+
+    public void updateAddress(Location location, LocationDTO locationDTO) {
+        if (locationDTO.address() != null) {
+            location.setAddress(locationDTO.address());
+        }
+    }
+
+    public void updatePhone(Location location, LocationDTO locationDTO) {
+        if (locationDTO.phone() != null) {
+            location.setPhone(locationDTO.phone());
+        }
+    }
+
     public LocationDTO getLocationById(Integer locationId) {
         Optional<Location> locationOpt = locationRepo.findById(locationId);
         if (locationOpt.isEmpty()) {
