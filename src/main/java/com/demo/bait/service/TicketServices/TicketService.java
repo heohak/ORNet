@@ -179,6 +179,23 @@ public class TicketService {
     }
 
     @Transactional
+    public ResponseDTO addStatusToTicket(Integer ticketId, Integer statusId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        Optional<TicketStatusClassificator> statusOpt = ticketStatusRepo.findById(statusId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        if (statusOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket status with id " + statusId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        TicketStatusClassificator status = statusOpt.get();
+        ticket.setStatus(status);
+        ticketRepo.save(ticket);
+        return new ResponseDTO("Ticket status added successfully");
+    }
+
+    @Transactional
     public void addClientToTicket(Ticket ticket, Integer clientId) {
         if (clientId != null) {
             Optional<Client> clientOpt = clientRepo.findById(clientId);
