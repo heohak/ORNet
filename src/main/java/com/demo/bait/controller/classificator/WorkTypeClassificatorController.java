@@ -30,4 +30,9 @@ public class WorkTypeClassificatorController {
                                                    @RequestBody WorkTypeClassificatorDTO workTypeClassificatorDTO) {
         return workTypeClassificatorService.updateWorkTypeClassificator(workTypeId, workTypeClassificatorDTO);
     }
+
+    @DeleteMapping("/{workTypeId}")
+    public ResponseDTO deleteWorkType(@PathVariable Integer workTypeId) {
+        return workTypeClassificatorService.deleteWorkTypeClassificator(workTypeId);
+    }
 }

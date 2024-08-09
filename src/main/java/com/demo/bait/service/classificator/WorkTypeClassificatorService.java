@@ -48,6 +48,12 @@ public class WorkTypeClassificatorService {
         return new ResponseDTO("Work type classificator updated successfully");
     }
 
+    @Transactional
+    public ResponseDTO deleteWorkTypeClassificator(Integer workTypeId) {
+        workTypeClassificatorRepo.deleteById(workTypeId);
+        return new ResponseDTO("Work type deleted successfully");
+    }
+
     public List<WorkTypeClassificatorDTO> getAllWorkTypes() {
         return workTypeClassificatorMapper.toDtoList(workTypeClassificatorRepo.findAll());
     }
