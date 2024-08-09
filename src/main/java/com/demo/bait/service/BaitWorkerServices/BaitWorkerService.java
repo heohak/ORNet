@@ -7,8 +7,10 @@ import com.demo.bait.mapper.BaitWorkerMapper;
 import com.demo.bait.repository.BaitWorkerRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +23,7 @@ public class BaitWorkerService {
     private BaitWorkerRepo baitWorkerRepo;
     private BaitWorkerMapper baitWorkerMapper;
 
+    @Transactional
     public ResponseDTO addWorker(BaitWorkerDTO workerDTO) {
         BaitWorker worker = new BaitWorker();
         worker.setFirstName(workerDTO.firstName());
@@ -32,13 +35,60 @@ public class BaitWorkerService {
         return new ResponseDTO("Bait Worker added successfully");
     }
 
-    public List<BaitWorkerDTO> getAllWorkers() {
-        return baitWorkerMapper.toDtoList(baitWorkerRepo.findAll());
-    }
-
+    @Transactional
     public ResponseDTO deleteBaitWorker(Integer baitWorkerId) {
         baitWorkerRepo.deleteById(baitWorkerId);
         return new ResponseDTO("Bait Worker deleted successfully");
+    }
+
+    @Transactional
+    public ResponseDTO updateBaitWorker(Integer baitWorkerId, BaitWorkerDTO baitWorkerDTO) {
+        Optional<BaitWorker> baitWorkerOpt = baitWorkerRepo.findById(baitWorkerId);
+        if (baitWorkerOpt.isEmpty()) {
+            throw new EntityNotFoundException("Bait worker with id " + baitWorkerId + " not found");
+        }
+        BaitWorker worker = baitWorkerOpt.get();
+        updateFirstName(worker, baitWorkerDTO);
+        updateLastName(worker, baitWorkerDTO);
+        updateEmail(worker, baitWorkerDTO);
+        updatePhoneNumber(worker, baitWorkerDTO);
+        updateTitle(worker, baitWorkerDTO);
+        baitWorkerRepo.save(worker);
+        return new ResponseDTO("Bait Worker updated successfully");
+    }
+
+    public void updateFirstName(BaitWorker worker, BaitWorkerDTO baitWorkerDTO) {
+        if (baitWorkerDTO.firstName() != null) {
+            worker.setFirstName(baitWorkerDTO.firstName());
+        }
+    }
+
+    public void updateLastName(BaitWorker worker, BaitWorkerDTO baitWorkerDTO) {
+        if (baitWorkerDTO.lastName() != null) {
+            worker.setLastName(baitWorkerDTO.lastName());
+        }
+    }
+
+    public void updateEmail(BaitWorker worker, BaitWorkerDTO baitWorkerDTO) {
+        if (baitWorkerDTO.email() != null) {
+            worker.setEmail(baitWorkerDTO.email());
+        }
+    }
+
+    public void updatePhoneNumber(BaitWorker worker, BaitWorkerDTO baitWorkerDTO) {
+        if (baitWorkerDTO.phoneNumber() != null) {
+            worker.setPhoneNumber(baitWorkerDTO.phoneNumber());
+        }
+    }
+
+    public void updateTitle(BaitWorker worker, BaitWorkerDTO baitWorkerDTO) {
+        if (baitWorkerDTO.title() != null) {
+            worker.setTitle(baitWorkerDTO.title());
+        }
+    }
+
+    public List<BaitWorkerDTO> getAllWorkers() {
+        return baitWorkerMapper.toDtoList(baitWorkerRepo.findAll());
     }
 
     public BaitWorkerDTO getBaitWorkerById(Integer workerId) {

@@ -33,9 +33,11 @@ public class LinkedDeviceService {
     @Transactional
     public ResponseDTO addLinkedDevice(LinkedDeviceDTO linkedDeviceDTO) {
         LinkedDevice linkedDevice = new LinkedDevice();
-        if (linkedDeviceDTO.deviceId() != null && deviceRepo.findById(linkedDeviceDTO.deviceId()).isPresent()) {
-            linkedDevice.setDevice(deviceRepo.getReferenceById(linkedDeviceDTO.deviceId()));
-        }
+//        if (linkedDeviceDTO.deviceId() != null && deviceRepo.findById(linkedDeviceDTO.deviceId()).isPresent()) {
+//            linkedDevice.setDevice(deviceRepo.getReferenceById(linkedDeviceDTO.deviceId()));
+//        }
+        updateDevice(linkedDevice, linkedDeviceDTO);
+
         linkedDevice.setName(linkedDeviceDTO.name());
         linkedDevice.setManufacturer(linkedDeviceDTO.manufacturer());
         linkedDevice.setProductCode(linkedDeviceDTO.productCode());
@@ -79,6 +81,54 @@ public class LinkedDeviceService {
     public ResponseDTO deleteLinkedDevice(Integer linkedDeviceId) {
         linkedDeviceRepo.deleteById(linkedDeviceId);
         return new ResponseDTO("Linked Device deleted");
+    }
+
+    @Transactional
+    public ResponseDTO updateLinkedDevice(Integer linkedDeviceId, LinkedDeviceDTO linkedDeviceDTO) {
+        Optional<LinkedDevice> linkedDeviceOpt = linkedDeviceRepo.findById(linkedDeviceId);
+        if (linkedDeviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
+        }
+        LinkedDevice linkedDevice = linkedDeviceOpt.get();
+
+        updateDevice(linkedDevice, linkedDeviceDTO);
+        updateName(linkedDevice, linkedDeviceDTO);
+        updateManufacturer(linkedDevice, linkedDeviceDTO);
+        updateProductCode(linkedDevice, linkedDeviceDTO);
+        updateSerialNumber(linkedDevice, linkedDeviceDTO);
+        linkedDeviceRepo.save(linkedDevice);
+        return new ResponseDTO("Linked Device updated successfully");
+    }
+
+    public void updateDevice(LinkedDevice linkedDevice, LinkedDeviceDTO linkedDeviceDTO) {
+        if (linkedDeviceDTO.deviceId() != null) {
+            Optional<Device> deviceOpt = deviceRepo.findById(linkedDeviceDTO.deviceId());
+            deviceOpt.ifPresent(linkedDevice::setDevice);
+        }
+    }
+
+    public void updateName(LinkedDevice linkedDevice, LinkedDeviceDTO linkedDeviceDTO) {
+        if (linkedDeviceDTO.name() != null) {
+            linkedDevice.setName(linkedDeviceDTO.name());
+        }
+    }
+
+    public void updateManufacturer(LinkedDevice linkedDevice, LinkedDeviceDTO linkedDeviceDTO) {
+        if (linkedDeviceDTO.manufacturer() != null) {
+            linkedDevice.setManufacturer(linkedDeviceDTO.manufacturer());
+        }
+    }
+
+    public void updateProductCode(LinkedDevice linkedDevice, LinkedDeviceDTO linkedDeviceDTO) {
+        if (linkedDeviceDTO.productCode() != null) {
+            linkedDevice.setProductCode(linkedDeviceDTO.productCode());
+        }
+    }
+
+    public void updateSerialNumber(LinkedDevice linkedDevice, LinkedDeviceDTO linkedDeviceDTO) {
+        if (linkedDeviceDTO.serialNumber() != null) {
+            linkedDevice.setSerialNumber(linkedDeviceDTO.serialNumber());
+        }
     }
 
     public List<LinkedDeviceDTO> getNotUsedLinkedDevices() {

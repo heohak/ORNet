@@ -23,7 +23,6 @@ import java.util.Optional;
 public class LinkedDeviceCommentService {
 
     private LinkedDeviceRepo linkedDeviceRepo;
-    private CommentRepo commentRepo;
     private CommentMapper commentMapper;
     private CommentService commentService;
 

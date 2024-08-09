@@ -1,5 +1,6 @@
 package com.demo.bait.service.ClientServices;
 
+import com.demo.bait.dto.ClientDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.ThirdPartyITDTO;
 import com.demo.bait.entity.Client;
@@ -7,6 +8,7 @@ import com.demo.bait.entity.ThirdPartyIT;
 import com.demo.bait.mapper.ThirdPartyITMapper;
 import com.demo.bait.repository.ClientRepo;
 import com.demo.bait.repository.ThirdPartyITRepo;
+import com.demo.bait.service.ThirdPartyITServices.ThirdPartyITService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -24,6 +27,7 @@ public class ClientThirdPartyITService {
     private ClientRepo clientRepo;
     private ThirdPartyITRepo thirdPartyITRepo;
     private ThirdPartyITMapper thirdPartyITMapper;
+    private ThirdPartyITService thirdPartyITService;
 
     @Transactional
     public ResponseDTO addThirdPartyIT(Integer clientId, Integer thirdPartyITId) {
@@ -52,5 +56,13 @@ public class ClientThirdPartyITService {
 
         Client client = clientOpt.get();
         return thirdPartyITMapper.toDtoList(client.getThirdPartyITs().stream().toList());
+    }
+
+    public void updateThirdPartyITs(Client client, ClientDTO clientDTO) {
+        if (clientDTO.thirdPartyIds() != null) {
+            Set<ThirdPartyIT> thirdPartyITs = thirdPartyITService
+                    .thirdPartyITIdsToThirdPartyITsSet(clientDTO.thirdPartyIds());
+            client.setThirdPartyITs(thirdPartyITs);
+        }
     }
 }

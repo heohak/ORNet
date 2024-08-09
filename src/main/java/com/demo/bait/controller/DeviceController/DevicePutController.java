@@ -62,4 +62,9 @@ public class DevicePutController {
     public ResponseDTO addCommentToDevice(@PathVariable Integer deviceId, @RequestParam("comment") String comment) {
         return deviceCommentService.addCommentToDevice(deviceId, comment);
     }
+
+    @PutMapping("/update/{deviceId}")
+    public ResponseDTO updateDevice(@PathVariable Integer deviceId, @RequestBody DeviceDTO deviceDTO) {
+        return deviceService.updateDevice(deviceId, deviceDTO);
+    }
 }

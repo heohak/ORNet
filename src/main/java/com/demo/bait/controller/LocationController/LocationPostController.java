@@ -17,7 +17,7 @@ public class LocationPostController {
     public final LocationService locationService;
 
     @PostMapping("/add")
-    public ResponseDTO addLocation(@RequestBody LocationDTO locationDTO) {
+    public LocationDTO addLocation(@RequestBody LocationDTO locationDTO) {
         return locationService.addLocation(locationDTO);
     }
 }

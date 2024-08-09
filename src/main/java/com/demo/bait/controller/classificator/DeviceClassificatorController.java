@@ -24,4 +24,15 @@ public class DeviceClassificatorController {
     public List<DeviceClassificatorDTO> getAllDeviceClassificators() {
         return deviceClassificatorService.getAllClassificators();
     }
+
+    @PutMapping("/update/{deviceClassificatorId}")
+    public ResponseDTO updateDeviceClassificator(@PathVariable Integer deviceClassificatorId,
+                                                 @RequestBody DeviceClassificatorDTO deviceClassificatorDTO) {
+        return deviceClassificatorService.updateDeviceClassificator(deviceClassificatorId, deviceClassificatorDTO);
+    }
+
+    @DeleteMapping("/{deviceClassificatorId}")
+    public ResponseDTO deleteDeviceClassificator(@PathVariable Integer deviceClassificatorId) {
+        return deviceClassificatorService.deleteDeviceClassificator(deviceClassificatorId);
+    }
 }

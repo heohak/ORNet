@@ -1,9 +1,6 @@
 package com.demo.bait.entity.classificator;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,7 +12,9 @@ import lombok.Setter;
 public class TicketStatusClassificator {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ticket_status_classificator_seq")
+    @SequenceGenerator(name = "ticket_status_classificator_seq", sequenceName = "ticket_status_classificator_seq",
+            allocationSize = 1)
     private Integer id;
 
     private String status;

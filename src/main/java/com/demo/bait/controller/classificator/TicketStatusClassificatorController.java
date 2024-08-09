@@ -29,4 +29,15 @@ public class TicketStatusClassificatorController {
     public TicketStatusClassificatorDTO getTicketStatusClassificatorById(@PathVariable Integer statusId) {
         return ticketStatusService.getTicketStatusClassificatorById(statusId);
     }
+
+    @PutMapping("/update/{statusId}")
+    public ResponseDTO updateTicketStatusClassificator(@PathVariable Integer statusId,
+                                                       @RequestBody TicketStatusClassificatorDTO statusDTO) {
+        return ticketStatusService.updateTicketStatus(statusId, statusDTO);
+    }
+
+    @DeleteMapping("/{statusId}")
+    public ResponseDTO deleteTicketStatus(@PathVariable Integer statusId) {
+        return ticketStatusService.deleteTicketStatus(statusId);
+    }
 }

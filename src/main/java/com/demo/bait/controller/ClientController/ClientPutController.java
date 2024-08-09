@@ -1,15 +1,13 @@
 package com.demo.bait.controller.ClientController;
 
+import com.demo.bait.dto.ClientDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.service.ClientServices.ClientLocationService;
 import com.demo.bait.service.ClientServices.ClientMaintenanceService;
 import com.demo.bait.service.ClientServices.ClientService;
 import com.demo.bait.service.ClientServices.ClientThirdPartyITService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -34,5 +32,10 @@ public class ClientPutController {
     @PutMapping("/maintenance/{clientId}/{maintenanceId}")
     public ResponseDTO addMaintenanceToClient(@PathVariable Integer clientId, @PathVariable Integer maintenanceId) {
         return clientMaintenanceService.addMaintenanceToClient(clientId, maintenanceId);
+    }
+
+    @PutMapping("/update/{clientId}")
+    public ResponseDTO updateClient(@PathVariable Integer clientId, @RequestBody ClientDTO clientDTO) {
+        return clientService.updateClient(clientId, clientDTO);
     }
 }

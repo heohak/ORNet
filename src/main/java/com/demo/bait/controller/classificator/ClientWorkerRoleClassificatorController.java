@@ -24,4 +24,15 @@ public class ClientWorkerRoleClassificatorController {
     public List<ClientWorkerRoleClassificatorDTO> getAllWorkerRoleClassificators() {
         return workerRoleClassificatorService.getAllWorkerRoleClassificators();
     }
+
+    @PutMapping("/update/{roleId}")
+    public ResponseDTO updateWorkerRole(@PathVariable Integer roleId,
+                                        @RequestBody ClientWorkerRoleClassificatorDTO workerRoleDTO) {
+        return workerRoleClassificatorService.updateWorkerRoleClassificator(roleId, workerRoleDTO);
+    }
+
+    @DeleteMapping("/{roleId}")
+    public ResponseDTO deleteWorkerRole(@PathVariable Integer roleId) {
+        return workerRoleClassificatorService.deleteWorkerRoleClassificator(roleId);
+    }
 }

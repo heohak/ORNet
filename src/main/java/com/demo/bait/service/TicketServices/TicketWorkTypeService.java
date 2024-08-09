@@ -30,18 +30,13 @@ public class TicketWorkTypeService {
     private WorkTypeClassificatorService workTypeClassificatorService;
 
     @Transactional
-    public void addWorkTypeToTicket(Integer ticketId, TicketDTO ticketDTO) {
-        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
-        if (ticketOpt.isEmpty()) {
-            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
-        }
-        Ticket ticket = ticketOpt.get();
+    public void addWorkTypeToTicket(Ticket ticket, TicketDTO ticketDTO) {
         if (ticketDTO.workTypeIds() != null) {
             Set<WorkTypeClassificator> workTypes = workTypeClassificatorService
                     .workTypeIdsToWorkTypesSet(ticketDTO.workTypeIds());
             ticket.setWorkTypes(workTypes);
+            ticketRepo.save(ticket);
         }
-        ticketRepo.save(ticket);
     }
 
     public List<WorkTypeClassificatorDTO> getTicketWorkTypes(Integer ticketId) {

@@ -1,13 +1,11 @@
 package com.demo.bait.controller.ClientWorkerController;
 
+import com.demo.bait.dto.ClientWorkerDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.service.ClientWorkerServices.ClientWorkerRoleService;
 import com.demo.bait.service.ClientWorkerServices.ClientWorkerService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -30,5 +28,16 @@ public class ClientWorkerPutController {
     @PutMapping("/role/{workerId}/{roleId}")
     public ResponseDTO addRole(@PathVariable Integer workerId, @PathVariable Integer roleId) {
         return clientWorkerRoleService.addRoleToEmployee(workerId, roleId);
+    }
+
+    @PutMapping("/role/{workerId}")
+    public ResponseDTO addRoles(@PathVariable Integer workerId, @RequestBody ClientWorkerDTO clientWorkerDTO) {
+        return clientWorkerRoleService.addRolesToWorker(workerId, clientWorkerDTO);
+    }
+
+    @PutMapping("/update/{workerId}")
+    public ResponseDTO updateClientWorker(@PathVariable Integer workerId,
+                                          @RequestBody ClientWorkerDTO clientWorkerDTO) {
+        return clientWorkerService.updateClientWorker(workerId, clientWorkerDTO);
     }
 }

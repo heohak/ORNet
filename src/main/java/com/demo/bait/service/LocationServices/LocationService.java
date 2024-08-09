@@ -25,19 +25,52 @@ public class LocationService {
     private LocationMapper locationMapper;
 
     @Transactional
-    public ResponseDTO addLocation(LocationDTO locationDTO) {
+    public LocationDTO addLocation(LocationDTO locationDTO) {
         Location location = new Location();
         location.setName(locationDTO.name());
         location.setAddress(locationDTO.address());
         location.setPhone(locationDTO.phone());
         locationRepo.save(location);
-        return new ResponseDTO("Location added successfully");
+        return locationMapper.toDto(location);
     }
 
     @Transactional
     public ResponseDTO deleteLocation(Integer locationId) {
         locationRepo.deleteById(locationId);
         return new ResponseDTO("Location deleted successfully");
+    }
+
+    @Transactional
+    public ResponseDTO updateLocation(Integer locationId, LocationDTO locationDTO) {
+        Optional<Location> locationOpt = locationRepo.findById(locationId);
+        if (locationOpt.isEmpty()) {
+            throw new EntityNotFoundException("Location with id " + locationId + " not found");
+        }
+        Location location = locationOpt.get();
+
+        updateName(location, locationDTO);
+        updateAddress(location, locationDTO);
+        updatePhone(location, locationDTO);
+        locationRepo.save(location);
+        return new ResponseDTO("Location updated successfully");
+    }
+
+    public void updateName(Location location, LocationDTO locationDTO) {
+        if (locationDTO.name() != null) {
+            location.setName(locationDTO.name());
+        }
+    }
+
+    public void updateAddress(Location location, LocationDTO locationDTO) {
+        if (locationDTO.address() != null) {
+            location.setAddress(locationDTO.address());
+        }
+    }
+
+    public void updatePhone(Location location, LocationDTO locationDTO) {
+        if (locationDTO.phone() != null) {
+            location.setPhone(locationDTO.phone());
+        }
     }
 
     public LocationDTO getLocationById(Integer locationId) {

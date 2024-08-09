@@ -1,5 +1,6 @@
 package com.demo.bait.service.DeviceServices;
 
+import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.Device;
@@ -7,6 +8,7 @@ import com.demo.bait.entity.Maintenance;
 import com.demo.bait.mapper.MaintenanceMapper;
 import com.demo.bait.repository.DeviceRepo;
 import com.demo.bait.repository.MaintenanceRepo;
+import com.demo.bait.service.MaintenanceServices.MaintenanceService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -24,6 +27,7 @@ public class DeviceMaintenanceService {
     private DeviceRepo deviceRepo;
     private MaintenanceRepo maintenanceRepo;
     private MaintenanceMapper maintenanceMapper;
+    private MaintenanceService maintenanceService;
 
     @Transactional
     public ResponseDTO addMaintenanceToDevice(Integer deviceId, Integer maintenanceId) {
@@ -52,5 +56,13 @@ public class DeviceMaintenanceService {
 
         Device device = deviceOpt.get();
         return maintenanceMapper.toDtoList(device.getMaintenances().stream().toList());
+    }
+
+    public void updateMaintenances(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.maintenanceIds() != null) {
+            Set<Maintenance> maintenances = maintenanceService
+                    .maintenanceIdsToMaintenancesSet(deviceDTO.maintenanceIds());
+            device.setMaintenances(maintenances);
+        }
     }
 }
