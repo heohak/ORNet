@@ -47,6 +47,12 @@ public class ClientWorkerRoleClassificatorService {
         return new ResponseDTO("Client worker role classificator updated successfully");
     }
 
+    @Transactional
+    public ResponseDTO deleteWorkerRoleClassificator(Integer roleId) {
+        workerRoleClassificatorRepo.deleteById(roleId);
+        return new ResponseDTO("Worker role classificator deleted successfully");
+    }
+
     public List<ClientWorkerRoleClassificatorDTO> getAllWorkerRoleClassificators() {
         return workerRoleClassificatorMapper.toDtoList(workerRoleClassificatorRepo.findAll());
     }

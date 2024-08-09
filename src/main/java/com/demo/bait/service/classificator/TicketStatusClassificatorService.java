@@ -45,6 +45,12 @@ public class TicketStatusClassificatorService {
         return new ResponseDTO("Ticket status classificator updated successfully");
     }
 
+    @Transactional
+    public ResponseDTO deleteTicketStatus(Integer statusId) {
+        ticketStatusClassificatorRepo.deleteById(statusId);
+        return new ResponseDTO("Ticket status classificator deleted successfully");
+    }
+
     public List<TicketStatusClassificatorDTO> getAllTicketStatusClassificators() {
         return ticketStatusClassificatorMapper.toDtoList(ticketStatusClassificatorRepo.findAll());
     }

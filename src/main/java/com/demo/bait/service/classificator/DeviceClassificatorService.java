@@ -48,4 +48,10 @@ public class DeviceClassificatorService {
     public List<DeviceClassificatorDTO> getAllClassificators() {
         return deviceClassificatorMapper.toDtoList(deviceClassificatorRepo.findAll());
     }
+
+    @Transactional
+    public ResponseDTO deleteDeviceClassificator(Integer deviceClassificatorId) {
+        deviceClassificatorRepo.deleteById(deviceClassificatorId);
+        return new ResponseDTO("Device classificator deleted successfully");
+    }
 }
