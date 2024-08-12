@@ -35,4 +35,9 @@ public class TicketStatusClassificatorController {
                                                        @RequestBody TicketStatusClassificatorDTO statusDTO) {
         return ticketStatusService.updateTicketStatus(statusId, statusDTO);
     }
+
+    @DeleteMapping("/{statusId}")
+    public ResponseDTO deleteTicketStatus(@PathVariable Integer statusId) {
+        return ticketStatusService.deleteTicketStatus(statusId);
+    }
 }
