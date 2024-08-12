@@ -25,11 +25,11 @@ public class ClientWorkerRoleClassificatorService {
     private ClientWorkerRoleClassificatorMapper workerRoleClassificatorMapper;
 
     @Transactional
-    public ResponseDTO addWorkerRoleClassificator(ClientWorkerRoleClassificatorDTO workerRoleClassificatorDTO) {
+    public ClientWorkerRoleClassificatorDTO addWorkerRoleClassificator(ClientWorkerRoleClassificatorDTO workerRoleClassificatorDTO) {
         ClientWorkerRoleClassificator workerRoleClassificator = new ClientWorkerRoleClassificator();
         workerRoleClassificator.setRole(workerRoleClassificatorDTO.role());
         workerRoleClassificatorRepo.save(workerRoleClassificator);
-        return new ResponseDTO("Worker role classificator added successfully");
+        return workerRoleClassificatorMapper.toDto(workerRoleClassificator);
     }
 
     @Transactional
