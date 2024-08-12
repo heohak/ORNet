@@ -31,10 +31,10 @@ public class TicketPutController {
 //        return ticketService.addLocationToTicket(ticketId, locationId);
 //    }
 
-//    @PutMapping("/status/{ticketId}/{statusId}")
-//    public ResponseDTO addStatusToTicket(@PathVariable Integer ticketId, @PathVariable Integer statusId) {
-//        return ticketService.addStatusToTicket(ticketId, statusId);
-//    }
+    @PutMapping("/status/{ticketId}/{statusId}")
+    public ResponseDTO addStatusToTicket(@PathVariable Integer ticketId, @PathVariable Integer statusId) {
+        return ticketService.addStatusToTicket(ticketId, statusId);
+    }
 
 //    @PutMapping("/update/{ticketId}")
 //    public ResponseDTO updateTicketResponseAndInsideInfo(@PathVariable Integer ticketId,
