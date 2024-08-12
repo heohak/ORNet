@@ -17,7 +17,7 @@ public class ThirdPartyITPostController {
     public final ThirdPartyITService thirdPartyITService;
 
     @PostMapping("/add")
-    public ResponseDTO addThirdPartyIT(@RequestBody ThirdPartyITDTO thirdPartyITDTO) {
+    public ThirdPartyITDTO addThirdPartyIT(@RequestBody ThirdPartyITDTO thirdPartyITDTO) {
         return thirdPartyITService.addThirdPartyIT(thirdPartyITDTO);
     }
 }

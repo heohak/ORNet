@@ -25,13 +25,13 @@ public class ThirdPartyITService {
     private ThirdPartyITMapper thirdPartyITMapper;
 
     @Transactional
-    public ResponseDTO addThirdPartyIT(ThirdPartyITDTO thirdPartyITDTO) {
+    public ThirdPartyITDTO addThirdPartyIT(ThirdPartyITDTO thirdPartyITDTO) {
         ThirdPartyIT thirdPartyIT = new ThirdPartyIT();
         thirdPartyIT.setName(thirdPartyITDTO.name());
         thirdPartyIT.setEmail(thirdPartyITDTO.email());
         thirdPartyIT.setPhone(thirdPartyITDTO.phone());
-        thirdPartyITRepo.save(thirdPartyIT);
-        return new ResponseDTO("Third party IT added successfully");
+        ThirdPartyIT savedThirdParty = thirdPartyITRepo.save(thirdPartyIT);
+        return thirdPartyITMapper.toDto(savedThirdParty);
     }
 
     @Transactional

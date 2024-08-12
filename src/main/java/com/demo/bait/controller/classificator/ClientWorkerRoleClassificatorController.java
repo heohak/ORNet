@@ -16,7 +16,7 @@ public class ClientWorkerRoleClassificatorController {
     public final ClientWorkerRoleClassificatorService workerRoleClassificatorService;
 
     @PostMapping("/add")
-    public ResponseDTO addWorkerRoleClassificator(@RequestBody ClientWorkerRoleClassificatorDTO workerRoleDTO) {
+    public ClientWorkerRoleClassificatorDTO addWorkerRoleClassificator(@RequestBody ClientWorkerRoleClassificatorDTO workerRoleDTO) {
         return workerRoleClassificatorService.addWorkerRoleClassificator(workerRoleDTO);
     }
 
