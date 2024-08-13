@@ -2,6 +2,7 @@ package com.demo.bait.service.classificator;
 
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.DeviceClassificatorDTO;
+import com.demo.bait.entity.Client;
 import com.demo.bait.entity.classificator.DeviceClassificator;
 import com.demo.bait.mapper.classificator.DeviceClassificatorMapper;
 import com.demo.bait.repository.classificator.DeviceClassificatorRepo;
@@ -23,11 +24,11 @@ public class DeviceClassificatorService {
     private DeviceClassificatorMapper deviceClassificatorMapper;
 
     @Transactional
-    public ResponseDTO addDeviceClassificator(DeviceClassificatorDTO deviceClassificatorDTO) {
+    public DeviceClassificatorDTO addDeviceClassificator(DeviceClassificatorDTO deviceClassificatorDTO) {
         DeviceClassificator deviceClassificator = new DeviceClassificator();
         deviceClassificator.setName(deviceClassificatorDTO.name());
         deviceClassificatorRepo.save(deviceClassificator);
-        return new ResponseDTO("Device classificator added successfully");
+        return deviceClassificatorMapper.toDto(deviceClassificator);
     }
 
     @Transactional
@@ -53,5 +54,14 @@ public class DeviceClassificatorService {
     public ResponseDTO deleteDeviceClassificator(Integer deviceClassificatorId) {
         deviceClassificatorRepo.deleteById(deviceClassificatorId);
         return new ResponseDTO("Device classificator deleted successfully");
+    }
+
+    @Transactional
+    public DeviceClassificatorDTO getDeviceClassificatorById(Integer deviceClassificatorId) {
+        Optional<DeviceClassificator> deviceClassificatorOpt = deviceClassificatorRepo.findById(deviceClassificatorId);
+        if (deviceClassificatorOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device classificator with id " + deviceClassificatorId + " not found");
+        }
+        return deviceClassificatorMapper.toDto(deviceClassificatorOpt.get());
     }
 }
