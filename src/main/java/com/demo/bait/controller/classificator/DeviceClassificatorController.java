@@ -2,6 +2,7 @@ package com.demo.bait.controller.classificator;
 
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.DeviceClassificatorDTO;
+import com.demo.bait.entity.classificator.DeviceClassificator;
 import com.demo.bait.service.classificator.DeviceClassificatorService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,13 +17,18 @@ public class DeviceClassificatorController {
     public final DeviceClassificatorService deviceClassificatorService;
 
     @PostMapping("/add")
-    public ResponseDTO addDeviceClassificator(@RequestBody DeviceClassificatorDTO deviceClassificatorDTO) {
+    public DeviceClassificatorDTO addDeviceClassificator(@RequestBody DeviceClassificatorDTO deviceClassificatorDTO) {
         return deviceClassificatorService.addDeviceClassificator(deviceClassificatorDTO);
     }
 
     @GetMapping("/all")
     public List<DeviceClassificatorDTO> getAllDeviceClassificators() {
         return deviceClassificatorService.getAllClassificators();
+    }
+
+    @GetMapping("/{deviceClassificatorId}")
+    public DeviceClassificatorDTO getDeviceClassificatorById(@PathVariable Integer deviceClassificatorId) {
+        return deviceClassificatorService.getDeviceClassificatorById(deviceClassificatorId);
     }
 
     @PutMapping("/update/{deviceClassificatorId}")
