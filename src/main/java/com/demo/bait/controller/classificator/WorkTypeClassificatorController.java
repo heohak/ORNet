@@ -35,4 +35,14 @@ public class WorkTypeClassificatorController {
     public ResponseDTO deleteWorkType(@PathVariable Integer workTypeId) {
         return workTypeClassificatorService.deleteWorkTypeClassificator(workTypeId);
     }
+
+    @GetMapping("/history/{workTypeId}")
+    public List<WorkTypeClassificatorDTO> getWorkTypeHistory(@PathVariable Integer workTypeId) {
+        return workTypeClassificatorService.getWorkTypeHistory(workTypeId);
+    }
+
+    @GetMapping("/deleted")
+    public List<WorkTypeClassificatorDTO> getDeletedWorkTypes() {
+        return workTypeClassificatorService.getDeletedEntities();
+    }
 }
