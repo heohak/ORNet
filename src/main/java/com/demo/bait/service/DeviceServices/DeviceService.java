@@ -3,16 +3,20 @@ package com.demo.bait.service.DeviceServices;
 import com.demo.bait.dto.*;
 import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.DeviceClassificator;
+import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import com.demo.bait.mapper.DeviceMapper;
 import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.DeviceClassificatorRepo;
 import com.demo.bait.service.CommentServices.CommentService;
 import com.demo.bait.service.FileUploadServices.FileUploadService;
 import com.demo.bait.service.MaintenanceServices.MaintenanceService;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -30,6 +34,7 @@ public class DeviceService {
     private FileUploadService fileUploadService;
     private CommentService commentService;
     private DeviceMaintenanceService deviceMaintenanceService;
+    private EntityManager entityManager;
 
     @Transactional
     public ResponseDTO addDevice(DeviceDTO deviceDTO) {
@@ -295,5 +300,19 @@ public class DeviceService {
 
     public DeviceDTO getDeviceById(Integer deviceId) {
         return deviceMapper.toDto(deviceRepo.getReferenceById(deviceId));
+    }
+
+    public List<DeviceDTO> getDeviceHistory(Integer deviceId) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+        List<Number> revisions = auditReader.getRevisions(Device.class, deviceId);
+
+        List<Device> history = new ArrayList<>();
+        for (Number rev : revisions) {
+            Device DeviceVersion = auditReader
+                    .find(Device.class, deviceId, rev);
+            history.add(DeviceVersion);
+        }
+
+        return deviceMapper.toDtoList(history);
     }
 }

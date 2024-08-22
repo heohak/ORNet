@@ -7,12 +7,14 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
+@Audited
 @NoArgsConstructor
 public class Comment {
 
