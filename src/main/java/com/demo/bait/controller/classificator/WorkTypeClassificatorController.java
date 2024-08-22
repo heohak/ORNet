@@ -43,6 +43,6 @@ public class WorkTypeClassificatorController {
 
     @GetMapping("/deleted")
     public List<WorkTypeClassificatorDTO> getDeletedWorkTypes() {
-        return workTypeClassificatorService.getDeletedEntities();
+        return workTypeClassificatorService.getDeletedWorkTypeClassificators();
     }
 }

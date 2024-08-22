@@ -88,7 +88,7 @@ public class WorkTypeClassificatorService {
         return workTypeClassificatorMapper.toDtoList(history);
     }
 
-    public List<WorkTypeClassificatorDTO> getDeletedEntities() {
+    public List<WorkTypeClassificatorDTO> getDeletedWorkTypeClassificators() {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);
 
         AuditQuery query = auditReader.createQuery()
@@ -105,7 +105,8 @@ public class WorkTypeClassificatorService {
                     WorkTypeClassificator lastStateBeforeDeletion = auditReader.find(
                             WorkTypeClassificator.class,
                             deletedEntity.getId(),
-                            revisionEntity.getId() - 1);
+                            revisionEntity.getId() - 1
+                    );
 
                     return lastStateBeforeDeletion != null ? lastStateBeforeDeletion : deletedEntity;
                 })

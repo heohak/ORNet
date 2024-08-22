@@ -41,4 +41,14 @@ public class DeviceClassificatorController {
     public ResponseDTO deleteDeviceClassificator(@PathVariable Integer deviceClassificatorId) {
         return deviceClassificatorService.deleteDeviceClassificator(deviceClassificatorId);
     }
+
+    @GetMapping("/history/{deviceClassificatorId}")
+    public List<DeviceClassificatorDTO> getDeviceClassificatorHistory(@PathVariable Integer deviceClassificatorId) {
+        return deviceClassificatorService.getDeviceClassificatorHistory(deviceClassificatorId);
+    }
+
+    @GetMapping("/deleted")
+    public List<DeviceClassificatorDTO> getDeletedDeviceClassificators() {
+        return deviceClassificatorService.getDeletedDeviceClassificators();
+    }
 }

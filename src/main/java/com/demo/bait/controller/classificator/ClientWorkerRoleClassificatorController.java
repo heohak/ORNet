@@ -35,4 +35,14 @@ public class ClientWorkerRoleClassificatorController {
     public ResponseDTO deleteWorkerRole(@PathVariable Integer roleId) {
         return workerRoleClassificatorService.deleteWorkerRoleClassificator(roleId);
     }
+
+    @GetMapping("/history/{roleId}")
+    public List<ClientWorkerRoleClassificatorDTO> getWorkerRoleClassificatorHistory(@PathVariable Integer roleId) {
+        return workerRoleClassificatorService.getWorkerRoleClassificatorHistory(roleId);
+    }
+
+    @GetMapping("/deleted")
+    public List<ClientWorkerRoleClassificatorDTO> getDeletedRoles() {
+        return workerRoleClassificatorService.getDeletedRoles();
+    }
 }
