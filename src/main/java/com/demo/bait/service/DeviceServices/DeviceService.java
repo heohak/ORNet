@@ -35,6 +35,7 @@ public class DeviceService {
     private CommentService commentService;
     private DeviceMaintenanceService deviceMaintenanceService;
     private EntityManager entityManager;
+    private DeviceAttributeService deviceAttributeService;
 
     @Transactional
     public ResponseDTO addDevice(DeviceDTO deviceDTO) {
@@ -183,6 +184,7 @@ public class DeviceService {
         updateSoftwareKey(device, deviceDTO);
         updateIntroducedDate(device, deviceDTO);
         updateWrittenOffDate(device, deviceDTO);
+        deviceAttributeService.updateDeviceAttributes(deviceId, deviceDTO.attributes());
 
         updateDeviceClassificator(device, deviceDTO);
 
