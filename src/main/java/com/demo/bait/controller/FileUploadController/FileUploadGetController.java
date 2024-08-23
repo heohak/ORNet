@@ -33,4 +33,9 @@ public class FileUploadGetController {
     public ResponseEntity<Resource> downloadFile(@PathVariable Integer fileId) {
         return fileUploadService.downloadFile(fileId);
     }
+
+    @GetMapping("/{fileId}")
+    public FileUploadDTO getFileById(@PathVariable Integer fileId) {
+        return fileUploadService.getFileById(fileId);
+    }
 }
