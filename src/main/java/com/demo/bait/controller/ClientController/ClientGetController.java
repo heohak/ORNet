@@ -4,11 +4,13 @@ import com.demo.bait.dto.ClientDTO;
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ThirdPartyITDTO;
+import com.demo.bait.dto.historyDTO.ClientLocationHistoryDTO;
 import com.demo.bait.service.ClientServices.*;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @AllArgsConstructor
@@ -57,4 +59,14 @@ public class ClientGetController {
             @RequestParam(value = "clientType", required = false) String clientType) {
         return clientSpecificationService.searchAndFilterClients(query, clientType);
     }
+
+    @GetMapping("/history/{clientId}")
+    public List<ClientDTO> getClientHistory(@PathVariable Integer clientId) {
+        return clientService.getClientHistory(clientId);
+    }
+
+//    @GetMapping("/location/history/{clientId}")
+//    public List<ClientLocationHistoryDTO> getClientLocationHistory(@PathVariable Integer clientId) {
+//        return clientLocationService.getClientLocationHistory(clientId);
+//    }
 }
