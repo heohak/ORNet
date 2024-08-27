@@ -4,7 +4,6 @@ import com.demo.bait.dto.ClientDTO;
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ThirdPartyITDTO;
-import com.demo.bait.dto.historyDTO.ClientLocationHistoryDTO;
 import com.demo.bait.service.ClientServices.*;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
