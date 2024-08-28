@@ -4,6 +4,7 @@ import com.demo.bait.dto.ThirdPartyITDTO;
 import com.demo.bait.service.ThirdPartyITServices.ThirdPartyITService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,5 +20,10 @@ public class ThirdPartyITGetController {
     @GetMapping("/all")
     public List<ThirdPartyITDTO> getAllThirdPartyITs() {
         return thirdPartyITService.getAllThirdParties();
+    }
+
+    @GetMapping("/{thirdPartyId}")
+    public ThirdPartyITDTO getThirdPartyITById(@PathVariable Integer thirdPartyId) {
+        return thirdPartyITService.getThirdPartyITById(thirdPartyId);
     }
 }

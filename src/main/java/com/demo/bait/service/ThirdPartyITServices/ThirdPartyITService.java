@@ -77,6 +77,15 @@ public class ThirdPartyITService {
         return thirdPartyITMapper.toDtoList(thirdPartyITRepo.findAll());
     }
 
+    public ThirdPartyITDTO getThirdPartyITById(Integer thirdPartyId) {
+        Optional<ThirdPartyIT> thirdPartyITOpt = thirdPartyITRepo.findById(thirdPartyId);
+        if (thirdPartyITOpt.isEmpty()) {
+            throw new EntityNotFoundException("Third Party IT with id " + thirdPartyId + " not found");
+        }
+        ThirdPartyIT thirdPartyIT = thirdPartyITOpt.get();
+        return thirdPartyITMapper.toDto(thirdPartyIT);
+    }
+
     public Set<ThirdPartyIT> thirdPartyITIdsToThirdPartyITsSet(List<Integer> thirdPartyITIds) {
         Set<ThirdPartyIT> thirdPartyITs = new HashSet<>();
         for (Integer thirdPartyITId : thirdPartyITIds) {

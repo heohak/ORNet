@@ -301,7 +301,12 @@ public class DeviceService {
     }
 
     public DeviceDTO getDeviceById(Integer deviceId) {
-        return deviceMapper.toDto(deviceRepo.getReferenceById(deviceId));
+        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+        if (deviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        }
+        Device device = deviceOpt.get();
+        return deviceMapper.toDto(device);
     }
 
     public List<DeviceDTO> getDeviceHistory(Integer deviceId) {
