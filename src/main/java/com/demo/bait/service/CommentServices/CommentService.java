@@ -5,6 +5,7 @@ import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.Comment;
 import com.demo.bait.mapper.CommentMapper;
 import com.demo.bait.repository.CommentRepo;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -53,5 +55,14 @@ public class CommentService {
             comments.add(comment);
         }
         return comments;
+    }
+
+    public CommentDTO getCommentById(Integer id) {
+        Optional<Comment> commentOpt = commentRepo.findById(id);
+        if (commentOpt.isEmpty()) {
+            throw new EntityNotFoundException("Comment with ID " + id + " not found");
+        }
+        Comment comment = commentOpt.get();
+        return commentMapper.toDto(comment);
     }
 }

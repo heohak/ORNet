@@ -4,6 +4,7 @@ import com.demo.bait.dto.FileUploadDTO;
 import com.demo.bait.entity.FileUpload;
 import com.demo.bait.mapper.FileUploadMapper;
 import com.demo.bait.repository.FileUploadRepo;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +30,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -128,5 +130,14 @@ public class FileUploadService {
             files.add(file);
         }
         return files;
+    }
+
+    public FileUploadDTO getFileById(Integer id) {
+        Optional<FileUpload> fileOpt = fileUploadRepo.findById(id);
+        if (fileOpt.isEmpty()) {
+            throw new EntityNotFoundException("File with ID " + id + " not found");
+        }
+        FileUpload file = fileOpt.get();
+        return fileUploadMapper.toDto(file);
     }
 }

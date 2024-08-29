@@ -1,5 +1,6 @@
 package com.demo.bait.service.ClientWorkerServices;
 
+import com.demo.bait.dto.ClientDTO;
 import com.demo.bait.dto.ClientWorkerDTO;
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.ResponseDTO;
@@ -9,6 +10,7 @@ import com.demo.bait.entity.ClientWorker;
 import com.demo.bait.entity.Device;
 import com.demo.bait.entity.Location;
 import com.demo.bait.entity.classificator.ClientWorkerRoleClassificator;
+import com.demo.bait.mapper.ClientMapper;
 import com.demo.bait.mapper.ClientWorkerMapper;
 import com.demo.bait.mapper.LocationMapper;
 import com.demo.bait.mapper.classificator.ClientWorkerRoleClassificatorMapper;
@@ -43,6 +45,7 @@ public class ClientWorkerService {
     private LocationRepo locationRepo;
     private LocationMapper locationMapper;
     private ClientWorkerRoleClassificatorService clientWorkerRoleClassificatorService;
+    private ClientMapper clientMapper;
 
     @Transactional
     public ResponseDTO addWorker(ClientWorkerDTO workerDTO) {
@@ -193,6 +196,16 @@ public class ClientWorkerService {
         ClientWorker worker = workerOpt.get();
         Location location = worker.getLocation();
         return locationMapper.toDto(location);
+    }
+
+    public ClientDTO getWorkerEmployer(Integer workerId) {
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        if (workerOpt.isEmpty()) {
+            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        }
+        ClientWorker worker = workerOpt.get();
+        Client client = worker.getClient();
+        return clientMapper.toDto(client);
     }
 
     public Set<ClientWorker> contactIdsToClientWorkersSet(List<Integer> contactIds) {

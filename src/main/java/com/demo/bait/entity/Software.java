@@ -5,12 +5,14 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.Audited;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
 @Entity
+@Audited
 @NoArgsConstructor
 public class Software {
 

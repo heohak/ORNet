@@ -1,5 +1,6 @@
 package com.demo.bait.controller.ClientWorkerController;
 
+import com.demo.bait.dto.ClientDTO;
 import com.demo.bait.dto.ClientWorkerDTO;
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.classificator.ClientWorkerRoleClassificatorDTO;
@@ -46,5 +47,10 @@ public class ClientWorkerGetController {
             @RequestParam(value = "roleId", required = false) Integer roleId,
             @RequestParam(value = "clientId", required = false) Integer clientId) {
         return clientWorkerSpecificationService.searchAndFilterClientWorkers(query, roleId, clientId);
+    }
+
+    @GetMapping("/employer/{workerId}")
+    public ClientDTO getWorkerEmployer(@PathVariable Integer workerId) {
+        return clientWorkerService.getWorkerEmployer(workerId);
     }
 }

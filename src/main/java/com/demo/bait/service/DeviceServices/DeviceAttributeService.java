@@ -34,7 +34,9 @@ public class DeviceAttributeService {
     public DeviceDTO updateDeviceAttributes(Integer deviceId, Map<String, Object> newAttributes) {
         Device device = deviceRepo.findById(deviceId)
                 .orElseThrow(() -> new EntityNotFoundException("Device not found"));
-        device.getAttributes().putAll(newAttributes);
+        if (newAttributes != null) {
+            device.getAttributes().putAll(newAttributes);
+        }
         Device updatedDevice = deviceRepo.save(device);
         return deviceMapper.toDto(updatedDevice);
     }

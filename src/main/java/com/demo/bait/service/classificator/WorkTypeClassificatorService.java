@@ -9,12 +9,18 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.envers.DefaultRevisionEntity;
+import org.hibernate.envers.query.AuditEntity;
+import org.hibernate.envers.query.AuditQuery;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
+
+import jakarta.persistence.EntityManager;
 
 @Slf4j
 @Service
@@ -23,6 +29,7 @@ public class WorkTypeClassificatorService {
 
     private WorkTypeClassificatorRepo workTypeClassificatorRepo;
     private WorkTypeClassificatorMapper workTypeClassificatorMapper;
+    private EntityManager entityManager;
 
     @Transactional
     public ResponseDTO addWorkTypeClassificator(WorkTypeClassificatorDTO workTypeClassificatorDTO) {
@@ -66,5 +73,45 @@ public class WorkTypeClassificatorService {
             workTypes.add(workType);
         }
         return workTypes;
+    }
+
+    public List<WorkTypeClassificatorDTO> getWorkTypeHistory(Integer workTypeId) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+        List<Number> revisions = auditReader.getRevisions(WorkTypeClassificator.class, workTypeId);
+
+        List<WorkTypeClassificator> history = new ArrayList<>();
+        for (Number rev : revisions) {
+            WorkTypeClassificator workTypeClassificatorVersion = auditReader
+                    .find(WorkTypeClassificator.class, workTypeId, rev);
+            history.add(workTypeClassificatorVersion);
+        }
+        return workTypeClassificatorMapper.toDtoList(history);
+    }
+
+    public List<WorkTypeClassificatorDTO> getDeletedWorkTypeClassificators() {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+
+        AuditQuery query = auditReader.createQuery()
+                .forRevisionsOfEntity(WorkTypeClassificator.class, false, true)
+                .add(AuditEntity.revisionType().eq(org.hibernate.envers.RevisionType.DEL));
+
+        List<Object[]> result = query.getResultList();
+
+        List<WorkTypeClassificator> deletedEntities = result.stream()
+                .map(r -> {
+                    WorkTypeClassificator deletedEntity = (WorkTypeClassificator) r[0];
+                    DefaultRevisionEntity revisionEntity = (DefaultRevisionEntity) r[1];
+
+                    WorkTypeClassificator lastStateBeforeDeletion = auditReader.find(
+                            WorkTypeClassificator.class,
+                            deletedEntity.getId(),
+                            revisionEntity.getId() - 1
+                    );
+
+                    return lastStateBeforeDeletion != null ? lastStateBeforeDeletion : deletedEntity;
+                })
+                .collect(Collectors.toList());
+
+        return workTypeClassificatorMapper.toDtoList(deletedEntities);
     }
 }

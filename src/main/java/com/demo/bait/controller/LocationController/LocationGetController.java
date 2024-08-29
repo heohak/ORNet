@@ -26,4 +26,9 @@ public class LocationGetController {
     public LocationDTO getLocationById(@PathVariable Integer locationId) {
         return locationService.getLocationById(locationId);
     }
+
+    @GetMapping("/history/{locationId}")
+    public List<LocationDTO> getLocationHistory(@PathVariable Integer locationId) {
+        return locationService.getLocationHistory(locationId);
+    }
 }

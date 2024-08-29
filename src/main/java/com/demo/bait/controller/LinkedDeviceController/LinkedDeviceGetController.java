@@ -39,4 +39,9 @@ public class LinkedDeviceGetController {
     public List<LinkedDeviceDTO> getNotUsedLinkedDevices() {
         return linkedDeviceService.getNotUsedLinkedDevices();
     }
+
+    @GetMapping("/history/{linkedDeviceId}")
+    public List<LinkedDeviceDTO> getLinkedDeviceHistory(@PathVariable Integer linkedDeviceId) {
+        return linkedDeviceService.getLinkedDeviceHistory(linkedDeviceId);
+    }
 }

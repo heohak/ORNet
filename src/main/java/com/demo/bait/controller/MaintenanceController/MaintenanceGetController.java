@@ -29,4 +29,9 @@ public class MaintenanceGetController {
     public List<FileUploadDTO> getMaintenanceFiles(@PathVariable Integer maintenanceId) {
         return maintenanceFileUploadService.getMaintenanceFiles(maintenanceId);
     }
+
+    @GetMapping("/{maintenanceId}")
+    public MaintenanceDTO getMaintenanceById(@PathVariable Integer maintenanceId) {
+        return maintenanceService.getMaintenanceById(maintenanceId);
+    }
 }

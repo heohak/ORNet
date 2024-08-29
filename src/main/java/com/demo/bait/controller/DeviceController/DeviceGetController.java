@@ -70,4 +70,9 @@ public class DeviceGetController {
     public Map<String, Integer> getClientDevicesSummary(@PathVariable Integer clientId) {
         return deviceSummaryService.getClientDevicesSummary(clientId);
     }
+
+    @GetMapping("/history/{deviceId}")
+    public List<DeviceDTO> getDeviceHistory(@PathVariable Integer deviceId) {
+        return deviceService.getDeviceHistory(deviceId);
+    }
 }
