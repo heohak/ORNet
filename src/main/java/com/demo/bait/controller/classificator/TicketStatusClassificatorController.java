@@ -40,4 +40,14 @@ public class TicketStatusClassificatorController {
     public ResponseDTO deleteTicketStatus(@PathVariable Integer statusId) {
         return ticketStatusService.deleteTicketStatus(statusId);
     }
+
+    @GetMapping("/history/{statusId}")
+    public List<TicketStatusClassificatorDTO> getTicketStatusClassificatorHistory(@PathVariable Integer statusId) {
+        return ticketStatusService.getTicketStatusHistory(statusId);
+    }
+
+    @GetMapping("/deleted")
+    public List<TicketStatusClassificatorDTO> getDeletedTicketStatuses() {
+        return ticketStatusService.getDeletedTicketStatuses();
+    }
 }

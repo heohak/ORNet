@@ -2,6 +2,7 @@ package com.demo.bait.service.ClientServices;
 
 import com.demo.bait.dto.*;
 import com.demo.bait.entity.*;
+import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import com.demo.bait.mapper.ClientMapper;
 import com.demo.bait.repository.ClientRepo;
 import com.demo.bait.repository.LocationRepo;
@@ -10,17 +11,17 @@ import com.demo.bait.repository.ThirdPartyITRepo;
 import com.demo.bait.service.LocationServices.LocationService;
 import com.demo.bait.service.MaintenanceServices.MaintenanceService;
 import com.demo.bait.service.ThirdPartyITServices.ThirdPartyITService;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -33,6 +34,7 @@ public class ClientService {
     private ClientLocationService clientLocationService;
     private ClientThirdPartyITService clientThirdPartyITService;
     private ClientMaintenanceService clientMaintenanceService;
+    private EntityManager entityManager;
 
     @Transactional
     public ResponseDTO addClient(ClientDTO clientDTO) {
@@ -160,5 +162,18 @@ public class ClientService {
             throw new EntityNotFoundException("Client with id " + clientId + " not found");
         }
         return clientMapper.toDto(clientOpt.get());
+    }
+
+    public List<ClientDTO> getClientHistory(Integer clientId) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+        List<Number> revisions = auditReader.getRevisions(Client.class, clientId);
+
+        List<Client> history = new ArrayList<>();
+        for (Number rev : revisions) {
+            Client clientVersion = auditReader
+                    .find(Client.class, clientId, rev);
+            history.add(clientVersion);
+        }
+        return clientMapper.toDtoList(history);
     }
 }

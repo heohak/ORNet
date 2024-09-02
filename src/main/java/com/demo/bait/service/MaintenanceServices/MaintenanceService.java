@@ -60,4 +60,15 @@ public class MaintenanceService {
         }
         return maintenances;
     }
+
+    public MaintenanceDTO getMaintenanceById(Integer id) {
+        Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(id);
+
+        if (maintenanceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Maintenance with " + id + " not found");
+        }
+
+        Maintenance maintenance = maintenanceOpt.get();
+        return maintenanceMapper.toDto(maintenance);
+    }
 }

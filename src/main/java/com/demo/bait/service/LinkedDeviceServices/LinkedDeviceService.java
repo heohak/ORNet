@@ -6,16 +6,20 @@ import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.Comment;
 import com.demo.bait.entity.Device;
 import com.demo.bait.entity.LinkedDevice;
+import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import com.demo.bait.mapper.CommentMapper;
 import com.demo.bait.mapper.LinkedDeviceMapper;
 import com.demo.bait.repository.CommentRepo;
 import com.demo.bait.repository.DeviceRepo;
 import com.demo.bait.repository.LinkedDeviceRepo;
 import com.demo.bait.service.CommentServices.CommentService;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -29,6 +33,7 @@ public class LinkedDeviceService {
     private LinkedDeviceMapper linkedDeviceMapper;
     private DeviceRepo deviceRepo;
     private CommentService commentService;
+    private EntityManager entityManager;
 
     @Transactional
     public ResponseDTO addLinkedDevice(LinkedDeviceDTO linkedDeviceDTO) {
@@ -141,5 +146,18 @@ public class LinkedDeviceService {
 
     public List<LinkedDeviceDTO> getLinkedDevicesByDeviceId(Integer deviceId) {
         return linkedDeviceMapper.toDtoList(linkedDeviceRepo.findByDeviceId(deviceId));
+    }
+
+    public List<LinkedDeviceDTO> getLinkedDeviceHistory(Integer linkedDeviceId) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+        List<Number> revisions = auditReader.getRevisions(LinkedDevice.class, linkedDeviceId);
+
+        List<LinkedDevice> history = new ArrayList<>();
+        for (Number rev : revisions) {
+            LinkedDevice LinkedDeviceVersion = auditReader
+                    .find(LinkedDevice.class, linkedDeviceId, rev);
+            history.add(LinkedDeviceVersion);
+        }
+        return linkedDeviceMapper.toDtoList(history);
     }
 }

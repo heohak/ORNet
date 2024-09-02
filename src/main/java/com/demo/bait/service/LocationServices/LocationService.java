@@ -3,18 +3,19 @@ package com.demo.bait.service.LocationServices;
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.Location;
+import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import com.demo.bait.mapper.LocationMapper;
 import com.demo.bait.repository.LocationRepo;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -23,6 +24,7 @@ public class LocationService {
 
     private LocationRepo locationRepo;
     private LocationMapper locationMapper;
+    private EntityManager entityManager;
 
     @Transactional
     public LocationDTO addLocation(LocationDTO locationDTO) {
@@ -93,5 +95,18 @@ public class LocationService {
             locations.add(location);
         }
         return locations;
+    }
+
+    public List<LocationDTO> getLocationHistory(Integer locationId) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+        List<Number> revisions = auditReader.getRevisions(Location.class, locationId);
+
+        List<Location> history = new ArrayList<>();
+        for (Number rev : revisions) {
+            Location LocationVersion = auditReader
+                    .find(Location.class, locationId, rev);
+            history.add(LocationVersion);
+        }
+        return locationMapper.toDtoList(history);
     }
 }

@@ -6,14 +6,23 @@ import com.demo.bait.dto.classificator.TicketStatusClassificatorDTO;
 import com.demo.bait.entity.classificator.TicketStatusClassificator;
 import com.demo.bait.mapper.classificator.TicketStatusClassificatorMapper;
 import com.demo.bait.repository.classificator.TicketStatusClassificatorRepo;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
+import org.hibernate.envers.DefaultRevisionEntity;
+import org.hibernate.envers.RevisionType;
+import org.hibernate.envers.query.AuditEntity;
+import org.hibernate.envers.query.AuditQuery;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -22,6 +31,7 @@ public class TicketStatusClassificatorService {
 
     private TicketStatusClassificatorRepo ticketStatusClassificatorRepo;
     private TicketStatusClassificatorMapper ticketStatusClassificatorMapper;
+    private EntityManager entityManager;
 
     @Transactional
     public ResponseDTO addTicketStatus(TicketStatusClassificatorDTO ticketStatusClassificatorDTO) {
@@ -61,5 +71,43 @@ public class TicketStatusClassificatorService {
             throw new EntityNotFoundException("Ticket status classificator with id: " + ticketStatusId + " not found");
         }
         return ticketStatusClassificatorMapper.toDto(ticketStatusOpt.get());
+    }
+
+    public List<TicketStatusClassificatorDTO> getTicketStatusHistory(Integer statusId) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+        List<Number> revisions = auditReader.getRevisions(TicketStatusClassificator.class, statusId);
+
+        List<TicketStatusClassificator> history = new ArrayList<>();
+        for (Number rev : revisions) {
+            TicketStatusClassificator status = auditReader.find(TicketStatusClassificator.class, statusId, rev);
+            history.add(status);
+        }
+        return ticketStatusClassificatorMapper.toDtoList(history);
+    }
+
+    public List<TicketStatusClassificatorDTO> getDeletedTicketStatuses() {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+
+        AuditQuery query = auditReader.createQuery()
+                .forRevisionsOfEntity(TicketStatusClassificator.class, false, true)
+                .add(AuditEntity.revisionType().eq(RevisionType.DEL));
+
+        List<Object[]> result = query.getResultList();
+
+        List<TicketStatusClassificator> deletedEntities = result.stream()
+                .map(r -> {
+                    TicketStatusClassificator deletedEntity = (TicketStatusClassificator) r[0];
+                    DefaultRevisionEntity revisionEntity = (DefaultRevisionEntity) r[1];
+
+                    TicketStatusClassificator lastStateBeforeDeletion = auditReader.find(
+                            TicketStatusClassificator.class,
+                            deletedEntity.getId(),
+                            revisionEntity.getId() - 1
+                    );
+
+                    return lastStateBeforeDeletion != null ? lastStateBeforeDeletion : deletedEntity;
+                })
+                .collect(Collectors.toList());
+        return ticketStatusClassificatorMapper.toDtoList(deletedEntities);
     }
 }
