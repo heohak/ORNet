@@ -49,3 +49,7 @@ For endpoint testing you can download Postman here [Postman](https://postman.com
 
 ## Deployment
 *Coming Soon*
+
+## Database Diagram
+![Bait_Partner_Project_Diagram_1](https://github.com/user-attachments/assets/1dc0792a-85bd-4dde-b08c-6d90679024c4)
+
