@@ -50,6 +50,22 @@ For endpoint testing you can download Postman here [Postman](https://postman.com
 ## Deployment
 *Coming Soon*
 
+## Project Structure
+
+- `src/`
+    - `main/java/com/demo/bait/`: Contains the source code for the backend app.
+        - `components/`: Software table components.
+        - `config/`: Configuration file for CORS.
+        - `controller/`: Rest controllers for every entity.
+        - `converter/`: Converters.
+        - `dto/`: DTOs for entities.
+        - `entity/`: All tables are generated based on entities.
+        - `mapper/`: Mappers to map entities to DTOs.
+        - `repository`: All repositories for entities.
+        - `service/`: All endpoints functionality.
+        - `specification/`: Search functions for entities.
+    - `resources/`: Contains application properties and database config files.
+  
 ## Database Diagram
 ![Bait_Partner_Project_Diagram_1](https://github.com/user-attachments/assets/1dc0792a-85bd-4dde-b08c-6d90679024c4)
 
