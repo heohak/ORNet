@@ -4,6 +4,7 @@ import com.demo.bait.dto.ClientWorkerDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.service.ClientWorkerServices.ClientWorkerRoleService;
 import com.demo.bait.service.ClientWorkerServices.ClientWorkerService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +38,7 @@ public class ClientWorkerPutController {
 
     @PutMapping("/update/{workerId}")
     public ResponseDTO updateClientWorker(@PathVariable Integer workerId,
-                                          @RequestBody ClientWorkerDTO clientWorkerDTO) {
+                                          @Valid @RequestBody ClientWorkerDTO clientWorkerDTO) {
         return clientWorkerService.updateClientWorker(workerId, clientWorkerDTO);
     }
 }
