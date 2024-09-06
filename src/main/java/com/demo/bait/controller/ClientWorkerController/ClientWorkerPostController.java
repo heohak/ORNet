@@ -3,6 +3,7 @@ package com.demo.bait.controller.ClientWorkerController;
 import com.demo.bait.dto.ClientWorkerDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.service.ClientWorkerServices.ClientWorkerService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +18,7 @@ public class ClientWorkerPostController {
     public final ClientWorkerService clientWorkerService;
 
     @PostMapping("/add")
-    public ResponseDTO addWorker(@RequestBody ClientWorkerDTO workerDTO) {
+    public ResponseDTO addWorker(@Valid @RequestBody ClientWorkerDTO workerDTO) {
         return clientWorkerService.addWorker(workerDTO);
     }
 }

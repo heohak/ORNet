@@ -32,8 +32,15 @@ public class ClientWorkerSpecification implements Specification<ClientWorker> {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
             return criteriaBuilder.conjunction();
         }
-        String likePattern = "%" + searchTerm.toLowerCase() + "%";
+        String likePattern = "%" + searchTerm.toLowerCase().replaceAll("\\s+", "%") + "%";
 
+        Predicate fullNamePredicate = criteriaBuilder.like(
+                criteriaBuilder.concat(
+                        criteriaBuilder.concat(criteriaBuilder.lower(root.get("firstName")), " "),
+                        criteriaBuilder.lower(root.get("lastName"))
+                ),
+                likePattern
+        );
         Predicate firstNamePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("firstName")), likePattern);
         Predicate lastNamePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("lastName")), likePattern);
         Predicate emailPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), likePattern);
@@ -47,7 +54,8 @@ public class ClientWorkerSpecification implements Specification<ClientWorker> {
         Predicate clientFullNamePredicate = criteriaBuilder.like(criteriaBuilder.lower(clientJoin.get("fullName")), likePattern);
         Predicate clientShortNamePredicate = criteriaBuilder.like(criteriaBuilder.lower(clientJoin.get("shortName")), likePattern);
 
-        return criteriaBuilder.or(firstNamePredicate, lastNamePredicate, emailPredicate, phoneNumberPredicate,
-                titlePredicate, locationPredicate, clientFullNamePredicate, clientShortNamePredicate);
+        return criteriaBuilder.or(fullNamePredicate, firstNamePredicate, lastNamePredicate, emailPredicate,
+                phoneNumberPredicate, titlePredicate, locationPredicate, clientFullNamePredicate,
+                clientShortNamePredicate);
     }
 }
