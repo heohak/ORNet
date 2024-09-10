@@ -11,8 +11,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,11 +33,10 @@ public class DeviceSummaryService {
         for (DeviceClassificator classificator : deviceClassificatorRepo.findAll()) {
             Specification<Device> classificatorSpec = DeviceSpecification.hasClassificatorId(classificator.getId());
             Integer sum = deviceRepo.findAll(classificatorSpec).size();
-
             summaryMap.put(classificator.getName(), sum);
         }
 
-        return summaryMap;
+        return sortMapWithSpecialFirst(summaryMap, "All Devices");
     }
 
     public Map<String, Integer> getClientDevicesSummary(Integer clientId) {
@@ -53,6 +54,42 @@ public class DeviceSummaryService {
             clientSummaryMap.put(classificator.getName(), sum);
         }
 
-        return clientSummaryMap;
+        Map<String, Integer> newClientSummaryMap = removeZeroValues(clientSummaryMap);
+
+        return sortMapWithSpecialFirst(newClientSummaryMap, "All Client Devices");
+    }
+
+    public static Map<String, Integer> sortMapWithSpecialFirst(Map<String, Integer> map, String specialKey) {
+        Integer specialValue = map.remove(specialKey);
+
+        Map<String, Integer> sortedMap = map.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue,
+                        LinkedHashMap::new
+                ));
+
+        Map<String, Integer> finalMap = new LinkedHashMap<>();
+        if (specialValue != null) {
+            finalMap.put(specialKey, specialValue);
+        }
+        finalMap.putAll(sortedMap);
+
+        return finalMap;
+    }
+
+    public static Map<String, Integer> removeZeroValues(Map<String, Integer> map) {
+        return map.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() != 0)
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (oldValue, newValue) -> oldValue,
+                        LinkedHashMap::new
+                ));
     }
 }

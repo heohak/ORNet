@@ -3,6 +3,7 @@ package com.demo.bait.controller.LocationController;
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.service.LocationServices.LocationService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +18,7 @@ public class LocationPostController {
     public final LocationService locationService;
 
     @PostMapping("/add")
-    public LocationDTO addLocation(@RequestBody LocationDTO locationDTO) {
+    public LocationDTO addLocation(@Valid @RequestBody LocationDTO locationDTO) {
         return locationService.addLocation(locationDTO);
     }
 }
