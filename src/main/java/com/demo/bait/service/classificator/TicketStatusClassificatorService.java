@@ -37,6 +37,7 @@ public class TicketStatusClassificatorService {
     public ResponseDTO addTicketStatus(TicketStatusClassificatorDTO ticketStatusClassificatorDTO) {
         TicketStatusClassificator ticketStatus = new TicketStatusClassificator();
         ticketStatus.setStatus(ticketStatusClassificatorDTO.status());
+        ticketStatus.setColor(ticketStatusClassificatorDTO.color());
         ticketStatusClassificatorRepo.save(ticketStatus);
         return new ResponseDTO("Ticket status classificator added successfully");
     }
@@ -51,6 +52,7 @@ public class TicketStatusClassificatorService {
         if (statusDTO.status() != null) {
             ticketStatus.setStatus(statusDTO.status());
         }
+        ticketStatus.setColor(statusDTO.color());
         ticketStatusClassificatorRepo.save(ticketStatus);
         return new ResponseDTO("Ticket status classificator updated successfully");
     }

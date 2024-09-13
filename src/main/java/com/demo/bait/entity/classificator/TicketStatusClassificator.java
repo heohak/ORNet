@@ -20,4 +20,5 @@ public class TicketStatusClassificator {
     private Integer id;
 
     private String status;
+    private String color;
 }
