@@ -16,7 +16,7 @@ public class WorkTypeClassificatorController {
     public final WorkTypeClassificatorService workTypeClassificatorService;
 
     @PostMapping("/add")
-    public ResponseDTO addWorkTypeClassificator(@RequestBody WorkTypeClassificatorDTO workTypeClassificatorDTO) {
+    public WorkTypeClassificatorDTO addWorkTypeClassificator(@RequestBody WorkTypeClassificatorDTO workTypeClassificatorDTO) {
         return workTypeClassificatorService.addWorkTypeClassificator(workTypeClassificatorDTO);
     }
 
