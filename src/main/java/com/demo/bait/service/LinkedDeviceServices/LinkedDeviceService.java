@@ -1,6 +1,7 @@
 package com.demo.bait.service.LinkedDeviceServices;
 
 import com.demo.bait.dto.CommentDTO;
+import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.dto.LinkedDeviceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.Comment;
@@ -8,11 +9,13 @@ import com.demo.bait.entity.Device;
 import com.demo.bait.entity.LinkedDevice;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import com.demo.bait.mapper.CommentMapper;
+import com.demo.bait.mapper.DeviceMapper;
 import com.demo.bait.mapper.LinkedDeviceMapper;
 import com.demo.bait.repository.CommentRepo;
 import com.demo.bait.repository.DeviceRepo;
 import com.demo.bait.repository.LinkedDeviceRepo;
 import com.demo.bait.service.CommentServices.CommentService;
+import com.demo.bait.service.DeviceServices.DeviceService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -34,6 +37,7 @@ public class LinkedDeviceService {
     private DeviceRepo deviceRepo;
     private CommentService commentService;
     private EntityManager entityManager;
+    private DeviceMapper deviceMapper;
 
     @Transactional
     public ResponseDTO addLinkedDevice(LinkedDeviceDTO linkedDeviceDTO) {
@@ -159,5 +163,14 @@ public class LinkedDeviceService {
             history.add(LinkedDeviceVersion);
         }
         return linkedDeviceMapper.toDtoList(history);
+    }
+
+    public DeviceDTO getLinkedDeviceDevice(Integer linkedDeviceId) {
+        Optional<LinkedDevice> linkedDeviceOpt = linkedDeviceRepo.findById(linkedDeviceId);
+        if (linkedDeviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
+        }
+        LinkedDevice linkedDevice = linkedDeviceOpt.get();
+        return deviceMapper.toDto(linkedDevice.getDevice());
     }
 }
