@@ -20,7 +20,8 @@ public class DeviceSpecificationService {
     private DeviceRepo deviceRepo;
     private DeviceMapper deviceMapper;
 
-    public List<DeviceDTO> searchAndFilterDevices(String searchTerm, Integer classificatorId, Integer clientId) {
+    public List<DeviceDTO> searchAndFilterDevices(String searchTerm, Integer classificatorId, Integer clientId,
+                                                  Integer locationId) {
         Specification<Device> combinedSpec = Specification.where(null);
 
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
@@ -36,6 +37,11 @@ public class DeviceSpecificationService {
         if (clientId != null) {
             Specification<Device> clientSpec = DeviceSpecification.hasClientId(clientId);
             combinedSpec = combinedSpec.and(clientSpec);
+        }
+
+        if (locationId != null) {
+            Specification<Device> locationSpec = DeviceSpecification.hasLocationId(locationId);
+            combinedSpec = combinedSpec.and(locationSpec);
         }
 
         return deviceMapper.toDtoList(deviceRepo.findAll(combinedSpec));

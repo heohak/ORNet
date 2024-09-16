@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
 @AllArgsConstructor
-public class DeviceSpecification implements Specification<Device>{
+public class DeviceSpecification implements Specification<Device> {
 
     private String searchTerm;
 
@@ -22,6 +22,13 @@ public class DeviceSpecification implements Specification<Device>{
         return (root, query, criteriaBuilder) -> {
             Join<Device, Client> clientJoin = root.join("client");
             return criteriaBuilder.equal(clientJoin.get("id"), clientId);
+        };
+    }
+
+    public static Specification<Device> hasLocationId(Integer locationId) {
+        return (root, query, criteriaBuilder) -> {
+            Join<Device, Location> locationJoin = root.join("location");
+            return criteriaBuilder.equal(locationJoin.get("id"), locationId);
         };
     }
 
