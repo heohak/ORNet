@@ -84,7 +84,9 @@ public class LocationService {
     }
 
     public List<LocationDTO> getAllLocations() {
-        return locationMapper.toDtoList(locationRepo.findAll());
+        List<LocationDTO> locations = locationMapper.toDtoList(locationRepo.findAll());
+        locations.sort(Comparator.comparing(LocationDTO::name, String::compareToIgnoreCase));
+        return locations;
     }
 
     public Set<Location> locationIdsToLocationsSet(List<Integer> locationIds) {

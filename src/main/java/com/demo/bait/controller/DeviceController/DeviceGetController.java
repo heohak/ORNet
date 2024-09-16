@@ -47,8 +47,9 @@ public class DeviceGetController {
     public List<DeviceDTO> searchAndFilterDevices(
             @RequestParam(value = "q", required = false) String query,
             @RequestParam(value = "classificatorId", required = false) Integer classificatorId,
-            @RequestParam(value = "clientId", required = false) Integer clientId) {
-        return deviceSpecificationService.searchAndFilterDevices(query, classificatorId, clientId);
+            @RequestParam(value = "clientId", required = false) Integer clientId,
+            @RequestParam(value = "locationId", required = false) Integer locationId) {
+        return deviceSpecificationService.searchAndFilterDevices(query, classificatorId, clientId, locationId);
     }
 
     @GetMapping("/comment/{deviceId}")
@@ -62,8 +63,8 @@ public class DeviceGetController {
     }
 
     @GetMapping("/summary")
-    public Map<String, Integer> getDevicesSummary() {
-        return deviceSummaryService.getDevicesSummary();
+    public Map<String, Integer> getDevicesSummary(@RequestParam List<Integer> deviceIds) {
+        return deviceSummaryService.getDevicesSummary(deviceIds);
     }
 
     @GetMapping("/client/summary/{clientId}")
