@@ -2,11 +2,9 @@ package com.demo.bait.controller.LocationController;
 
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.service.LocationServices.LocationService;
+import com.demo.bait.service.LocationServices.LocationSpecificationService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,6 +14,7 @@ import java.util.List;
 public class LocationGetController {
 
     public final LocationService locationService;
+    public final LocationSpecificationService locationSpecificationService;
 
     @GetMapping("/all")
     public List<LocationDTO> getAllLocations() {
@@ -30,5 +29,10 @@ public class LocationGetController {
     @GetMapping("/history/{locationId}")
     public List<LocationDTO> getLocationHistory(@PathVariable Integer locationId) {
         return locationService.getLocationHistory(locationId);
+    }
+
+    @GetMapping("/search")
+    public List<LocationDTO> searchLocations(@RequestParam(value = "q", required = false) String query) {
+        return locationSpecificationService.searchLocations(query);
     }
 }
