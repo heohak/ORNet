@@ -1,6 +1,7 @@
 package com.demo.bait.controller.LinkedDeviceController;
 
 import com.demo.bait.dto.CommentDTO;
+import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.dto.LinkedDeviceDTO;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceCommentService;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceService;
@@ -43,5 +44,10 @@ public class LinkedDeviceGetController {
     @GetMapping("/history/{linkedDeviceId}")
     public List<LinkedDeviceDTO> getLinkedDeviceHistory(@PathVariable Integer linkedDeviceId) {
         return linkedDeviceService.getLinkedDeviceHistory(linkedDeviceId);
+    }
+
+    @GetMapping("/device/{linkedDeviceId}")
+    public DeviceDTO getLinkedDeviceDevice(@PathVariable Integer linkedDeviceId) {
+        return linkedDeviceService.getLinkedDeviceDevice(linkedDeviceId);
     }
 }

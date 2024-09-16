@@ -1,10 +1,12 @@
 package com.demo.bait.service.DeviceServices;
 
+import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.entity.Device;
 import com.demo.bait.entity.classificator.DeviceClassificator;
 import com.demo.bait.repository.DeviceRepo;
 import com.demo.bait.repository.classificator.DeviceClassificatorRepo;
 import com.demo.bait.specification.DeviceSpecification;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,15 +26,22 @@ public class DeviceSummaryService {
     private DeviceRepo deviceRepo;
     private DeviceClassificatorRepo deviceClassificatorRepo;
 
-    public Map<String, Integer> getDevicesSummary() {
+    public Map<String, Integer> getDevicesSummary(List<Integer> deviceIds) {
         Map<String, Integer> summaryMap = new HashMap<>();
 
-        Integer allDevices = Math.toIntExact(deviceRepo.count());
+        Integer allDevices = Math.toIntExact(deviceIds.toArray().length);
         summaryMap.put("All Devices", allDevices);
+
+        Specification<Device> byDeviceIds = (root, query, criteriaBuilder) -> {
+            CriteriaBuilder.In<Integer> inClause = criteriaBuilder.in(root.get("id"));
+            deviceIds.forEach(inClause::value);
+            return inClause;
+        };
 
         for (DeviceClassificator classificator : deviceClassificatorRepo.findAll()) {
             Specification<Device> classificatorSpec = DeviceSpecification.hasClassificatorId(classificator.getId());
-            Integer sum = deviceRepo.findAll(classificatorSpec).size();
+            Specification<Device> combinedSpec = Specification.where(byDeviceIds).and(classificatorSpec);
+            Integer sum = deviceRepo.findAll(combinedSpec).size();
             summaryMap.put(classificator.getName(), sum);
         }
 

@@ -32,11 +32,11 @@ public class WorkTypeClassificatorService {
     private EntityManager entityManager;
 
     @Transactional
-    public ResponseDTO addWorkTypeClassificator(WorkTypeClassificatorDTO workTypeClassificatorDTO) {
+    public WorkTypeClassificatorDTO addWorkTypeClassificator(WorkTypeClassificatorDTO workTypeClassificatorDTO) {
         WorkTypeClassificator workTypeClassificator = new WorkTypeClassificator();
         workTypeClassificator.setWorkType(workTypeClassificatorDTO.workType());
         workTypeClassificatorRepo.save(workTypeClassificator);
-        return new ResponseDTO("Work Type classificator added successfully");
+        return workTypeClassificatorMapper.toDto(workTypeClassificator);
     }
 
     @Transactional
