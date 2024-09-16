@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -29,6 +30,8 @@ public class LocationSpecificationService {
             Specification<Location> searchSpec = new LocationSpecification(searchTerm);
             combinedSpec = combinedSpec.and(searchSpec);
         }
-        return locationMapper.toDtoList(locationRepo.findAll(combinedSpec));
+        List<LocationDTO> locations = locationMapper.toDtoList(locationRepo.findAll(combinedSpec));
+        locations.sort(Comparator.comparing(LocationDTO::name, String::compareToIgnoreCase));
+        return locations;
     }
 }
