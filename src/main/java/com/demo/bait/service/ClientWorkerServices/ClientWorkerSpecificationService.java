@@ -21,7 +21,8 @@ public class ClientWorkerSpecificationService {
     private ClientWorkerRepo clientWorkerRepo;
     private ClientWorkerMapper clientWorkerMapper;
 
-    public List<ClientWorkerDTO> searchAndFilterClientWorkers(String searchTerm, Integer roleId, Integer clientId) {
+    public List<ClientWorkerDTO> searchAndFilterClientWorkers(String searchTerm, Integer roleId, Integer clientId,
+                                                              Boolean favorite) {
         Specification<ClientWorker> combinedSpec = Specification.where(null);
 
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
@@ -37,6 +38,11 @@ public class ClientWorkerSpecificationService {
         if (clientId != null) {
             Specification<ClientWorker> clientSpec = ClientWorkerSpecification.hasClientId(clientId);
             combinedSpec = combinedSpec.and(clientSpec);
+        }
+
+        if (favorite != null) {
+            Specification<ClientWorker> favoriteSpec = ClientWorkerSpecification.isFavorite();
+            combinedSpec = combinedSpec.and(favoriteSpec);
         }
 
         return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll(combinedSpec,
