@@ -32,6 +32,8 @@ public record ClientWorkerDTO(
 
         Integer locationId,
 
-        List<Integer> roleIds
+        List<Integer> roleIds,
+
+        Boolean favorite
 ) {
 }

@@ -7,6 +7,7 @@ import com.demo.bait.repository.ClientWorkerRepo;
 import com.demo.bait.specification.ClientWorkerSpecification;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,7 @@ public class ClientWorkerSpecificationService {
             combinedSpec = combinedSpec.and(clientSpec);
         }
 
-        return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll(combinedSpec));
+        return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll(combinedSpec,
+                Sort.by(Sort.Direction.DESC, "favorite")));
     }
 }

@@ -14,4 +14,7 @@ public interface ClientWorkerRepo extends JpaRepository<ClientWorker, Integer>, 
     List<ClientWorker> findByLocationId(Integer locationId);
     @Query("SELECT cw FROM ClientWorker cw JOIN cw.roles r WHERE r.id = :roleId")
     List<ClientWorker> findByRoleId(@Param("roleId") Integer roleId);
+
+    List<ClientWorker> findByOrderByFavoriteDesc();
+    List<ClientWorker> findByClientIdOrderByFavoriteDesc(Integer clientId);
 }
