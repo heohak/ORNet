@@ -41,4 +41,9 @@ public class ClientWorkerPutController {
                                           @Valid @RequestBody ClientWorkerDTO clientWorkerDTO) {
         return clientWorkerService.updateClientWorker(workerId, clientWorkerDTO);
     }
+
+    @PutMapping("/favorite/{workerId}")
+    public ResponseDTO updateFavorite(@PathVariable Integer workerId) {
+        return clientWorkerService.toggleFavorite(workerId);
+    }
 }

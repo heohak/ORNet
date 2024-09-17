@@ -7,6 +7,7 @@ import com.demo.bait.repository.ClientWorkerRepo;
 import com.demo.bait.specification.ClientWorkerSpecification;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,8 @@ public class ClientWorkerSpecificationService {
     private ClientWorkerRepo clientWorkerRepo;
     private ClientWorkerMapper clientWorkerMapper;
 
-    public List<ClientWorkerDTO> searchAndFilterClientWorkers(String searchTerm, Integer roleId, Integer clientId) {
+    public List<ClientWorkerDTO> searchAndFilterClientWorkers(String searchTerm, Integer roleId, Integer clientId,
+                                                              Boolean favorite) {
         Specification<ClientWorker> combinedSpec = Specification.where(null);
 
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
@@ -38,6 +40,12 @@ public class ClientWorkerSpecificationService {
             combinedSpec = combinedSpec.and(clientSpec);
         }
 
-        return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll(combinedSpec));
+        if (favorite != null) {
+            Specification<ClientWorker> favoriteSpec = ClientWorkerSpecification.isFavorite();
+            combinedSpec = combinedSpec.and(favoriteSpec);
+        }
+
+        return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll(combinedSpec,
+                Sort.by(Sort.Direction.DESC, "favorite")));
     }
 }

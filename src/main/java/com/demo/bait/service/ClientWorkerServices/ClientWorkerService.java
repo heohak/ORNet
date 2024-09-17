@@ -60,6 +60,8 @@ public class ClientWorkerService {
         updateLocation(worker, workerDTO);
         updateRoles(worker, workerDTO);
 
+        worker.setFavorite(workerDTO.favorite() != null ? workerDTO.favorite() : false);
+
         clientWorkerRepo.save(worker);
         return new ResponseDTO(worker.getId().toString());
     }
@@ -124,6 +126,7 @@ public class ClientWorkerService {
         updateClient(worker, clientWorkerDTO);
         updateLocation(worker, clientWorkerDTO);
         updateRoles(worker, clientWorkerDTO);
+        updateFavorite(worker, clientWorkerDTO);
         clientWorkerRepo.save(worker);
         return new ResponseDTO("Client worker updated successfully");
     }
@@ -158,6 +161,12 @@ public class ClientWorkerService {
         }
     }
 
+    public void updateFavorite(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
+        if (clientWorkerDTO.favorite() != null) {
+            worker.setFavorite(clientWorkerDTO.favorite());
+        }
+    }
+
     public void updateClient(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
         if (clientWorkerDTO.clientId() != null) {
             Optional<Client> clientOpt = clientRepo.findById(clientWorkerDTO.clientId());
@@ -181,11 +190,11 @@ public class ClientWorkerService {
     }
 
     public List<ClientWorkerDTO> getAllWorkers() {
-        return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll());
+        return clientWorkerMapper.toDtoList(clientWorkerRepo.findByOrderByFavoriteDesc());
     }
 
     public List<ClientWorkerDTO> getWorkersByClientId(Integer clientId) {
-        return clientWorkerMapper.toDtoList(clientWorkerRepo.findByClientId(clientId));
+        return clientWorkerMapper.toDtoList(clientWorkerRepo.findByClientIdOrderByFavoriteDesc(clientId));
     }
 
     public LocationDTO getWorkerLocation(Integer workerId) {
@@ -216,5 +225,19 @@ public class ClientWorkerService {
             contacts.add(contact);
         }
         return contacts;
+    }
+
+    public ResponseDTO toggleFavorite(Integer workerId) {
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        if (workerOpt.isEmpty()) {
+            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        }
+        ClientWorker worker = workerOpt.get();
+        if (worker.getFavorite() == null) {
+            worker.setFavorite(false);
+        }
+        worker.setFavorite(!worker.getFavorite());
+        clientWorkerRepo.save(worker);
+        return new ResponseDTO("Worker favorite changed");
     }
 }
