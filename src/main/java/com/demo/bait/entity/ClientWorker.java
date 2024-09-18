@@ -45,4 +45,5 @@ public class ClientWorker {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private Set<ClientWorkerRoleClassificator> roles = new HashSet<>();
+    private Boolean favorite;
 }

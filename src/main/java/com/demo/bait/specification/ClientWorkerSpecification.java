@@ -27,6 +27,11 @@ public class ClientWorkerSpecification implements Specification<ClientWorker> {
             return criteriaBuilder.equal(rolesJoin.get("id"), roleId);
         };
     }
+
+    public static Specification<ClientWorker> isFavorite() {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("favorite"), true);
+    }
+
     @Override
     public Predicate toPredicate(Root<ClientWorker> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
