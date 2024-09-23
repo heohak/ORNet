@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +46,10 @@ public class TicketCommentService {
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
         Ticket ticket = ticketOpt.get();
-        return commentMapper.toDtoList(ticket.getComments().stream().toList());
+        return commentMapper.toDtoList(
+                ticket.getComments()
+                        .stream()
+                        .sorted(Comparator.comparing(Comment::getTimestamp).reversed())
+                        .toList());
     }
 }
