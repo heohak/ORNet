@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -36,6 +37,7 @@ public class DeviceService {
     private DeviceMaintenanceService deviceMaintenanceService;
     private EntityManager entityManager;
     private DeviceAttributeService deviceAttributeService;
+    private DeviceCommentService deviceCommentService;
 
     @Transactional
     public ResponseDTO addDevice(DeviceDTO deviceDTO) {
@@ -141,7 +143,7 @@ public class DeviceService {
     }
 
     @Transactional
-    public ResponseDTO addWrittenOffDate(Integer deviceId, DeviceDTO deviceDTO) {
+    public ResponseDTO addWrittenOffDate(Integer deviceId, DeviceDTO deviceDTO, String comment) {
         Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
 
         if (deviceOpt.isEmpty()) {
@@ -150,8 +152,30 @@ public class DeviceService {
 
         Device device = deviceOpt.get();
         device.setWrittenOffDate(deviceDTO.writtenOffDate());
+        String commentText = (comment != null ? comment : "") + " (DEVICE WRITTEN-OFF)";
+        deviceCommentService.addCommentToDevice(deviceId, commentText);
         deviceRepo.save(device);
         return new ResponseDTO("Written off date added successfully");
+    }
+
+    @Transactional
+    public ResponseDTO reactivateDevice(Integer deviceId, String comment) {
+        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+        if (deviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        }
+        Device device = deviceOpt.get();
+
+        if (device.getWrittenOffDate() == null) {
+            throw new ApplicationContextException("Device with id " + deviceId + " has not been written off");
+        }
+
+        String commentText = (comment != null ? comment : "") + " (DEVICE REACTIVATED)";
+        deviceCommentService.addCommentToDevice(deviceId, commentText);
+
+        device.setWrittenOffDate(null);
+        deviceRepo.save(device);
+        return new ResponseDTO("Device reactivated");
     }
 
     @Transactional
