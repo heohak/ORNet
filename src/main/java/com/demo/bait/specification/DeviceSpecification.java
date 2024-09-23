@@ -32,6 +32,16 @@ public class DeviceSpecification implements Specification<Device> {
         };
     }
 
+    public static Specification<Device> isWrittenOff(Boolean writtenOff) {
+        return (root, query, criteriaBuilder) -> {
+            if (writtenOff) {
+                return criteriaBuilder.isNotNull(root.get("writtenOffDate"));
+            }
+            System.out.println("yeeeeeet");
+            return criteriaBuilder.isNull(root.get("writtenOffDate"));
+        };
+    }
+
     @Override
     public Predicate toPredicate(Root<Device> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {

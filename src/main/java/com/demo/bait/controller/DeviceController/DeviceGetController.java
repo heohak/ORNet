@@ -48,8 +48,9 @@ public class DeviceGetController {
             @RequestParam(value = "q", required = false) String query,
             @RequestParam(value = "classificatorId", required = false) Integer classificatorId,
             @RequestParam(value = "clientId", required = false) Integer clientId,
-            @RequestParam(value = "locationId", required = false) Integer locationId) {
-        return deviceSpecificationService.searchAndFilterDevices(query, classificatorId, clientId, locationId);
+            @RequestParam(value = "locationId", required = false) Integer locationId,
+            @RequestParam(value = "writtenOff", required = false) Boolean writtenOff) {
+        return deviceSpecificationService.searchAndFilterDevices(query, classificatorId, clientId, locationId, writtenOff);
     }
 
     @GetMapping("/comment/{deviceId}")

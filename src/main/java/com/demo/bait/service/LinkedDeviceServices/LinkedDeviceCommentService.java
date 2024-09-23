@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,6 +46,10 @@ public class LinkedDeviceCommentService {
             throw new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
         }
         LinkedDevice linkedDevice = linkedDeviceOpt.get();
-        return commentMapper.toDtoList(linkedDevice.getComments().stream().toList());
+        return commentMapper.toDtoList(
+                linkedDevice.getComments()
+                        .stream()
+                        .sorted(Comparator.comparing(Comment::getTimestamp).reversed())
+                        .toList());
     }
 }

@@ -54,8 +54,15 @@ public class DevicePutController {
     }
 
     @PutMapping("/written-off/{deviceId}")
-    public ResponseDTO addWrittenOffDate(@PathVariable Integer deviceId, @RequestBody DeviceDTO deviceDTO) {
-        return deviceService.addWrittenOffDate(deviceId, deviceDTO);
+    public ResponseDTO addWrittenOffDate(@PathVariable Integer deviceId, @RequestBody DeviceDTO deviceDTO,
+                                         @RequestParam(value = "comment", required = false) String comment) {
+        return deviceService.addWrittenOffDate(deviceId, deviceDTO, comment);
+    }
+
+    @PutMapping("/reactivate/{deviceId}")
+    public ResponseDTO reactivateDevice(@PathVariable Integer deviceId,
+                                        @RequestParam(value = "comment", required = false) String comment) {
+        return deviceService.reactivateDevice(deviceId, comment);
     }
 
     @PutMapping("/comment/{deviceId}")

@@ -30,7 +30,6 @@ public class ClientService {
 
     private ClientRepo clientRepo;
     private ClientMapper clientMapper;
-    private MaintenanceService maintenanceService;
     private ClientLocationService clientLocationService;
     private ClientThirdPartyITService clientThirdPartyITService;
     private ClientMaintenanceService clientMaintenanceService;
