@@ -27,6 +27,10 @@ public class TicketSpecification implements Specification<Ticket> {
         };
     }
 
+    public static Specification<Ticket> hasBaitWorkerId(Integer baitWorkerId) {
+        return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("baitWorker").get("id"), baitWorkerId);
+    }
+
     public static Specification<Ticket> isCrisis(Boolean crisis) {
         return (root, query, criteriaBuilder) -> {
             if (crisis == null) {
