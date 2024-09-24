@@ -43,8 +43,10 @@ public class TicketGetController {
             @RequestParam(value = "statusId", required = false) Integer statusId,
             @RequestParam(value = "crisis", required = false) Boolean crisis,
             @RequestParam(value = "paidWork", required = false) Boolean paidWork,
-            @RequestParam(value = "workTypeId", required = false) Integer workTypeId) {
-        return ticketSpecificationService.searchAndFilterTickets(searchTerm, statusId, crisis, paidWork, workTypeId);
+            @RequestParam(value = "workTypeId", required = false) Integer workTypeId,
+            @RequestParam(value = "baitWorkerId", required = false) Integer baitWorkerId) {
+        return ticketSpecificationService.searchAndFilterTickets(searchTerm, statusId, crisis, paidWork,
+                workTypeId, baitWorkerId);
     }
 
     @GetMapping("/maintenance/{ticketId}")

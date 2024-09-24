@@ -37,7 +37,6 @@ public class DeviceSpecification implements Specification<Device> {
             if (writtenOff) {
                 return criteriaBuilder.isNotNull(root.get("writtenOffDate"));
             }
-            System.out.println("yeeeeeet");
             return criteriaBuilder.isNull(root.get("writtenOffDate"));
         };
     }

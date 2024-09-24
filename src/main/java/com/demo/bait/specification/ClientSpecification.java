@@ -29,6 +29,20 @@ public class ClientSpecification implements Specification<Client> {
         };
     }
 
+    public static Specification<Client> hasLocationId(Integer locationId) {
+        return (root, query, criteriaBuilder) -> {
+            Join<Client, Location> locationJoin = root.join("locations");
+            return criteriaBuilder.equal(locationJoin.get("id"), locationId);
+        };
+    }
+
+    public static Specification<Client> hasThirdPartyId(Integer thirdPartyId) {
+        return (root, query, criteriaBuilder) -> {
+            Join<Client, ThirdPartyIT> thirdPartyITJoin = root.join("thirdPartyITs");
+            return criteriaBuilder.equal(thirdPartyITJoin.get("id"), thirdPartyId);
+        };
+    }
+
     @Override
     public Predicate toPredicate(Root<Client> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {

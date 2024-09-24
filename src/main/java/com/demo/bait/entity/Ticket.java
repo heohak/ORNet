@@ -49,7 +49,6 @@ public class Ticket {
     )
     private Set<ClientWorker> contacts = new HashSet<>();
 
-//    private String workType;  // enum?? classificator?? piisab maintenance-ga sidumisest??
     @ManyToMany
     @JoinTable(
             name = "ticket_work_type_classificator",

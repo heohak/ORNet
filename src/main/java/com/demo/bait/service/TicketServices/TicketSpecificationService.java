@@ -21,7 +21,7 @@ public class TicketSpecificationService {
     private TicketMapper ticketMapper;
 
     public List<TicketDTO> searchAndFilterTickets(String searchTerm, Integer statusId, Boolean crisis, Boolean paid,
-                                                  Integer workTypeId) {
+                                                  Integer workTypeId, Integer baitWorkerId) {
         Specification<Ticket> combinedSpec = Specification.where(null);
 
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
@@ -47,6 +47,11 @@ public class TicketSpecificationService {
         if (workTypeId != null) {
             Specification<Ticket> workTypeSpec = TicketSpecification.hasWorkTypeId(workTypeId);
             combinedSpec = combinedSpec.and(workTypeSpec);
+        }
+
+        if (baitWorkerId != null) {
+            Specification<Ticket> baitWorkerSpec = TicketSpecification.hasBaitWorkerId(baitWorkerId);
+            combinedSpec = combinedSpec.and(baitWorkerSpec);
         }
 
         return ticketMapper.toDtoList(ticketRepo.findAll(combinedSpec));
