@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -51,8 +52,8 @@ public class TicketService {
         }
 
         Ticket ticket = new Ticket();
+        setTicketTitle(ticket);
         ticket.setClient(clientOpt.get());
-        ticket.setTitle(ticketDTO.title());
         ticket.setBaitNumeration(ticketDTO.baitNumeration());
         ticket.setClientNumeration(ticketDTO.clientNumeration());
         ticket.setDescription(ticketDTO.description());
@@ -320,6 +321,23 @@ public class TicketService {
         ticketContactsService.addContactsToTicket(ticket, ticketDTO);
         setTicketUpdateTime(ticket);
         return new ResponseDTO("Whole ticket updated successfully");
+    }
+
+    public void setTicketTitle(Ticket ticket) {
+        ticketRepo.save(ticket);
+        LocalDate now = LocalDate.now();
+        String yy = String.valueOf(now.getYear()).substring(2);
+        String mm = String.format("%02d", now.getMonthValue());
+        String dd = String.format("%02d", now.getDayOfMonth());
+        String nn;
+        if (ticket.getId() < 10) {
+            nn = String.format("0%d", ticket.getId());
+        } else {
+            nn = String.valueOf(ticket.getId());
+        }
+
+        String title = String.format("Ticket: %s%s%s%s", yy, mm, dd, nn);
+        ticket.setTitle(title);
     }
 
     public List<TicketDTO> getTicketsByClientId(Integer clientId) {
