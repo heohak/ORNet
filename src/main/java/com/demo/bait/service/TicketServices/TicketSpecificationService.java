@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Slf4j
@@ -54,6 +55,11 @@ public class TicketSpecificationService {
             combinedSpec = combinedSpec.and(baitWorkerSpec);
         }
 
-        return ticketMapper.toDtoList(ticketRepo.findAll(combinedSpec));
+        List<TicketDTO> ticketDTOs = ticketMapper.toDtoList(ticketRepo.findAll(combinedSpec));
+        ticketDTOs.sort(Comparator.comparing(
+                ticketDTO -> ticketDTO.title() != null ? ticketDTO.title() : "",
+                String::compareToIgnoreCase
+        ));
+        return ticketDTOs;
     }
 }
