@@ -58,7 +58,6 @@ public class DeviceMaintenanceService {
         return maintenanceMapper.toDtoList(device.getMaintenances().stream().toList());
     }
 
-    @Transactional
     public void updateMaintenances(Device device, DeviceDTO deviceDTO) {
         if (deviceDTO.maintenanceIds() != null) {
             Set<Maintenance> maintenances = maintenanceService
