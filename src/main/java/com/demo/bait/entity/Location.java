@@ -24,7 +24,11 @@ public class Location {
     private Integer id;
 
     private String name;
-    private String address;
+//    private String address;
+    private String country;
+    private String city;
+    private String streetAddress;
+    private String postalCode;
     @Pattern(regexp = "^\\+?[0-9 ]{1,15}$", message = "Invalid phone number format")
     private String phone;
     @Email

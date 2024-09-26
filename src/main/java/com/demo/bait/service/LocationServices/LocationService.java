@@ -34,7 +34,11 @@ public class LocationService {
     public LocationDTO addLocation(LocationDTO locationDTO) {
         Location location = new Location();
         location.setName(locationDTO.name());
-        location.setAddress(locationDTO.address());
+//        location.setAddress(locationDTO.address());
+        location.setCountry(locationDTO.country());
+        location.setCity(locationDTO.city());
+        location.setStreetAddress(locationDTO.streetAddress());
+        location.setPostalCode(locationDTO.postalCode());
         location.setPhone(locationDTO.phone());
         location.setEmail(locationDTO.email());
         location.setLastMaintenance(locationDTO.lastMaintenance());
@@ -63,7 +67,11 @@ public class LocationService {
         Location location = locationOpt.get();
 
         updateName(location, locationDTO);
-        updateAddress(location, locationDTO);
+//        updateAddress(location, locationDTO);
+        updateCountry(location, locationDTO);
+        updateCity(location, locationDTO);
+        updateStreetAddress(location, locationDTO);
+        updatePostalCode(location, locationDTO);
         updatePhone(location, locationDTO);
         updateEmail(location, locationDTO);
         updateLastMaintenance(location, locationDTO);
@@ -79,9 +87,33 @@ public class LocationService {
         }
     }
 
-    public void updateAddress(Location location, LocationDTO locationDTO) {
-        if (locationDTO.address() != null) {
-            location.setAddress(locationDTO.address());
+//    public void updateAddress(Location location, LocationDTO locationDTO) {
+//        if (locationDTO.address() != null) {
+//            location.setAddress(locationDTO.address());
+//        }
+//    }
+
+    public void updateCountry(Location location, LocationDTO locationDTO) {
+        if (locationDTO.country() != null) {
+            location.setCountry(locationDTO.country());
+        }
+    }
+
+    public void updateCity(Location location, LocationDTO locationDTO) {
+        if (locationDTO.city() != null) {
+            location.setCity(locationDTO.city());
+        }
+    }
+
+    public void updateStreetAddress(Location location, LocationDTO locationDTO) {
+        if (locationDTO.streetAddress() != null) {
+            location.setStreetAddress(locationDTO.streetAddress());
+        }
+    }
+
+    public void updatePostalCode(Location location, LocationDTO locationDTO) {
+        if (locationDTO.postalCode() != null) {
+            location.setPostalCode(locationDTO.postalCode());
         }
     }
 

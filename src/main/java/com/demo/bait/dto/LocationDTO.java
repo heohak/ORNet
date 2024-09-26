@@ -11,10 +11,14 @@ import java.util.List;
 @Builder
 public record LocationDTO(
         Integer id,
-        @NotBlank(message = "Name cannot be empty")
+//        @NotBlank(message = "Name cannot be empty")
         String name,
-        @NotBlank(message = "Address cannot be empty")
-        String address,
+//        @NotBlank(message = "Address cannot be empty")
+//        String address,
+        String country,
+        String city,
+        String streetAddress,
+        String postalCode,
         @Pattern(regexp = "^\\+?[0-9 ]{1,15}$", message = "Invalid phone number format")
         String phone,
         @Email
