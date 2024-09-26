@@ -23,6 +23,7 @@ public class Maintenance {
 
     private String maintenanceName;
     private LocalDate maintenanceDate;
+    @Column(columnDefinition = "TEXT")
     private String comment;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)

@@ -30,6 +30,7 @@ public class Ticket {
     private String title;
     private String baitNumeration;
     private String clientNumeration;
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @ManyToOne
@@ -66,10 +67,13 @@ public class Ticket {
     @JoinColumn(name = "responsible_id", referencedColumnName = "id")
     private BaitWorker baitWorker;
     private LocalDateTime responseDateTime;
+    @Column(columnDefinition = "TEXT")
     private String response;  // vastukirja sisu vastavalt vajadusele ehk vb vaja midagi muud kui string
+    @Column(columnDefinition = "TEXT")
     private String insideInfo;  // siseinfo mis ei lahe raportisse
     private LocalDateTime endDateTime;
     private LocalDateTime updateDateTime;
+    @Column(columnDefinition = "TEXT")
     private String rootCause;
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
