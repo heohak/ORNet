@@ -18,6 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -73,14 +76,42 @@ public class FileUploadService {
 
     private byte[] generateThumbnail(MultipartFile file) {
         try {
-            ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
-            Thumbnails.of(file.getInputStream())
-                    .size(150, 150)  // width and height of the thumbnail
-                    .outputFormat("jpg")
-                    .toOutputStream(thumbnailOutputStream);
-            return thumbnailOutputStream.toByteArray();
+            String contentType = file.getContentType();
+            if (contentType != null && contentType.startsWith("image/")) {
+                ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
+                Thumbnails.of(file.getInputStream())
+                        .size(150, 150)
+                        .outputFormat("jpg")
+                        .toOutputStream(thumbnailOutputStream);
+                return thumbnailOutputStream.toByteArray();
+            } else {
+                return generatePlaceholderImage(file.getOriginalFilename(), contentType);
+            }
         } catch (IOException e) {
             log.error("Error generating thumbnail for file: {}", file.getOriginalFilename(), e);
+            return new byte[0];
+        }
+    }
+
+    private byte[] generatePlaceholderImage(String fileName, String contentType) {
+        try {
+            BufferedImage placeholder = new BufferedImage(150, 150, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g2d = placeholder.createGraphics();
+            g2d.setColor(Color.GRAY);
+            g2d.fillRect(0, 0, 150, 150);
+            g2d.setColor(Color.WHITE);
+            g2d.setFont(new Font("Arial", Font.BOLD, 20));
+
+            String fileExtension = fileName != null ? fileName
+                    .substring(fileName.lastIndexOf('.') + 1).toUpperCase() : "FILE";
+            g2d.drawString(fileExtension, 40, 80);
+            g2d.dispose();
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ImageIO.write(placeholder, "jpg", outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            log.error("Error generating placeholder image", e);
             return new byte[0];
         }
     }
