@@ -99,6 +99,14 @@ public class FileUploadService {
     }
 
     public ResponseEntity<Resource> downloadFile(Integer fileId) {
+        return prepareFileResponse(fileId, "attachment");
+    }
+
+    public ResponseEntity<Resource> openFileInBrowser(Integer fileId) {
+        return prepareFileResponse(fileId, "inline");
+    }
+
+    private ResponseEntity<Resource> prepareFileResponse(Integer fileId, String dispositionType) {
         FileUpload fileUpload = fileUploadRepo.findById(fileId)
                 .orElseThrow(() -> new RuntimeException("File not found"));
 
@@ -114,7 +122,7 @@ public class FileUploadService {
         }
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileUpload.getFileName() + "\"");
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, dispositionType + "; filename=\"" + fileUpload.getFileName() + "\"");
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentLength(fileUpload.getFileSize())
