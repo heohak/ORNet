@@ -34,6 +34,11 @@ public class FileUploadGetController {
         return fileUploadService.downloadFile(fileId);
     }
 
+    @GetMapping("/open/{fileId}")
+    public ResponseEntity<Resource> openFile(@PathVariable Integer fileId) {
+        return fileUploadService.openFileInBrowser(fileId);
+    }
+
     @GetMapping("/{fileId}")
     public FileUploadDTO getFileById(@PathVariable Integer fileId) {
         return fileUploadService.getFileById(fileId);
