@@ -9,6 +9,6 @@ import java.util.List;
 public interface TicketRepo extends JpaRepository<Ticket, Integer>, JpaSpecificationExecutor<Ticket> {
 
     List<Ticket> findByClientId(Integer clientId);
-    List<Ticket> findByTicketId(Integer mainTicketId);
+//    List<Ticket> findByTicketId(Integer mainTicketId);
     List<Ticket> findByStatusId(Integer statusId);
 }

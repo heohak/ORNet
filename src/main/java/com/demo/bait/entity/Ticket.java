@@ -33,9 +33,9 @@ public class Ticket {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "main_ticket_id", referencedColumnName = "id")
-    private Ticket ticket;
+//    @ManyToOne
+//    @JoinColumn(name = "main_ticket_id", referencedColumnName = "id")
+//    private Ticket ticket;
 
     private LocalDateTime startDateTime;
 //    private LocalDateTime beenOpen;  // format p:h:min
