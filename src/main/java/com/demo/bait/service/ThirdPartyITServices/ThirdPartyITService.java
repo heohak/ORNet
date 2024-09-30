@@ -2,8 +2,10 @@ package com.demo.bait.service.ThirdPartyITServices;
 
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.ThirdPartyITDTO;
+import com.demo.bait.entity.Client;
 import com.demo.bait.entity.ThirdPartyIT;
 import com.demo.bait.mapper.ThirdPartyITMapper;
+import com.demo.bait.repository.ClientRepo;
 import com.demo.bait.repository.ThirdPartyITRepo;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -23,6 +25,7 @@ public class ThirdPartyITService {
 
     private ThirdPartyITRepo thirdPartyITRepo;
     private ThirdPartyITMapper thirdPartyITMapper;
+    private ClientRepo clientRepo;
 
     @Transactional
     public ThirdPartyITDTO addThirdPartyIT(ThirdPartyITDTO thirdPartyITDTO) {
@@ -36,7 +39,17 @@ public class ThirdPartyITService {
 
     @Transactional
     public ResponseDTO deleteThirdPartyIT(Integer id) {
-        thirdPartyITRepo.deleteById(id);
+        ThirdPartyIT thirdPartyIT = thirdPartyITRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Third party IT not found"));
+
+        List<Client> clients = clientRepo.findByThirdPartyITsContaining(thirdPartyIT);
+        for (Client client : clients) {
+            client.getThirdPartyITs().remove(thirdPartyIT);
+            clientRepo.save(client);
+        }
+
+        thirdPartyITRepo.delete(thirdPartyIT);
+
         return new ResponseDTO("Third party IT deleted successfully");
     }
 

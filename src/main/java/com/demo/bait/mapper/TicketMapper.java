@@ -27,7 +27,7 @@ public interface TicketMapper {
 
     @Mapping(source = "client.fullName", target = "clientName")
     @Mapping(source = "client.id", target = "clientId")
-    @Mapping(source = "ticket.id", target = "mainTicketId")
+//    @Mapping(source = "ticket.id", target = "mainTicketId")
     @Mapping(source = "location.id", target = "locationId")
     @Mapping(source = "status.id", target = "statusId")
     @Mapping(source = "baitWorker.id", target = "baitWorkerId")

@@ -7,7 +7,9 @@ import java.util.List;
 
 @Builder
 public record TicketDTO(Integer id, Integer clientId, String title, String baitNumeration, String clientNumeration,
-                        String description, Integer mainTicketId, LocalDateTime startDateTime, Integer locationId,
+                        String description,
+//                        Integer mainTicketId,
+                        LocalDateTime startDateTime, Integer locationId,
                         List<Integer> contactIds, List<Integer> workTypeIds, Boolean remote, Boolean crisis,
                         Integer statusId, Integer baitWorkerId, LocalDateTime responseDateTime, String response,
                         String insideInfo, LocalDateTime endDateTime, LocalDateTime updateDateTime, String rootCause,
