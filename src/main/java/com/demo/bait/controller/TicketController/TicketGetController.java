@@ -32,10 +32,10 @@ public class TicketGetController {
         return ticketService.getAllTickets();
     }
 
-    @GetMapping("/main/{mainTicketId}")
-    public List<TicketDTO> getTicketsByMainTicketId(@PathVariable Integer mainTicketId) {
-        return ticketService.getTicketsByMainTicketId(mainTicketId);
-    }
+//    @GetMapping("/main/{mainTicketId}")
+//    public List<TicketDTO> getTicketsByMainTicketId(@PathVariable Integer mainTicketId) {
+//        return ticketService.getTicketsByMainTicketId(mainTicketId);
+//    }
 
     @GetMapping("/search")
     public List<TicketDTO> getTickets(
