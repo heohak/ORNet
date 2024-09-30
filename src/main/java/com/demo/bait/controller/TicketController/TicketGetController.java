@@ -37,6 +37,11 @@ public class TicketGetController {
 //        return ticketService.getTicketsByMainTicketId(mainTicketId);
 //    }
 
+    @GetMapping("/{ticketId}")
+    public TicketDTO getTicketById(@PathVariable Integer ticketId) {
+        return ticketService.getTicketById(ticketId);
+    }
+
     @GetMapping("/search")
     public List<TicketDTO> getTickets(
             @RequestParam(value = "searchTerm", required = false) String searchTerm,

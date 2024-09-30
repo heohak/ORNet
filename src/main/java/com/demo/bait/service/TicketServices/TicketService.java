@@ -340,6 +340,15 @@ public class TicketService {
         ticket.setTitle(title);
     }
 
+    public TicketDTO getTicketById(Integer ticketId) {
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+        return ticketMapper.toDto(ticket);
+    }
+
     public List<TicketDTO> getTicketsByClientId(Integer clientId) {
         return ticketMapper.toDtoList(ticketRepo.findByClientId(clientId));
     }
