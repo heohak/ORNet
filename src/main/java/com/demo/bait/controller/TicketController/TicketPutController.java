@@ -17,60 +17,13 @@ public class TicketPutController {
 
     public final TicketService ticketService;
     public final TicketFileUploadService ticketFileUploadService;
-    public final TicketMaintenanceService ticketMaintenanceService;
     public final TicketCommentService ticketCommentService;
     public final TicketPaidWorkService ticketPaidWorkService;
-
-//    @PutMapping("/bait/worker/{ticketId}/{workerId}")
-//    public ResponseDTO addResponsibleBaitWorkerToTicket(@PathVariable Integer ticketId, @PathVariable Integer workerId) {
-//        return ticketService.addResponsibleBaitWorkerToTicket(ticketId, workerId);
-//    }
-
-//    @PutMapping("/location/{ticketId}/{locationId}")
-//    public ResponseDTO addLocationToTicket(@PathVariable Integer ticketId, @PathVariable Integer locationId) {
-//        return ticketService.addLocationToTicket(ticketId, locationId);
-//    }
 
     @PutMapping("/status/{ticketId}/{statusId}")
     public ResponseDTO addStatusToTicket(@PathVariable Integer ticketId, @PathVariable Integer statusId) {
         return ticketService.addStatusToTicket(ticketId, statusId);
     }
-
-//    @PutMapping("/update/{ticketId}")
-//    public ResponseDTO updateTicketResponseAndInsideInfo(@PathVariable Integer ticketId,
-//                                                         @RequestBody TicketDTO ticketDTO) {
-//        return ticketService.updateTicketResponseAndInsideInfo(ticketId, ticketDTO);
-//    }
-
-    @PutMapping("/maintenance/{ticketId}/{maintenanceId}")
-    public ResponseDTO addMaintenanceToTicket(@PathVariable Integer ticketId, @PathVariable Integer maintenanceId) {
-        return ticketMaintenanceService.addMaintenanceToTicket(ticketId, maintenanceId);
-    }
-
-//    @PutMapping("/cause/{ticketId}")
-//    public ResponseDTO addRootCauseToTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
-//        return ticketService.addRootCauseToTicket(ticketId, ticketDTO);
-//    }
-
-//    @PutMapping("/end/date/{ticketId}")
-//    public ResponseDTO addEndDateTimeToTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
-//        return ticketService.addEndDateToTicket(ticketId, ticketDTO);
-//    }
-
-//    @PutMapping("/response/date/{ticketId}")
-//    public ResponseDTO addResponseDateTimeToTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
-//        return ticketService.addResponseDateToTicket(ticketId, ticketDTO);
-//    }
-
-//    @PutMapping("/crisis/{ticketId}")
-//    public ResponseDTO updateCrisisInTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
-//        return ticketService.updateCrisisInTicket(ticketId, ticketDTO);
-//    }
-
-//    @PutMapping("/remote/{ticketId}")
-//    public ResponseDTO updateRemoteInTicket(@PathVariable Integer ticketId, @RequestBody TicketDTO ticketDTO) {
-//        return ticketService.updateRemoteInTicket(ticketId, ticketDTO);
-//    }
 
     @PutMapping("/upload/{ticketId}")
     public ResponseDTO uploadFiles(@PathVariable Integer ticketId, @RequestParam("files") List<MultipartFile> files)

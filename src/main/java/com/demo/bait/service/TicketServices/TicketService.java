@@ -36,7 +36,6 @@ public class TicketService {
     private BaitWorkerRepo baitWorkerRepo;
     private TicketContactsService ticketContactsService;
     private TicketWorkTypeService ticketWorkTypeService;
-    private MaintenanceService maintenanceService;
     private FileUploadService fileUploadService;
     private CommentService commentService;
     private WorkTypeClassificatorService workTypeClassificatorService;
@@ -52,22 +51,12 @@ public class TicketService {
         }
 
         Ticket ticket = new Ticket();
-        setTicketTitle(ticket);
+        ticket.setTitle(ticketDTO.title());
+        setTicketName(ticket);
         ticket.setClient(clientOpt.get());
         ticket.setBaitNumeration(ticketDTO.baitNumeration());
         ticket.setClientNumeration(ticketDTO.clientNumeration());
         ticket.setDescription(ticketDTO.description());
-
-//        if (ticketDTO.mainTicketId() != null) {
-//            Optional<Ticket> ticketOpt = ticketRepo.findById(ticketDTO.mainTicketId());
-//
-//            if (ticketOpt.isPresent()) {
-//                Ticket mainTicket = ticketOpt.get();
-//                if (mainTicket.getClient().getId().equals(clientOpt.get().getId())) {
-//                    ticket.setTicket(mainTicket.getTicket() != null ? mainTicket.getTicket() : mainTicket);
-//                }
-//            }
-//        }
 
         ticket.setStartDateTime(ticketDTO.startDateTime());
 
@@ -115,11 +104,6 @@ public class TicketService {
         if (ticketDTO.commentIds() != null) {
             Set<Comment> comments = commentService.commentIdsToCommentsSet(ticketDTO.commentIds());
             ticket.setComments(comments);
-        }
-
-        if (ticketDTO.maintenanceIds() != null) {
-            Set<Maintenance> maintenances = maintenanceService.maintenanceIdsToMaintenancesSet(ticketDTO.maintenanceIds());
-            ticket.setMaintenances(maintenances);
         }
 
         if (ticketDTO.fileIds() != null) {
@@ -323,7 +307,7 @@ public class TicketService {
         return new ResponseDTO("Whole ticket updated successfully");
     }
 
-    public void setTicketTitle(Ticket ticket) {
+    public void setTicketName(Ticket ticket) {
         ticketRepo.save(ticket);
         LocalDate now = LocalDate.now();
         String yy = String.valueOf(now.getYear()).substring(2);
@@ -336,8 +320,8 @@ public class TicketService {
             nn = String.valueOf(ticket.getId());
         }
 
-        String title = String.format("Ticket: %s%s%s%s", yy, mm, dd, nn);
-        ticket.setTitle(title);
+        String name = String.format("Ticket: %s%s%s%s", yy, mm, dd, nn);
+        ticket.setName(name);
     }
 
     public TicketDTO getTicketById(Integer ticketId) {
@@ -356,46 +340,4 @@ public class TicketService {
     public List<TicketDTO> getAllTickets() {
         return ticketMapper.toDtoList(ticketRepo.findAll());
     }
-
-//    public List<TicketDTO> getTicketsByMainTicketId(Integer mainTicketId) {
-//        return ticketRepo.findById(mainTicketId)
-//                .map(mainTicket -> {
-//                    List<Ticket> ticketList = new ArrayList<>();
-//
-//                    Ticket rootTicket = mainTicket.getTicket() != null ? mainTicket.getTicket() : mainTicket;
-//                    ticketList.addAll(ticketRepo.findByTicketId(rootTicket.getId()));
-//                    ticketList.add(rootTicket);
-//
-//                    return ticketList.stream()
-//                            .sorted(Comparator.comparing(Ticket::getId))
-//                            .collect(Collectors.toList());
-//                })
-//                .map(ticketMapper::toDtoList)
-//                .orElse(Collections.emptyList());
-//    }
-
-//    public List<TicketDTO> getTicketsByMainTicketId(Integer mainTicketId) {
-//        Optional<Ticket> mainTicketOpt = ticketRepo.findById(mainTicketId);
-//
-//        if (mainTicketOpt.isEmpty()) {
-//            return Collections.emptyList();
-//        }
-//
-//        Ticket mainTicket = mainTicketOpt.get();
-//        List<Ticket> ticketList = new ArrayList<>();
-//
-//        if (mainTicket.getTicket() != null) {
-//            Integer actualMainTicketId = mainTicket.getTicket().getId();
-//            Ticket actualMainTicket = ticketRepo.getReferenceById(actualMainTicketId);
-//            ticketList.addAll(ticketRepo.findByTicketId(actualMainTicketId));
-//            ticketList.add(actualMainTicket);
-//        } else {
-//            ticketList.addAll(ticketRepo.findByTicketId(mainTicketId));
-//            ticketList.add(mainTicket);
-//        }
-//
-//        List<Ticket> sortedTickets = ticketList.stream().sorted(Comparator.comparing(Ticket::getId)).toList();
-//
-//        return ticketMapper.toDtoList(sortedTickets);
-//    }
 }
