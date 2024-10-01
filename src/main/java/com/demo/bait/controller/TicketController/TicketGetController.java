@@ -68,8 +68,8 @@ public class TicketGetController {
         return ticketWorkTypeService.getTicketWorkTypes(ticketId);
     }
 
-    @GetMapping("/paid-work/{ticketId}")
-    public PaidWorkDTO getTicketPaidWork(@PathVariable Integer ticketId) {
-        return ticketPaidWorkService.getTicketPaidWork(ticketId);
-    }
+//    @GetMapping("/paid-work/{ticketId}")
+//    public PaidWorkDTO getTicketPaidWork(@PathVariable Integer ticketId) {
+//        return ticketPaidWorkService.getTicketPaidWork(ticketId);
+//    }
 }

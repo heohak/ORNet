@@ -1,5 +1,6 @@
 package com.demo.bait.entity;
 
+import com.demo.bait.converter.DurationConverter;
 import com.demo.bait.entity.classificator.TicketStatusClassificator;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import jakarta.persistence.*;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -81,7 +83,13 @@ public class Ticket {
             inverseJoinColumns = @JoinColumn(name = "file_upload_id")
     )
     private Set<FileUpload> files = new HashSet<>();
-    @OneToOne
-    @JoinColumn(name = "paid_work_id", referencedColumnName = "id")
-    private PaidWork paidWork;
+//    @OneToOne
+//    @JoinColumn(name = "paid_work_id", referencedColumnName = "id")
+//    private PaidWork paidWork;
+    private Boolean paid;
+    private Boolean settled;
+    @Convert(converter = DurationConverter.class)
+    private Duration timeSpent;
+    @Convert(converter = DurationConverter.class)
+    private Duration paidTime;
 }
