@@ -16,8 +16,6 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ClientWorkerMapper {
 
-//    @Mapping(source = "client.id", target = "clientId")
-//    @Mapping(source = "location.id", target = "locationId")
     List<ClientWorkerDTO> toDtoList(List<ClientWorker> clientWorkerList);
 
     @Mapping(source = "client.id", target = "clientId")

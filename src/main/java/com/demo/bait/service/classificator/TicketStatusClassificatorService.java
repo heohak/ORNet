@@ -52,7 +52,9 @@ public class TicketStatusClassificatorService {
         if (statusDTO.status() != null) {
             ticketStatus.setStatus(statusDTO.status());
         }
-        ticketStatus.setColor(statusDTO.color());
+        if (statusDTO.color() != null) {
+            ticketStatus.setColor(statusDTO.color());
+        }
         ticketStatusClassificatorRepo.save(ticketStatus);
         return new ResponseDTO("Ticket status classificator updated successfully");
     }

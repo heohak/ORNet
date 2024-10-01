@@ -15,7 +15,6 @@ import java.util.List;
         uses = {HISMapper.class, PACSMapper.class, DICOMMapper.class, HL7Mapper.class, LISMapper.class})
 public interface SoftwareMapper {
 
-    //    @Mapping(source = "client.id", target = "clientId")
     List<SoftwareDTO> toDtoList(List<Software> softwareList);
     @Mapping(source = "client.id", target = "clientId")
     SoftwareDTO toDto(Software software);
