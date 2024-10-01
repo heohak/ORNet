@@ -41,7 +41,7 @@ public class TicketSpecificationService {
         }
 
         if (paid != null) {
-            Specification<Ticket> paidSpec = TicketSpecification.isPaidWork(paid);
+            Specification<Ticket> paidSpec = TicketSpecification.isPaid(paid);
             combinedSpec = combinedSpec.and(paidSpec);
         }
 

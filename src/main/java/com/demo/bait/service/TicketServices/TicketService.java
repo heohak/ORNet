@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -40,6 +41,7 @@ public class TicketService {
     private CommentService commentService;
     private WorkTypeClassificatorService workTypeClassificatorService;
     private ClientWorkerService clientWorkerService;
+    private TicketPaidWorkService ticketPaidWorkService;
 
 
     @Transactional
@@ -100,16 +102,11 @@ public class TicketService {
         ticket.setInsideInfo(ticketDTO.insideInfo());
         ticket.setEndDateTime(ticketDTO.endDateTime());
         ticket.setRootCause(ticketDTO.rootCause());
-
-        if (ticketDTO.commentIds() != null) {
-            Set<Comment> comments = commentService.commentIdsToCommentsSet(ticketDTO.commentIds());
-            ticket.setComments(comments);
-        }
-
         if (ticketDTO.fileIds() != null) {
             Set<FileUpload> files = fileUploadService.fileIdsToFilesSet(ticketDTO.fileIds());
             ticket.setFiles(files);
         }
+        ticket.setTimeSpent(Duration.ZERO);
 
         ticketRepo.save(ticket);
         setTicketUpdateTime(ticket);
@@ -307,6 +304,7 @@ public class TicketService {
         return new ResponseDTO("Whole ticket updated successfully");
     }
 
+    @Transactional
     public void setTicketName(Ticket ticket) {
         ticketRepo.save(ticket);
         LocalDate now = LocalDate.now();
@@ -322,6 +320,32 @@ public class TicketService {
 
         String name = String.format("Ticket: %s%s%s%s", yy, mm, dd, nn);
         ticket.setName(name);
+    }
+
+    @Transactional
+    public void addTimeSpent(Ticket ticket, Integer hours, Integer minutes, Boolean paid) {
+        Duration timeSpent = addDuration(ticket.getTimeSpent(), hours, minutes);
+        ticket.setTimeSpent(timeSpent);
+
+        if (Boolean.TRUE.equals(paid)) {
+            Duration paidTime = addDuration(ticket.getPaidTime(), hours, minutes);
+            ticket.setPaidTime(paidTime);
+        }
+
+        ticketRepo.save(ticket);
+    }
+
+    private Duration addDuration(Duration duration, Integer hours, Integer minutes) {
+        if (duration == null) {
+            duration = Duration.ZERO;
+        }
+        if (hours != null) {
+            duration = duration.plusHours(hours);
+        }
+        if (minutes != null) {
+            duration = duration.plusMinutes(minutes);
+        }
+        return duration;
     }
 
     public TicketDTO getTicketById(Integer ticketId) {

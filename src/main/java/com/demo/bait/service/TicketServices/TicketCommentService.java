@@ -26,14 +26,17 @@ public class TicketCommentService {
     private TicketRepo ticketRepo;
     private CommentMapper commentMapper;
     private CommentService commentService;
+    private TicketService ticketService;
 
     @Transactional
-    public ResponseDTO addCommentToTicket(Integer ticketId, String newComment) {
+    public ResponseDTO addCommentToTicket(Integer ticketId, String newComment, Integer hours, Integer minutes,
+                                          Boolean paid) {
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         if (ticketOpt.isEmpty()) {
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
         Ticket ticket = ticketOpt.get();
+        ticketService.addTimeSpent(ticket, hours, minutes, paid);
         Comment comment = commentService.addComment(newComment);
         ticket.getComments().add(comment);
         ticketRepo.save(ticket);

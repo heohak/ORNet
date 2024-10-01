@@ -2,6 +2,7 @@ package com.demo.bait.dto;
 
 import lombok.Builder;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,5 +14,7 @@ public record TicketDTO(Integer id, Integer clientId, String title, String name,
                         Integer statusId, Integer baitWorkerId, LocalDateTime responseDateTime, String response,
                         String insideInfo, LocalDateTime endDateTime, LocalDateTime updateDateTime, String rootCause,
                         String clientName, List<Integer> commentIds,
-                        List<Integer> fileIds, Integer paidWorkId) {
+                        List<Integer> fileIds,
+                        Integer paidWorkId,
+                        Boolean paid, Boolean settled, Duration timeSpent, Duration paidTime) {
 }

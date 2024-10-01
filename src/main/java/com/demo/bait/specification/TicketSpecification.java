@@ -40,16 +40,9 @@ public class TicketSpecification implements Specification<Ticket> {
         };
     }
 
-    public static Specification<Ticket> isPaidWork(Boolean paid) {
+    public static Specification<Ticket> isPaid(Boolean paid) {
         return (root, query, criteriaBuilder) -> {
-            if (paid == null) {
-                return criteriaBuilder.conjunction();
-            }
-            if (paid) {
-                return criteriaBuilder.isNotNull(root.get("paidWork"));
-            } else {
-                return criteriaBuilder.isNull(root.get("paidWork"));
-            }
+            return criteriaBuilder.equal(root.get("paid"), paid);
         };
     }
 
