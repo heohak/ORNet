@@ -41,7 +41,7 @@ public class TicketGetController {
             @RequestParam(value = "searchTerm", required = false) String searchTerm,
             @RequestParam(value = "statusId", required = false) Integer statusId,
             @RequestParam(value = "crisis", required = false) Boolean crisis,
-            @RequestParam(value = "paidWork", required = false) Boolean paidWork,
+            @RequestParam(value = "paid", required = false) Boolean paidWork,
             @RequestParam(value = "workTypeId", required = false) Integer workTypeId,
             @RequestParam(value = "baitWorkerId", required = false) Integer baitWorkerId) {
         return ticketSpecificationService.searchAndFilterTickets(searchTerm, statusId, crisis, paidWork,
