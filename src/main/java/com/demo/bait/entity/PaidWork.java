@@ -26,6 +26,6 @@ public class PaidWork {
     private Duration timeSpent;
     private Boolean settled;
 
-    @OneToOne(mappedBy = "paidWork")
-    private Ticket ticket;
+//    @OneToOne(mappedBy = "paidWork")
+//    private Ticket ticket;
 }

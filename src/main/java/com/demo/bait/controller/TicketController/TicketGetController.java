@@ -17,7 +17,6 @@ public class TicketGetController {
     public final TicketFileUploadService ticketFileUploadService;
     public final TicketContactsService ticketContactsService;
     public final TicketSpecificationService ticketSpecificationService;
-    public final TicketMaintenanceService ticketMaintenanceService;
     public final TicketCommentService ticketCommentService;
     public final TicketPaidWorkService ticketPaidWorkService;
     public final TicketWorkTypeService ticketWorkTypeService;
@@ -32,11 +31,6 @@ public class TicketGetController {
         return ticketService.getAllTickets();
     }
 
-//    @GetMapping("/main/{mainTicketId}")
-//    public List<TicketDTO> getTicketsByMainTicketId(@PathVariable Integer mainTicketId) {
-//        return ticketService.getTicketsByMainTicketId(mainTicketId);
-//    }
-
     @GetMapping("/{ticketId}")
     public TicketDTO getTicketById(@PathVariable Integer ticketId) {
         return ticketService.getTicketById(ticketId);
@@ -47,16 +41,11 @@ public class TicketGetController {
             @RequestParam(value = "searchTerm", required = false) String searchTerm,
             @RequestParam(value = "statusId", required = false) Integer statusId,
             @RequestParam(value = "crisis", required = false) Boolean crisis,
-            @RequestParam(value = "paidWork", required = false) Boolean paidWork,
+            @RequestParam(value = "paid", required = false) Boolean paidWork,
             @RequestParam(value = "workTypeId", required = false) Integer workTypeId,
             @RequestParam(value = "baitWorkerId", required = false) Integer baitWorkerId) {
         return ticketSpecificationService.searchAndFilterTickets(searchTerm, statusId, crisis, paidWork,
                 workTypeId, baitWorkerId);
-    }
-
-    @GetMapping("/maintenance/{ticketId}")
-    public List<MaintenanceDTO> getTicketMaintenances(@PathVariable Integer ticketId) {
-        return ticketMaintenanceService.getTicketMaintenances(ticketId);
     }
 
     @GetMapping("/comment/{ticketId}")
@@ -79,8 +68,8 @@ public class TicketGetController {
         return ticketWorkTypeService.getTicketWorkTypes(ticketId);
     }
 
-    @GetMapping("/paid-work/{ticketId}")
-    public PaidWorkDTO getTicketPaidWork(@PathVariable Integer ticketId) {
-        return ticketPaidWorkService.getTicketPaidWork(ticketId);
-    }
+//    @GetMapping("/paid-work/{ticketId}")
+//    public PaidWorkDTO getTicketPaidWork(@PathVariable Integer ticketId) {
+//        return ticketPaidWorkService.getTicketPaidWork(ticketId);
+//    }
 }
