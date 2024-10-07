@@ -16,5 +16,6 @@ public record TicketDTO(Integer id, Integer clientId, String title, String name,
                         String clientName, List<Integer> commentIds,
                         List<Integer> fileIds,
 //                        Integer paidWorkId,
-                        Boolean paid, Boolean settled, Duration timeSpent, Duration paidTime) {
+                        Boolean paid, Boolean settled, Duration timeSpent, Duration paidTime,
+                        List<Integer> deviceIds) {
 }

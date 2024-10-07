@@ -9,6 +9,7 @@ import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.TicketStatusClassificatorRepo;
 import com.demo.bait.service.ClientWorkerServices.ClientWorkerService;
 import com.demo.bait.service.CommentServices.CommentService;
+import com.demo.bait.service.DeviceServices.DeviceService;
 import com.demo.bait.service.FileUploadServices.FileUploadService;
 import com.demo.bait.service.MaintenanceServices.MaintenanceService;
 import com.demo.bait.service.classificator.WorkTypeClassificatorService;
@@ -38,10 +39,10 @@ public class TicketService {
     private TicketContactsService ticketContactsService;
     private TicketWorkTypeService ticketWorkTypeService;
     private FileUploadService fileUploadService;
-    private CommentService commentService;
     private WorkTypeClassificatorService workTypeClassificatorService;
     private ClientWorkerService clientWorkerService;
-    private TicketPaidWorkService ticketPaidWorkService;
+    private DeviceService deviceService;
+    private TicketDeviceService ticketDeviceService;
 
 
     @Transactional
@@ -105,6 +106,10 @@ public class TicketService {
         if (ticketDTO.fileIds() != null) {
             Set<FileUpload> files = fileUploadService.fileIdsToFilesSet(ticketDTO.fileIds());
             ticket.setFiles(files);
+        }
+        if (ticketDTO.deviceIds() != null) {
+            Set<Device> devices = deviceService.deviceIdsToDevicesSet(ticketDTO.deviceIds());
+            ticket.setDevices(devices);
         }
         ticket.setTimeSpent(Duration.ZERO);
 
@@ -300,6 +305,7 @@ public class TicketService {
         updateTicketResponse(ticket, ticketDTO);
         updateTicketInsideInfo(ticket, ticketDTO);
         ticketContactsService.addContactsToTicket(ticket, ticketDTO);
+        ticketDeviceService.addDevicesToTicket(ticket, ticketDTO);
         setTicketUpdateTime(ticket);
         return new ResponseDTO("Whole ticket updated successfully");
     }

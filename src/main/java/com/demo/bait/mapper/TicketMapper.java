@@ -28,6 +28,7 @@ public interface TicketMapper {
     @Mapping(target = "workTypeIds", expression = "java(mapWorkTypesToIds(ticket.getWorkTypes()))")
     @Mapping(target = "commentIds", expression = "java(mapCommentsToIds(ticket.getComments()))")
     @Mapping(target = "fileIds", expression = "java(mapFilesToIds(ticket.getFiles()))")
+    @Mapping(target = "deviceIds", expression = "java(mapDevicesToIds(ticket.getDevices()))")
     TicketDTO toDto(Ticket ticket);
 
     default List<Integer> mapContactsToIds(Set<ClientWorker> contacts) {
@@ -51,6 +52,12 @@ public interface TicketMapper {
     default List<Integer> mapWorkTypesToIds(Set<WorkTypeClassificator> workTypes) {
         return workTypes.stream()
                 .map(WorkTypeClassificator::getId)
+                .collect(Collectors.toList());
+    }
+
+    default List<Integer> mapDevicesToIds(Set<Device> devices) {
+        return devices.stream()
+                .map(Device::getId)
                 .collect(Collectors.toList());
     }
 }

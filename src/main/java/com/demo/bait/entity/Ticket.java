@@ -92,4 +92,11 @@ public class Ticket {
     private Duration timeSpent;
     @Convert(converter = DurationConverter.class)
     private Duration paidTime;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "ticket_device",
+            joinColumns = @JoinColumn(name = "ticket_id"),
+            inverseJoinColumns = @JoinColumn(name = "device_id")
+    )
+    private Set<Device> devices = new HashSet<>();
 }
