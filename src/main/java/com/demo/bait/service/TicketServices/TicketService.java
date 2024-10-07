@@ -61,7 +61,7 @@ public class TicketService {
         ticket.setClientNumeration(ticketDTO.clientNumeration());
         ticket.setDescription(ticketDTO.description());
 
-        ticket.setStartDateTime(ticketDTO.startDateTime());
+        ticket.setStartDateTime(LocalDateTime.now().withNano(0));
 
         if (ticketDTO.locationId() != null && locationRepo.findById(ticketDTO.locationId()).isPresent()) {
             ticket.setLocation(locationRepo.getReferenceById(ticketDTO.locationId()));

@@ -37,7 +37,7 @@ public class TicketCommentService {
         }
         Ticket ticket = ticketOpt.get();
         ticketService.addTimeSpent(ticket, hours, minutes, paid);
-        Comment comment = commentService.addComment(newComment);
+        Comment comment = commentService.addComment(newComment, hours, minutes);
         ticket.getComments().add(comment);
         ticketRepo.save(ticket);
         return new ResponseDTO("Comment added successfully");
