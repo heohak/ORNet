@@ -20,6 +20,8 @@ public class TicketGetController {
     public final TicketCommentService ticketCommentService;
     public final TicketPaidWorkService ticketPaidWorkService;
     public final TicketWorkTypeService ticketWorkTypeService;
+    public final TicketDeviceService ticketDeviceService;
+
 
     @GetMapping("/client/{clientId}")
     public List<TicketDTO> getTicketsByClientId(@PathVariable Integer clientId) {
@@ -66,6 +68,11 @@ public class TicketGetController {
     @GetMapping("/work-types/{ticketId}")
     public List<WorkTypeClassificatorDTO> getTicketWorkTypes(@PathVariable Integer ticketId) {
         return ticketWorkTypeService.getTicketWorkTypes(ticketId);
+    }
+
+    @GetMapping("/devices/{ticketId}")
+    public List<DeviceDTO> getTicketDevices(@PathVariable Integer ticketId) {
+        return ticketDeviceService.getTicketDevices(ticketId);
     }
 
 //    @GetMapping("/paid-work/{ticketId}")
