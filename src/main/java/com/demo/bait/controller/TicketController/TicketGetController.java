@@ -52,7 +52,7 @@ public class TicketGetController {
     }
 
     @GetMapping("/activity/{ticketId}")
-    public List<ActivityDTO> getTicketComments(@PathVariable Integer ticketId) {
+    public List<ActivityDTO> getTicketActivities(@PathVariable Integer ticketId) {
         return ticketActivityService.getTicketActivities(ticketId);
     }
 

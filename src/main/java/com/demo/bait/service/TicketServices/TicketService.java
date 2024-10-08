@@ -8,10 +8,8 @@ import com.demo.bait.mapper.*;
 import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.TicketStatusClassificatorRepo;
 import com.demo.bait.service.ClientWorkerServices.ClientWorkerService;
-import com.demo.bait.service.CommentServices.CommentService;
 import com.demo.bait.service.DeviceServices.DeviceService;
 import com.demo.bait.service.FileUploadServices.FileUploadService;
-import com.demo.bait.service.MaintenanceServices.MaintenanceService;
 import com.demo.bait.service.classificator.WorkTypeClassificatorService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -23,7 +21,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -112,6 +109,9 @@ public class TicketService {
             ticket.setDevices(devices);
         }
         ticket.setTimeSpent(Duration.ZERO);
+        ticket.setPaidTime(Duration.ZERO);
+        ticket.setPaid(Boolean.FALSE);
+        ticket.setSettled(Boolean.FALSE);
 
         ticketRepo.save(ticket);
         setTicketUpdateTime(ticket);
