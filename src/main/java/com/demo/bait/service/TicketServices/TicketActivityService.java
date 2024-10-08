@@ -47,7 +47,7 @@ public class TicketActivityService {
 //        Comment comment = commentService.addComment(newComment, hours, minutes);
 //        ticket.getComments().add(comment);
         ticketRepo.save(ticket);
-        return new ResponseDTO("Comment added successfully");
+        return new ResponseDTO("Activity added successfully");
     }
 
     public List<ActivityDTO> getTicketActivities(Integer ticketId) {
@@ -56,6 +56,7 @@ public class TicketActivityService {
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
         Ticket ticket = ticketOpt.get();
+        System.out.println(ticket.getActivities().stream().toList().get(0).getActivity());
         return activityMapper.toDtoList(
                 ticket.getActivities()
                         .stream()
