@@ -23,11 +23,9 @@ public class ReportController {
     @GetMapping("/client-tickets")
     public ResponseEntity<Resource> generateClientTicketsReport(
             @RequestParam("clientId") Integer clientId,
-            @RequestParam(value = "startDate", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(value = "endDate", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(value = "fileName", required = false) String fileName) {
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam("fileName") String fileName) {
         return reportService.generateClientTicketsReport(clientId, startDate, endDate, fileName);
     }
 }
