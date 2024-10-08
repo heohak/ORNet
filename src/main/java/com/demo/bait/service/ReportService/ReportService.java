@@ -142,17 +142,18 @@ public class ReportService {
                                 .append(ticket.getName()).append(" Root Cause").append(",")
                                 .append(ticket.getRootCause().replace(",", ";")).append("\n\n");
 
-                    List<Comment> comments = ticket.getComments().stream().toList();
-                    if (comments.size() == 0) {
+                    List<Activity> activities = ticket.getActivities().stream().toList();
+                    if (activities.size() == 0) {
                         csvBuilder.append("This ticket does not have any activity's").append("\n\n");
                     } else {
                         csvBuilder.append("Completed Activity's").append("\n")
-                            .append("Timestamp, Time Spent, Activity").append("\n");
+                            .append("Timestamp, Time Spent, Paid, Activity").append("\n");
 
-                        for (Comment comment : comments) {
-                            csvBuilder.append(comment.getTimestamp()).append(",")
-                                    .append(comment.getTimeSpent()).append(",")
-                                    .append(comment.getComment().replace(",", ";")).append("\n");
+                        for (Activity activity : activities) {
+                            csvBuilder.append(activity.getTimestamp()).append(",")
+                                    .append(activity.getTimeSpent()).append(",")
+                                    .append(activity.getPaid()).append(",")
+                                    .append(activity.getActivity().replace(",", ";")).append("\n");
                         }
                         csvBuilder.append("\n");
                     }

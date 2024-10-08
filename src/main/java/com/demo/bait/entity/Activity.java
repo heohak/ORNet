@@ -15,12 +15,15 @@ import java.time.LocalDateTime;
 @Entity
 @Audited
 @NoArgsConstructor
-public class Comment {
+public class Activity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     @Column(columnDefinition = "TEXT")
-    private String comment;
+    private String activity;
     private LocalDateTime timestamp;
+    @Convert(converter = DurationConverter.class)
+    private Duration timeSpent;
+    private Boolean paid;
 }

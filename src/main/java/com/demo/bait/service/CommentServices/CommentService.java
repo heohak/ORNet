@@ -31,7 +31,6 @@ public class CommentService {
         Comment comment = new Comment();
         comment.setComment(commentDTO.comment());
         comment.setTimestamp(LocalDateTime.now());
-        comment.setTimeSpent(commentDTO.timeSpent());
         commentRepo.save(comment);
         return new ResponseDTO("Comment added successfully");
     }
@@ -41,24 +40,6 @@ public class CommentService {
         Comment comment = new Comment();
         comment.setComment(newComment);
         comment.setTimestamp(LocalDateTime.now());
-        commentRepo.save(comment);
-        return comment;
-    }
-
-    @Transactional
-    public Comment addComment(String newComment, Integer hours, Integer minutes) {
-        Comment comment = new Comment();
-        comment.setComment(newComment);
-        comment.setTimestamp(LocalDateTime.now());
-        if (hours != null && minutes != null) {
-            comment.setTimeSpent(Duration.ofHours(hours).plusMinutes(minutes));
-        } else if (hours != null) {
-            comment.setTimeSpent(Duration.ofHours(hours));
-        } else if (minutes != null) {
-            comment.setTimeSpent(Duration.ofMinutes(minutes));
-        } else {
-            comment.setTimeSpent(Duration.ZERO);
-        }
         commentRepo.save(comment);
         return comment;
     }

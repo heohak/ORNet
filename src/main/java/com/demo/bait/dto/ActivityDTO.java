@@ -6,5 +6,5 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Builder
-public record CommentDTO(Integer id, String comment, LocalDateTime timestamp) {
+public record ActivityDTO(Integer id, String comment, LocalDateTime timestamp, Duration timeSpent, Boolean paid) {
 }

@@ -76,8 +76,10 @@ public class TicketSpecification implements Specification<Ticket> {
         Predicate baitWorkerFirstNamePredicate = criteriaBuilder.like(criteriaBuilder.lower(baitWorkerJoin.get("firstName")), likePattern);
         Predicate baitWorkerLastNamePredicate = criteriaBuilder.like(criteriaBuilder.lower(baitWorkerJoin.get("lastName")), likePattern);
 
-        Join<Ticket, Comment> commentJoin = root.join("comments", JoinType.LEFT);
-        Predicate commentPredicate = criteriaBuilder.like(criteriaBuilder.lower(commentJoin.get("comment")), likePattern);
+//        Join<Ticket, Comment> commentJoin = root.join("comments", JoinType.LEFT);
+//        Predicate commentPredicate = criteriaBuilder.like(criteriaBuilder.lower(commentJoin.get("comment")), likePattern);
+        Join<Ticket, Activity> activityJoin = root.join("activity", JoinType.LEFT);
+        Predicate activityPredicate = criteriaBuilder.like(criteriaBuilder.lower(activityJoin.get("activity")), likePattern);
 
         Join<Ticket, Maintenance> maintenanceJoin = root.join("maintenances", JoinType.LEFT);
         Predicate maintenancePredicate = criteriaBuilder.like(criteriaBuilder.lower(maintenanceJoin.get("maintenanceName")), likePattern);
@@ -89,7 +91,10 @@ public class TicketSpecification implements Specification<Ticket> {
                 clientNumerationPredicate, responsePredicate, insideInfoPredicate, rootCausePredicate,
                 clientFullNamePredicate, clientShortNamePredicate, locationPredicate, contactsFirstNamePredicate,
                 contactsLastNamePredicate, contactsTitlePredicate, baitWorkerFirstNamePredicate,
-                baitWorkerLastNamePredicate, commentPredicate, maintenancePredicate, fileUploadPredicate);
+                baitWorkerLastNamePredicate,
+//                commentPredicate,
+                activityPredicate,
+                maintenancePredicate, fileUploadPredicate);
     }
 
 }

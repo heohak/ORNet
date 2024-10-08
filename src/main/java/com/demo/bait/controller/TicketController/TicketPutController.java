@@ -17,7 +17,7 @@ public class TicketPutController {
 
     public final TicketService ticketService;
     public final TicketFileUploadService ticketFileUploadService;
-    public final TicketCommentService ticketCommentService;
+    public final TicketActivityService ticketCommentService;
     public final TicketPaidWorkService ticketPaidWorkService;
 
     @PutMapping("/status/{ticketId}/{statusId}")
@@ -31,13 +31,13 @@ public class TicketPutController {
         return ticketFileUploadService.uploadFilesToTicket(ticketId, files);
     }
 
-    @PutMapping("/comment/{ticketId}")
-    public ResponseDTO addCommentToTicket(@PathVariable Integer ticketId,
-                                          @RequestParam("comment") String comment,
+    @PutMapping("/activity/{ticketId}")
+    public ResponseDTO addActivityToTicket(@PathVariable Integer ticketId,
+                                          @RequestParam("activity") String activity,
                                           @RequestParam(value = "hours", required = false) Integer hours,
                                           @RequestParam(value = "minutes", required = false) Integer minutes,
                                           @RequestParam(value = "paid", required = false) Boolean paid) {
-        return ticketCommentService.addCommentToTicket(ticketId, comment, hours, minutes, paid);
+        return ticketCommentService.addActivityToTicket(ticketId, activity, hours, minutes, paid);
     }
 
     @PutMapping("/update/whole/{ticketId}")

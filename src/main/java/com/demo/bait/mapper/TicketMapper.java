@@ -26,7 +26,8 @@ public interface TicketMapper {
 //    @Mapping(source = "paidWork.id", target = "paidWorkId")
     @Mapping(target = "contactIds", expression = "java(mapContactsToIds(ticket.getContacts()))")
     @Mapping(target = "workTypeIds", expression = "java(mapWorkTypesToIds(ticket.getWorkTypes()))")
-    @Mapping(target = "commentIds", expression = "java(mapCommentsToIds(ticket.getComments()))")
+//    @Mapping(target = "commentIds", expression = "java(mapCommentsToIds(ticket.getComments()))")
+    @Mapping(target = "activityIds", expression = "java(mapActivitiesToIds(ticket.getActivities()))")
     @Mapping(target = "fileIds", expression = "java(mapFilesToIds(ticket.getFiles()))")
     @Mapping(target = "deviceIds", expression = "java(mapDevicesToIds(ticket.getDevices()))")
     TicketDTO toDto(Ticket ticket);
@@ -43,9 +44,14 @@ public interface TicketMapper {
                 .collect(Collectors.toList());
     }
 
-    default List<Integer> mapCommentsToIds(Set<Comment> comments) {
-        return comments.stream()
-                .map(Comment::getId)
+//    default List<Integer> mapCommentsToIds(Set<Comment> comments) {
+//        return comments.stream()
+//                .map(Comment::getId)
+//                .collect(Collectors.toList());
+//    }
+    default List<Integer> mapActivitiesToIds(Set<Activity> activities) {
+        return activities.stream()
+                .map(Activity::getId)
                 .collect(Collectors.toList());
     }
 
