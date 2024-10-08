@@ -13,8 +13,11 @@ public record TicketDTO(Integer id, Integer clientId, String title, String name,
                         List<Integer> contactIds, List<Integer> workTypeIds, Boolean remote, Boolean crisis,
                         Integer statusId, Integer baitWorkerId, LocalDateTime responseDateTime, String response,
                         String insideInfo, LocalDateTime endDateTime, LocalDateTime updateDateTime, String rootCause,
-                        String clientName, List<Integer> commentIds,
+                        String clientName,
+//                        List<Integer> commentIds,
+                        List<Integer> activityIds,
                         List<Integer> fileIds,
 //                        Integer paidWorkId,
-                        Boolean paid, Boolean settled, Duration timeSpent, Duration paidTime) {
+                        Boolean paid, Boolean settled, Duration timeSpent, Duration paidTime,
+                        List<Integer> deviceIds) {
 }

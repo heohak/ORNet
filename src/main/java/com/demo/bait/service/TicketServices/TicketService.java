@@ -8,9 +8,8 @@ import com.demo.bait.mapper.*;
 import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.TicketStatusClassificatorRepo;
 import com.demo.bait.service.ClientWorkerServices.ClientWorkerService;
-import com.demo.bait.service.CommentServices.CommentService;
+import com.demo.bait.service.DeviceServices.DeviceService;
 import com.demo.bait.service.FileUploadServices.FileUploadService;
-import com.demo.bait.service.MaintenanceServices.MaintenanceService;
 import com.demo.bait.service.classificator.WorkTypeClassificatorService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -22,7 +21,6 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -38,10 +36,10 @@ public class TicketService {
     private TicketContactsService ticketContactsService;
     private TicketWorkTypeService ticketWorkTypeService;
     private FileUploadService fileUploadService;
-    private CommentService commentService;
     private WorkTypeClassificatorService workTypeClassificatorService;
     private ClientWorkerService clientWorkerService;
-    private TicketPaidWorkService ticketPaidWorkService;
+    private DeviceService deviceService;
+    private TicketDeviceService ticketDeviceService;
 
 
     @Transactional
@@ -60,7 +58,7 @@ public class TicketService {
         ticket.setClientNumeration(ticketDTO.clientNumeration());
         ticket.setDescription(ticketDTO.description());
 
-        ticket.setStartDateTime(ticketDTO.startDateTime());
+        ticket.setStartDateTime(LocalDateTime.now().withNano(0));
 
         if (ticketDTO.locationId() != null && locationRepo.findById(ticketDTO.locationId()).isPresent()) {
             ticket.setLocation(locationRepo.getReferenceById(ticketDTO.locationId()));
@@ -106,7 +104,14 @@ public class TicketService {
             Set<FileUpload> files = fileUploadService.fileIdsToFilesSet(ticketDTO.fileIds());
             ticket.setFiles(files);
         }
+        if (ticketDTO.deviceIds() != null) {
+            Set<Device> devices = deviceService.deviceIdsToDevicesSet(ticketDTO.deviceIds());
+            ticket.setDevices(devices);
+        }
         ticket.setTimeSpent(Duration.ZERO);
+        ticket.setPaidTime(Duration.ZERO);
+        ticket.setPaid(Boolean.FALSE);
+        ticket.setSettled(Boolean.FALSE);
 
         ticketRepo.save(ticket);
         setTicketUpdateTime(ticket);
@@ -300,6 +305,7 @@ public class TicketService {
         updateTicketResponse(ticket, ticketDTO);
         updateTicketInsideInfo(ticket, ticketDTO);
         ticketContactsService.addContactsToTicket(ticket, ticketDTO);
+        ticketDeviceService.addDevicesToTicket(ticket, ticketDTO);
         setTicketUpdateTime(ticket);
         return new ResponseDTO("Whole ticket updated successfully");
     }

@@ -346,4 +346,14 @@ public class DeviceService {
 
         return deviceMapper.toDtoList(history);
     }
+
+    public Set<Device> deviceIdsToDevicesSet(List<Integer> deviceIds) {
+        Set<Device> devices = new HashSet<>();
+        for (Integer deviceId : deviceIds) {
+            Device device = deviceRepo.findById(deviceId)
+                    .orElseThrow(() -> new IllegalArgumentException("Invalid device ID: " + deviceId));
+            devices.add(device);
+        }
+        return devices;
+    }
 }
