@@ -17,10 +17,11 @@ public class TicketGetController {
     public final TicketFileUploadService ticketFileUploadService;
     public final TicketContactsService ticketContactsService;
     public final TicketSpecificationService ticketSpecificationService;
-    public final TicketCommentService ticketCommentService;
+    public final TicketActivityService ticketCommentService;
     public final TicketPaidWorkService ticketPaidWorkService;
     public final TicketWorkTypeService ticketWorkTypeService;
     public final TicketDeviceService ticketDeviceService;
+    public final TicketActivityService ticketActivityService;
 
 
     @GetMapping("/client/{clientId}")
@@ -50,9 +51,9 @@ public class TicketGetController {
                 workTypeId, baitWorkerId);
     }
 
-    @GetMapping("/comment/{ticketId}")
-    public List<CommentDTO> getTicketComments(@PathVariable Integer ticketId) {
-        return ticketCommentService.getTicketComments(ticketId);
+    @GetMapping("/activity/{ticketId}")
+    public List<ActivityDTO> getTicketComments(@PathVariable Integer ticketId) {
+        return ticketActivityService.getTicketActivities(ticketId);
     }
 
     @GetMapping("/files/{ticketId}")

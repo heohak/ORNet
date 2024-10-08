@@ -69,13 +69,20 @@ public class Ticket {
     private LocalDateTime updateDateTime;
     @Column(columnDefinition = "TEXT")
     private String rootCause;
+//    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "ticket_comment",
+//            joinColumns = @JoinColumn(name = "ticket_id"),
+//            inverseJoinColumns = @JoinColumn(name = "comment_id")
+//    )
+//    private Set<Comment> comments = new HashSet<>();
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
-            name = "ticket_comment",
+            name = "ticket_activity",
             joinColumns = @JoinColumn(name = "ticket_id"),
-            inverseJoinColumns = @JoinColumn(name = "comment_id")
+            inverseJoinColumns = @JoinColumn(name = "activity_id")
     )
-    private Set<Comment> comments = new HashSet<>();
+    private Set<Activity> activities = new HashSet<>();
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name = "ticket_file_upload",
