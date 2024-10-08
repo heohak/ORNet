@@ -43,7 +43,6 @@ public class FileUploadService {
 
     private FileUploadRepo fileUploadRepo;
     private FileUploadMapper fileUploadMapper;
-
     private static final String UPLOAD_DIR = "uploads";
 
     @Transactional
@@ -142,23 +141,32 @@ public class FileUploadService {
                 .orElseThrow(() -> new RuntimeException("File not found"));
 
         Path path = Paths.get(fileUpload.getFilePath());
-        Resource resource;
-        try {
-            resource = new UrlResource(path.toUri());
-            if (!resource.exists() || !resource.isReadable()) {
-                throw new RuntimeException("File not found or not readable");
-            }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Error loading file", e);
-        }
+        Resource resource = loadResource(path);
+        HttpHeaders headers = createHeaders(fileUpload.getFileName(), dispositionType);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, dispositionType + "; filename=\"" + fileUpload.getFileName() + "\"");
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentLength(fileUpload.getFileSize())
                 .contentType(MediaType.parseMediaType(fileUpload.getFileType()))
                 .body(resource);
+    }
+
+    public static Resource loadResource(Path path) {
+        try {
+            Resource resource = new UrlResource(path.toUri());
+            if (!resource.exists() || !resource.isReadable()) {
+                throw new RuntimeException("File not found or not readable");
+            }
+            return resource;
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Error loading file", e);
+        }
+    }
+
+    public static HttpHeaders createHeaders(String fileName, String dispositionType) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, dispositionType + "; filename=\"" + fileName + "\"");
+        return headers;
     }
 
     public Set<FileUpload> fileIdsToFilesSet(List<Integer> fileIds) {

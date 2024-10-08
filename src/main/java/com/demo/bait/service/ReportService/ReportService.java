@@ -3,15 +3,25 @@ package com.demo.bait.service.ReportService;
 import com.demo.bait.entity.*;
 import com.demo.bait.repository.ClientRepo;
 import com.demo.bait.repository.TicketRepo;
+import com.demo.bait.service.FileUploadServices.FileUploadService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,10 +42,12 @@ public class ReportService {
 
     private ClientRepo clientRepo;
     private TicketRepo ticketRepo;
+    private static final String REPORTS_DIR = "reports";
 
-//    ResponseEntity<Resource>
-    public void generateClientTicketsReport(Integer clientId, LocalDate startDate,
-                                                                LocalDate endDate) {
+    public ResponseEntity<Resource> generateClientTicketsReport(Integer clientId, LocalDate startDate,
+                                                                LocalDate endDate, String fileName) {
+        fileName = fileName + ".xlsx";
+
         Optional<Client> clientOpt = clientRepo.findById(clientId);
         if (clientOpt.isEmpty()) {
             throw new EntityNotFoundException("Client with id " + clientId + " not found");
@@ -43,13 +55,10 @@ public class ReportService {
         Client client = clientOpt.get();
 
         List<Location> locations = client.getLocations().stream().toList();
-        System.out.println("Locations: " + locations);
 
         LocalDateTime startDateTime = startDate.atStartOfDay();
         LocalDateTime endDateTime = endDate.atTime(LocalTime.MAX);
         List<Ticket> tickets = ticketRepo.findByClientAndDateRange(clientId, startDateTime, endDateTime);
-        System.out.println("Tickets: " + tickets);
-        System.out.println("################################");
 
         Map<Location, List<Ticket>> ticketsByLocation = tickets.stream()
                 .collect(Collectors.groupingBy(Ticket::getLocation));
@@ -57,52 +66,95 @@ public class ReportService {
         for (Location location : locations) {
             ticketsByLocation.putIfAbsent(location, new ArrayList<>());
         }
-        System.out.println(ticketsByLocation);
-        System.out.println("################################");
 
-        ticketsByLocation.forEach((location, ticketsForLocation) -> {
-            System.out.println("Location: " + location);
-            System.out.println("Tickets: " + ticketsForLocation);
-        });
+        createExcelForClientTicketsReport(client, ticketsByLocation, startDate, endDate, fileName);
 
+        Path path = Paths.get(REPORTS_DIR + "/" + fileName);
+        Resource resource = FileUploadService.loadResource(path);
+        HttpHeaders headers = FileUploadService.createHeaders(fileName, "attachment");
 
-        StringBuilder csvBuilder = createCsvForClientTicketsReport(client, ticketsByLocation, startDate, endDate);
-
-        System.out.println(csvBuilder.toString());
-        saveCsvToFile(csvBuilder, "C:\\Users\\AMD\\IdeaProjects\\ORNet\\uploads", "testCSV.csv");
+        try {
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .contentLength(Files.size(path))
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+        } catch (IOException e) {
+            throw new RuntimeException("Error retrieving file size", e);
+        }
     }
 
-    public StringBuilder createCsvForClientTicketsReport(Client client, Map<Location, List<Ticket>> ticketsByLocation,
-                                                         LocalDate startDate, LocalDate endDate) {
-        StringBuilder csvBuilder = new StringBuilder();
+    public void createExcelForClientTicketsReport(Client client, Map<Location, List<Ticket>> ticketsByLocation,
+                                                  LocalDate startDate, LocalDate endDate, String fileName) {
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Client Ticket Report");
+        int rowNum = 0;
         Duration overallDuration = Duration.ZERO;
         Duration paidDuration = Duration.ZERO;
 
-        csvBuilder.append("Client Ticket Report").append("\n")
-                .append("Time Period").append(",").append(startDate).append(" - ").append(endDate).append("\n")
-                .append("Full Name, Short Name\n")
-                .append(client.getFullName()).append(",")
-                .append(client.getShortName()).append("\n\n");
+        Row headerRow = sheet.createRow(rowNum++);
+        headerRow.createCell(0).setCellValue("Client Ticket Report");
+
+        Row periodRow = sheet.createRow(rowNum++);
+        periodRow.createCell(0).setCellValue("Time Period");
+        periodRow.createCell(1).setCellValue(startDate + " - " + endDate);
+
+        Row clientInfoParameterRow = sheet.createRow(rowNum++);
+        clientInfoParameterRow.createCell(0).setCellValue("Client Full Name");
+        clientInfoParameterRow.createCell(1).setCellValue("Client Short Name");
+
+        Row clientInfoRow = sheet.createRow(rowNum++);
+        clientInfoRow.createCell(0).setCellValue(client.getFullName());
+        clientInfoRow.createCell(1).setCellValue(client.getShortName());
+
+        rowNum++;
 
         for (Map.Entry<Location, List<Ticket>> entry : ticketsByLocation.entrySet()) {
             Location location = entry.getKey();
             List<Ticket> ticketsForLocation = entry.getValue();
 
-            csvBuilder.append("Location").append("\n")
-                    .append("Location Name, Country, City, Street Address, Postal Code, Phone, Email\n");
+            Row locationHeaderRow = sheet.createRow(rowNum++);
+            locationHeaderRow.createCell(0).setCellValue("Location Details:");
 
-            csvBuilder.append(location.getName()).append(",")
-                    .append(location.getCountry()).append(",")
-                    .append(location.getCity()).append(",")
-                    .append(location.getStreetAddress()).append(",")
-                    .append(location.getPostalCode()).append(",")
-                    .append(location.getPhone()).append(",")
-                    .append(location.getEmail()).append("\n\n");
+            Row locationParameterRow = sheet.createRow(rowNum++);
+            locationParameterRow.createCell(0).setCellValue("Location Name");
+            locationParameterRow.createCell(1).setCellValue("Country");
+            locationParameterRow.createCell(2).setCellValue("City");
+            locationParameterRow.createCell(3).setCellValue("Street Address");
+            locationParameterRow.createCell(4).setCellValue("Postal Code");
+            locationParameterRow.createCell(5).setCellValue("Phone");
+            locationParameterRow.createCell(6).setCellValue("Email");
 
-            if (ticketsForLocation.size() == 0) {
-                csvBuilder.append("This location does not have any tickets in the time period ")
-                        .append(startDate).append(" - ").append(endDate).append("\n\n");
+            Row locationDetailsRow = sheet.createRow(rowNum++);
+            locationDetailsRow.createCell(0).setCellValue(location.getName());
+            locationDetailsRow.createCell(1).setCellValue(location.getCountry());
+            locationDetailsRow.createCell(2).setCellValue(location.getCity());
+            locationDetailsRow.createCell(3).setCellValue(location.getStreetAddress());
+            locationDetailsRow.createCell(4).setCellValue(location.getPostalCode());
+            locationDetailsRow.createCell(5).setCellValue(location.getPhone());
+            locationDetailsRow.createCell(6).setCellValue(location.getEmail());
+
+            rowNum++;
+
+            if (ticketsForLocation.isEmpty()) {
+                Row noTicketsRow = sheet.createRow(rowNum++);
+                noTicketsRow.createCell(0).setCellValue("No Tickets For Location");
             } else {
+                Row ticketDetails = sheet.createRow(rowNum++);
+                ticketDetails.createCell(0).setCellValue("Ticket Details:");
+                Row ticketParameterRow = sheet.createRow(rowNum++);
+                ticketParameterRow.createCell(0).setCellValue("Ticket ID");
+                ticketParameterRow.createCell(1).setCellValue("Title");
+                ticketParameterRow.createCell(2).setCellValue("Start Date Time");
+                ticketParameterRow.createCell(3).setCellValue("Numeration");
+                ticketParameterRow.createCell(4).setCellValue("Description");
+                ticketParameterRow.createCell(5).setCellValue("Devices");
+                ticketParameterRow.createCell(6).setCellValue("Status");
+                ticketParameterRow.createCell(7).setCellValue("Closed Date Time");
+                ticketParameterRow.createCell(8).setCellValue("Root Cause");
+                ticketParameterRow.createCell(9).setCellValue("Total Time Spent");
+                ticketParameterRow.createCell(10).setCellValue("Total Paid Time");
+
                 for (Ticket ticket : ticketsForLocation) {
                     if (ticket.getTimeSpent() != null) {
                         overallDuration = overallDuration.plus(ticket.getTimeSpent());
@@ -110,88 +162,102 @@ public class ReportService {
                     if (ticket.getPaidTime() != null) {
                         paidDuration = paidDuration.plus(ticket.getPaidTime());
                     }
-
-                    csvBuilder.append("Ticket").append("\n")
-                            .append("Ticket, Ticket Title, Bait Numeration, Client Numeration, Creation Date Time, Remote, " +
-                                    "Status, Responsible Bait Worker, End Date Time, Paid Work, Spent Time, Paid Spent Time")
-                            .append("\n");
-
-                    csvBuilder.append(ticket.getName()).append(",")
-                            .append(ticket.getTitle()).append(",")
-                            .append(ticket.getBaitNumeration()).append(",")
-                            .append(ticket.getClientNumeration()).append(",")
-                            .append(ticket.getStartDateTime()).append(",")
-                            .append(ticket.getRemote()).append(",")
-                            .append(ticket.getStatus().getStatus()).append(","); // kas raportisse lahevad ainult closed ticketid???
-
-                    if (ticket.getBaitWorker() != null) {
-                        csvBuilder.append(ticket.getBaitWorker().getFirstName())
-                                .append(" ")
-                                .append(ticket.getBaitWorker().getLastName()).append(",");
-                    } else {
-                        csvBuilder.append(" ").append(",");
-                    }
-                    csvBuilder.append(ticket.getEndDateTime()).append(",")
-                                .append(ticket.getPaid()).append(",")
-                                .append(ticket.getTimeSpent()).append(",")
-                                .append(ticket.getPaidTime()).append("\n")
-
-                                .append(ticket.getName()).append(" Description").append(",")
-                                .append(ticket.getDescription().replace(",", ";")).append("\n")
-
-                                .append(ticket.getName()).append(" Root Cause").append(",")
-                                .append(ticket.getRootCause().replace(",", ";")).append("\n\n");
-
-                    List<Activity> activities = ticket.getActivities().stream().toList();
-                    if (activities.size() == 0) {
-                        csvBuilder.append("This ticket does not have any activity's").append("\n\n");
-                    } else {
-                        csvBuilder.append("Completed Activity's").append("\n")
-                            .append("Timestamp, Time Spent, Paid, Activity").append("\n");
-
-                        for (Activity activity : activities) {
-                            csvBuilder.append(activity.getTimestamp()).append(",")
-                                    .append(activity.getTimeSpent()).append(",")
-                                    .append(activity.getPaid()).append(",")
-                                    .append(activity.getActivity().replace(",", ";")).append("\n");
-                        }
-                        csvBuilder.append("\n");
-                    }
+                    Row ticketRow = sheet.createRow(rowNum++);
+                    ticketRow.createCell(0).setCellValue(ticket.getName());
+                    ticketRow.createCell(1).setCellValue(ticket.getTitle());
+                    ticketRow.createCell(2).setCellValue(ticket.getStartDateTime().toString());
+                    ticketRow.createCell(3).setCellValue(ticket.getBaitNumeration());
+                    ticketRow.createCell(4).setCellValue(ticket.getDescription().replace(";", ","));
 
                     List<Device> devices = ticket.getDevices().stream().toList();
-                    if (devices.size() != 0) {
-                        csvBuilder.append("Affected Devices").append("\n")
-                                .append("Device Name, Serial Number, Department").append("\n");
-                        for (Device device : devices) {
-                            csvBuilder.append(device.getDeviceName()).append(",")
-                                    .append(device.getSerialNumber()).append(",")
-                                    .append(device.getDepartment()).append("\n");
+                    String devicesList = devices.isEmpty() ? "No affected devices"
+                            : devices.stream().map(Device::getDeviceName).collect(Collectors.joining(", "));
+                    ticketRow.createCell(5).setCellValue(devicesList);
+
+                    ticketRow.createCell(6).setCellValue(ticket.getStatus().getStatus());
+                    ticketRow.createCell(7).setCellValue(ticket.getEndDateTime() != null ? ticket.getEndDateTime().toString() : "");
+                    ticketRow.createCell(8).setCellValue(ticket.getRootCause().replace(";", ","));
+                    ticketRow.createCell(9).setCellValue(formatDuration(ticket.getTimeSpent()));
+                    ticketRow.createCell(10).setCellValue(formatDuration(ticket.getPaidTime()));
+
+                    List<Activity> activities = ticket.getActivities().stream().toList();
+                    if (activities.isEmpty()) {
+                        Row noActivitiesRow = sheet.createRow(rowNum++);
+                        noActivitiesRow.createCell(1).setCellValue("No Activities for this Ticket");
+                    } else {
+                        Row activityHeaderRow = sheet.createRow(rowNum++);
+                        activityHeaderRow.createCell(1).setCellValue("Activities:");
+                        Row activityParameterRow = sheet.createRow(rowNum++);
+                        activityParameterRow.createCell(2).setCellValue("Timestamp");
+                        activityParameterRow.createCell(3).setCellValue("Time Spent");
+                        activityParameterRow.createCell(4).setCellValue("Paid Activity");
+                        activityParameterRow.createCell(5).setCellValue("Activity Details");
+
+                        for (Activity activity : activities) {
+                            Row activityRow = sheet.createRow(rowNum++);
+                            activityRow.createCell(2).setCellValue(activity.getTimestamp().toString());
+                            activityRow.createCell(3).setCellValue(formatDuration(activity.getTimeSpent()));
+                            activityRow.createCell(4).setCellValue(activity.getPaid() ? "Yes" : "No");
+                            activityRow.createCell(5).setCellValue(activity.getActivity().replace(";", ","));
                         }
-                        csvBuilder.append("\n");
                     }
+                    rowNum++;
                 }
             }
+            rowNum++;
+            rowNum++;
         }
-        csvBuilder.append("Overall Time spent: ").append(overallDuration).append("\n")
-                .append("Paid Time: ").append(paidDuration)
-                .append("\n");
-        return csvBuilder;
+
+        rowNum++;
+        Row summaryHeaderRow = sheet.createRow(rowNum++);
+        summaryHeaderRow.createCell(0).setCellValue("Overall Summary:");
+
+        Row summaryRow = sheet.createRow(rowNum++);
+        summaryRow.createCell(0).setCellValue("Total Time Spent");
+        summaryRow.createCell(1).setCellValue(formatDuration(overallDuration));
+
+        Row paidTimeRow = sheet.createRow(rowNum++);
+        paidTimeRow.createCell(0).setCellValue("Total Paid Time");
+        paidTimeRow.createCell(1).setCellValue(formatDuration(paidDuration));
+
+        // columns sizes
+        for (int i = 0; i <= 13; i++) {
+//            sheet.autoSizeColumn(i);
+            sheet.setColumnWidth(i, 8000);
+        }
+
+        File uploadDir = new File(REPORTS_DIR);
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        String filePath = REPORTS_DIR + File.separator + fileName;
+
+        try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+            workbook.write(fileOut);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public void saveCsvToFile(StringBuilder csvContent, String folderPath, String fileName) {
-        try {
-            Path directoryPath = Paths.get(folderPath);
-            if (!Files.exists(directoryPath)) {
-                Files.createDirectories(directoryPath);
-            }
-
-            Path filePath = Paths.get(folderPath, fileName);
-
-            Files.write(filePath, csvContent.toString().getBytes(StandardCharsets.UTF_8));
-
-            System.out.println("CSV file saved successfully at: " + filePath.toString());
-        } catch (IOException e) {
-            System.err.println("Error saving CSV file: " + e.getMessage());
+    private String formatDuration(Duration duration) {
+        if (duration == null || duration.isZero()) {
+            return "0";
+        }
+        long hours = duration.toHours();
+        long minutes = duration.minusHours(hours).toMinutes();
+        if (hours > 0 && minutes > 0) {
+            return hours + "H " + minutes + "M";
+        } else if (hours > 0) {
+            return hours + "H";
+        } else {
+            return minutes + "M";
         }
     }
 }

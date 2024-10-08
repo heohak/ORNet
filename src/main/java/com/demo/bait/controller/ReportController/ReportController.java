@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 @RestController
@@ -19,14 +20,14 @@ public class ReportController {
 
     private ReportService reportService;
 
-//    ResponseEntity<Resource>
     @GetMapping("/client-tickets")
-    public void generateClientTicketsReport(
+    public ResponseEntity<Resource> generateClientTicketsReport(
             @RequestParam("clientId") Integer clientId,
             @RequestParam(value = "startDate", required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam(value = "endDate", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        reportService.generateClientTicketsReport(clientId, startDate, endDate);
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(value = "fileName", required = false) String fileName) {
+        return reportService.generateClientTicketsReport(clientId, startDate, endDate, fileName);
     }
 }
