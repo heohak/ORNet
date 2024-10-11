@@ -52,7 +52,7 @@ public class Ticket {
             inverseJoinColumns = @JoinColumn(name = "work_type_id")
     )
     private Set<WorkTypeClassificator> workTypes = new HashSet<>();
-    private Boolean remote;
+//    private Boolean remote;
     private Boolean crisis;
     @ManyToOne
     @JoinColumn(name = "status_id", referencedColumnName = "id")
@@ -61,8 +61,8 @@ public class Ticket {
     @JoinColumn(name = "responsible_id", referencedColumnName = "id")
     private BaitWorker baitWorker;
     private LocalDateTime responseDateTime;
-    @Column(columnDefinition = "TEXT")
-    private String response;  // vastukirja sisu vastavalt vajadusele ehk vb vaja midagi muud kui string
+//    @Column(columnDefinition = "TEXT")
+//    private String response;  // vastukirja sisu vastavalt vajadusele ehk vb vaja midagi muud kui string
     @Column(columnDefinition = "TEXT")
     private String insideInfo;  // siseinfo mis ei lahe raportisse (Internal comment)
     private LocalDateTime endDateTime;

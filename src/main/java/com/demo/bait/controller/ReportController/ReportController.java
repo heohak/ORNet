@@ -28,4 +28,13 @@ public class ReportController {
             @RequestParam("fileName") String fileName) {
         return reportService.generateClientTicketsReport(clientId, startDate, endDate, fileName);
     }
+
+    @GetMapping("/all-clients-tickets")
+    public ResponseEntity<Resource> generateAllClientsTicketsReport(
+            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam("fileName") String fileName
+    ) {
+        return reportService.generateAllClientsTicketsReport(startDate, endDate, fileName);
+    }
 }
