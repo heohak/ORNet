@@ -46,8 +46,10 @@ public class ClientWorkerGetController {
             @RequestParam(value = "q", required = false) String query,
             @RequestParam(value = "roleId", required = false) Integer roleId,
             @RequestParam(value = "clientId", required = false) Integer clientId,
-            @RequestParam(value = "favorite", required = false) Boolean favorite) {
-        return clientWorkerSpecificationService.searchAndFilterClientWorkers(query, roleId, clientId, favorite);
+            @RequestParam(value = "favorite", required = false) Boolean favorite,
+            @RequestParam(value = "locationId", required = false) Integer locationId) {
+        return clientWorkerSpecificationService.searchAndFilterClientWorkers(query, roleId, clientId, favorite,
+                locationId);
     }
 
     @GetMapping("/employer/{workerId}")
