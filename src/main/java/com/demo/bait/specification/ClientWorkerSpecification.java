@@ -28,6 +28,13 @@ public class ClientWorkerSpecification implements Specification<ClientWorker> {
         };
     }
 
+    public static Specification<ClientWorker> hasLocationId(Integer locationId) {
+        return (root, query, criteriaBuilder) -> {
+            Join<ClientWorker, Location> locationJoin = root.join("location");
+            return criteriaBuilder.equal(locationJoin.get("id"), locationId);
+        };
+    }
+
     public static Specification<ClientWorker> isFavorite() {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("favorite"), true);
     }
