@@ -75,11 +75,11 @@ public class TicketService {
             ticket.setWorkTypes(workTypes);
         }
 
-        if (ticketDTO.remote() == null) {
-            ticket.setRemote(false);
-        } else {
-            ticket.setRemote(ticketDTO.remote());
-        }
+//        if (ticketDTO.remote() == null) {
+//            ticket.setRemote(false);
+//        } else {
+//            ticket.setRemote(ticketDTO.remote());
+//        }
 
         if (ticketDTO.crisis() == null) {
             ticket.setCrisis(false);
@@ -96,7 +96,7 @@ public class TicketService {
         }
 
         ticket.setResponseDateTime(ticketDTO.responseDateTime());
-        ticket.setResponse(ticketDTO.response());
+//        ticket.setResponse(ticketDTO.response());
         ticket.setInsideInfo(ticketDTO.insideInfo());
         ticket.setEndDateTime(ticketDTO.endDateTime());
         ticket.setRootCause(ticketDTO.rootCause());
@@ -195,13 +195,13 @@ public class TicketService {
         }
     }
 
-    @Transactional
-    public void updateTicketResponse(Ticket ticket, TicketDTO ticketDTO) {
-        if (ticketDTO.response() != null) {
-            ticket.setResponse(ticketDTO.response());
-            ticketRepo.save(ticket);
-        }
-    }
+//    @Transactional
+//    public void updateTicketResponse(Ticket ticket, TicketDTO ticketDTO) {
+//        if (ticketDTO.response() != null) {
+//            ticket.setResponse(ticketDTO.response());
+//            ticketRepo.save(ticket);
+//        }
+//    }
 
     @Transactional
     public void updateTicketInsideInfo(Ticket ticket, TicketDTO ticketDTO) {
@@ -251,13 +251,13 @@ public class TicketService {
         }
     }
 
-    @Transactional
-    public void updateRemoteInTicket(Ticket ticket, TicketDTO ticketDTO) {
-        if (ticketDTO.remote() != null) {
-            ticket.setRemote(ticketDTO.remote());
-            ticketRepo.save(ticket);
-        }
-    }
+//    @Transactional
+//    public void updateRemoteInTicket(Ticket ticket, TicketDTO ticketDTO) {
+//        if (ticketDTO.remote() != null) {
+//            ticket.setRemote(ticketDTO.remote());
+//            ticketRepo.save(ticket);
+//        }
+//    }
 
     @Transactional
     public void updateTicketNumeration(Ticket ticket, TicketDTO ticketDTO) {
@@ -294,7 +294,7 @@ public class TicketService {
         updateTicketNumeration(ticket, ticketDTO);
         updateTicketClientNumeration(ticket, ticketDTO);
         updateCrisisInTicket(ticket, ticketDTO);
-        updateRemoteInTicket(ticket, ticketDTO);
+//        updateRemoteInTicket(ticket, ticketDTO);
         ticketWorkTypeService.addWorkTypeToTicket(ticket, ticketDTO);
         addResponsibleBaitWorkerToTicket(ticket, ticketDTO.baitWorkerId());
         addClientToTicket(ticket, ticketDTO.clientId());
@@ -302,7 +302,7 @@ public class TicketService {
         addStatusToTicket(ticket, ticketDTO.statusId());
         addRootCauseToTicket(ticket, ticketDTO);
         updateTicketDescription(ticket, ticketDTO);
-        updateTicketResponse(ticket, ticketDTO);
+//        updateTicketResponse(ticket, ticketDTO);
         updateTicketInsideInfo(ticket, ticketDTO);
         ticketContactsService.addContactsToTicket(ticket, ticketDTO);
         ticketDeviceService.addDevicesToTicket(ticket, ticketDTO);
