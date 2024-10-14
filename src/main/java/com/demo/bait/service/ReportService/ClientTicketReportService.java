@@ -12,7 +12,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,16 +27,13 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @AllArgsConstructor
-public class ReportService {
+public class ClientTicketReportService {
 
     private ClientRepo clientRepo;
     private TicketRepo ticketRepo;
@@ -128,15 +123,15 @@ public class ReportService {
         return ticketsByLocation;
     }
 
-    private Workbook createWorkbook() {
+    public Workbook createWorkbook() {
         return new XSSFWorkbook();
     }
 
-    private Sheet createSheet(Workbook workbook, String sheetName) {
+    public Sheet createSheet(Workbook workbook, String sheetName) {
         return workbook.createSheet(sheetName);
     }
 
-    private String saveWorkbookToFile(Workbook workbook, String fileName) {
+    public String saveWorkbookToFile(Workbook workbook, String fileName) {
         File uploadDir = new File(REPORTS_DIR);
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
@@ -158,7 +153,7 @@ public class ReportService {
         return filePath;
     }
 
-    private ResponseEntity<Resource> createResponseEntity(String fileName, String filePath) {
+    public ResponseEntity<Resource> createResponseEntity(String fileName, String filePath) {
         Path path = Paths.get(filePath);
         Resource resource = FileUploadService.loadResource(path);
         HttpHeaders headers = FileUploadService.createHeaders(fileName, "attachment");
@@ -294,7 +289,7 @@ public class ReportService {
         return rowNum;
     }
 
-    private void adjustColumnWidths(Sheet sheet) {
+    public void adjustColumnWidths(Sheet sheet) {
         for (int i = 0; i <= 13; i++) {
             sheet.setColumnWidth(i, 8000);
         }
