@@ -47,6 +47,38 @@ public class MaintenanceService {
         return new ResponseDTO(maintenance.getId().toString());
     }
 
+    @Transactional
+    public ResponseDTO updateMaintenance(Integer maintenanceId, MaintenanceDTO maintenanceDTO) {
+        Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
+        if (maintenanceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Maintenance with " + maintenanceId + " not found");
+        }
+        Maintenance maintenance = maintenanceOpt.get();
+        updateMaintenanceName(maintenance, maintenanceDTO);
+        updateMaintenanceDate(maintenance, maintenanceDTO);
+        updateMaintenanceComment(maintenance, maintenanceDTO);
+        maintenanceRepo.save(maintenance);
+        return new ResponseDTO("Maintenance updated successfully");
+    }
+
+    public void updateMaintenanceName(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.maintenanceName() != null) {
+            maintenance.setMaintenanceName(maintenanceDTO.maintenanceName());
+        }
+    }
+
+    public void updateMaintenanceDate(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.maintenanceDate() != null) {
+            maintenance.setMaintenanceDate(maintenanceDTO.maintenanceDate());
+        }
+    }
+
+    public void updateMaintenanceComment(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.comment() != null) {
+            maintenance.setComment(maintenanceDTO.comment());
+        }
+    }
+
     public List<MaintenanceDTO> getAllMaintenances() {
         return maintenanceMapper.toDtoList(maintenanceRepo.findAll());
     }
@@ -63,11 +95,9 @@ public class MaintenanceService {
 
     public MaintenanceDTO getMaintenanceById(Integer id) {
         Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(id);
-
         if (maintenanceOpt.isEmpty()) {
             throw new EntityNotFoundException("Maintenance with " + id + " not found");
         }
-
         Maintenance maintenance = maintenanceOpt.get();
         return maintenanceMapper.toDto(maintenance);
     }
