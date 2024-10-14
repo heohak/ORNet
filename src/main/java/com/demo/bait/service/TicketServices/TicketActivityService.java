@@ -60,7 +60,7 @@ public class TicketActivityService {
         return activityMapper.toDtoList(
                 ticket.getActivities()
                         .stream()
-                        .sorted(Comparator.comparing(Activity::getTimestamp).reversed())
+                        .sorted(Comparator.comparing(Activity::getTimestamp))
                         .toList());
     }
 }
