@@ -20,9 +20,16 @@ public class LocationSpecification implements Specification<Location> {
         String likePattern = "%" + searchTerm.toLowerCase() + "%";
 
         Predicate locationNamePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), likePattern);
-        Predicate locationAddressPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("address")), likePattern);
+        Predicate locationCountryPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("country")), likePattern);
+        Predicate locationCityPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("city")), likePattern);
+        Predicate locationStreetAddressPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("streetAddress")), likePattern);
+        Predicate locationPostalCodePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("postalCode")), likePattern);
+        Predicate locationEmailPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("email")), likePattern);
         Predicate locationPhonePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("phone")), likePattern);
 
-        return criteriaBuilder.or(locationNamePredicate, locationAddressPredicate, locationPhonePredicate);
+
+        return criteriaBuilder.or(locationNamePredicate,locationCountryPredicate, locationCityPredicate,
+                locationStreetAddressPredicate, locationPostalCodePredicate, locationEmailPredicate,
+                locationPhonePredicate);
     }
 }

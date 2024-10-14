@@ -1,5 +1,6 @@
 package com.demo.bait.controller.MaintenanceController;
 
+import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.service.MaintenanceServices.MaintenanceFileUploadService;
 import com.demo.bait.service.MaintenanceServices.MaintenanceService;
@@ -22,5 +23,11 @@ public class MaintenancePutController {
     public ResponseDTO uploadFileToMaintenance(@PathVariable Integer id,
                                                @RequestParam("files") List<MultipartFile> files) throws IOException {
         return maintenanceFileUploadService.uploadFilesToMaintenance(id, files);
+    }
+
+    @PutMapping("/update/{maintenanceId}")
+    public ResponseDTO updateMaintenance(@PathVariable Integer maintenanceId,
+                                         @RequestBody MaintenanceDTO maintenanceDTO) {
+        return maintenanceService.updateMaintenance(maintenanceId, maintenanceDTO);
     }
 }
