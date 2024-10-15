@@ -69,7 +69,8 @@ public class ClientTicketReportService {
         return createResponseEntity(fileName, filePath);
     }
 
-    public ResponseEntity<Resource> generateAllClientsTicketsReport(LocalDate startDate, LocalDate endDate, String fileName) {
+    public ResponseEntity<Resource> generateAllClientsTicketsReport(LocalDate startDate, LocalDate endDate,
+                                                                    String fileName) {
         fileName = fileName + ".xlsx";
 
         List<Client> clients = clientRepo.findAll();

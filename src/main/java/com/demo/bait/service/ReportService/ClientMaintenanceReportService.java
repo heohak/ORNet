@@ -65,6 +65,37 @@ public class ClientMaintenanceReportService {
         return clientTicketReportService.createResponseEntity(fileName, filePath);
     }
 
+    public ResponseEntity<Resource> generateAllClientsMaintenancesReport(LocalDate startDate, LocalDate endDate,
+                                                                         String fileName) {
+        fileName = fileName + ".xlsx";
+
+        List<Client> clients = clientRepo.findAll();
+        if (clients.isEmpty()) {
+            throw new RuntimeException("No clients found.");
+        }
+
+        Workbook workbook = clientTicketReportService.createWorkbook();
+        Sheet sheet = clientTicketReportService.createSheet(workbook, "All Customers Maintenance Report");
+        int rowNum = 0;
+
+        for (Client client : clients) {
+            List<Maintenance> maintenances = clientRepo.findMaintenancesByClientAndDateRange(client.getId(), startDate, endDate);
+
+            List<Location> locations = client.getLocations().stream().toList();
+            Map<Location, List<Maintenance>> maintenancesByLocation = findLocationMaintenances(locations, startDate, endDate);
+
+            List<Device> devices = deviceRepo.findByClientId(client.getId());
+            Map<Device, List<Maintenance>> maintenancesByDevice = findDeviceMaintenances(devices, startDate, endDate);
+            rowNum = writeClientDataToSheet(sheet, client, maintenances,
+                    maintenancesByLocation, maintenancesByDevice, startDate, endDate, rowNum);
+            rowNum++;
+            rowNum++;
+        }
+        clientTicketReportService.adjustColumnWidths(sheet);
+        String filePath = clientTicketReportService.saveWorkbookToFile(workbook, fileName);
+        return clientTicketReportService.createResponseEntity(fileName, filePath);
+    }
+
     private int writeClientDataToSheet(Sheet sheet, Client client, List<Maintenance> clientMaintenances,
                                                   Map<Location, List<Maintenance>> maintenancesByLocation,
                                                   Map<Device, List<Maintenance>> maintenancesByDevice,
