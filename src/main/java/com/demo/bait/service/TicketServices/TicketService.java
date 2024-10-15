@@ -115,7 +115,7 @@ public class TicketService {
 
         ticketRepo.save(ticket);
         setTicketUpdateTime(ticket);
-        return new ResponseDTO("Ticket added successfully");
+        return new ResponseDTO(ticket.getId().toString());
     }
 
     @Transactional
