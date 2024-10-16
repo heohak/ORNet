@@ -27,6 +27,11 @@ public class SoftwareGetController {
         return softwareService.getSoftwareByClientId(clientId);
     }
 
+    @GetMapping("/not-used")
+    public List<SoftwareDTO> getNotUsedSoftware() {
+        return softwareService.getNotUsedSoftware();
+    }
+
     @GetMapping("/{softwareId}")
     public SoftwareDTO getSoftwareById(@PathVariable Integer softwareId) {
         return softwareService.getSoftwareById(softwareId);
