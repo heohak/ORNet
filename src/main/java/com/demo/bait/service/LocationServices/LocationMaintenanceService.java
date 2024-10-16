@@ -48,7 +48,7 @@ public class LocationMaintenanceService {
         Integer maintenanceId = Integer.parseInt(maintenanceService.addMaintenance(maintenanceDTO).token());
         location.getMaintenances().add(maintenanceRepo.getReferenceById(maintenanceId));
         locationRepo.save(location);
-        return new ResponseDTO("Maintenance added to location successfully");
+        return new ResponseDTO(maintenanceId.toString());
     }
 
     public List<MaintenanceDTO> getLocationMaintenances(Integer locationId) {
