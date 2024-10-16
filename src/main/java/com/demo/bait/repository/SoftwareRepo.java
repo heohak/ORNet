@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface SoftwareRepo extends JpaRepository<Software, Integer> {
     List<Software> findByClientId(Integer clientId);
+    List<Software> findByClientIsNull();
 }
