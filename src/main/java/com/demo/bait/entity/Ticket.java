@@ -29,7 +29,7 @@ public class Ticket {
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client client;
     private String title;
-    private String name;
+//    private String name;
     private String baitNumeration;
     private String clientNumeration;
     @Column(columnDefinition = "TEXT")
