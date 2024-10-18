@@ -7,7 +7,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public record TicketDTO(Integer id, Integer clientId, String title, String name, String baitNumeration,
+public record TicketDTO(Integer id, Integer clientId, String title,
+//                        String name,
+                        String baitNumeration,
                         String clientNumeration, String description,
                         LocalDateTime startDateTime, Integer locationId,
                         List<Integer> contactIds, List<Integer> workTypeIds,
