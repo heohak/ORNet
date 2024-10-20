@@ -52,9 +52,9 @@ public class TicketService {
 
         Ticket ticket = new Ticket();
         ticket.setTitle(ticketDTO.title());
-        setTicketName(ticket);
         ticket.setClient(clientOpt.get());
-        ticket.setBaitNumeration(ticketDTO.baitNumeration());
+//        ticket.setBaitNumeration(ticketDTO.baitNumeration());
+        setTicketBaitNumeration(ticket);
         ticket.setClientNumeration(ticketDTO.clientNumeration());
         ticket.setDescription(ticketDTO.description());
 
@@ -259,13 +259,13 @@ public class TicketService {
 //        }
 //    }
 
-    @Transactional
-    public void updateTicketNumeration(Ticket ticket, TicketDTO ticketDTO) {
-        if (ticketDTO.baitNumeration() != null) {
-            ticket.setBaitNumeration(ticketDTO.baitNumeration());
-            ticketRepo.save(ticket);
-        }
-    }
+//    @Transactional
+//    public void updateTicketNumeration(Ticket ticket, TicketDTO ticketDTO) {
+//        if (ticketDTO.baitNumeration() != null) {
+//            ticket.setBaitNumeration(ticketDTO.baitNumeration());
+//            ticketRepo.save(ticket);
+//        }
+//    }
 
     @Transactional
     public void updateTicketClientNumeration(Ticket ticket, TicketDTO ticketDTO) {
@@ -291,7 +291,7 @@ public class TicketService {
 
         addResponseDateToTicket(ticket, ticketDTO);
         addEndDateToTicket(ticket, ticketDTO);
-        updateTicketNumeration(ticket, ticketDTO);
+//        updateTicketNumeration(ticket, ticketDTO);
         updateTicketClientNumeration(ticket, ticketDTO);
         updateCrisisInTicket(ticket, ticketDTO);
 //        updateRemoteInTicket(ticket, ticketDTO);
@@ -311,21 +311,23 @@ public class TicketService {
     }
 
     @Transactional
-    public void setTicketName(Ticket ticket) {
+    public void setTicketBaitNumeration(Ticket ticket) {
         ticketRepo.save(ticket);
         LocalDate now = LocalDate.now();
         String yy = String.valueOf(now.getYear()).substring(2);
-        String mm = String.format("%02d", now.getMonthValue());
-        String dd = String.format("%02d", now.getDayOfMonth());
+//        String mm = String.format("%02d", now.getMonthValue());
+//        String dd = String.format("%02d", now.getDayOfMonth());
         String nn;
         if (ticket.getId() < 10) {
+            nn = String.format("00%d", ticket.getId());
+        } else if (ticket.getId() < 100) {
             nn = String.format("0%d", ticket.getId());
         } else {
             nn = String.valueOf(ticket.getId());
         }
 
-        String name = String.format("Ticket: %s%s%s%s", yy, mm, dd, nn);
-        ticket.setName(name);
+        String numeration = String.format("T%s-%s", yy, nn);
+        ticket.setBaitNumeration(numeration);
     }
 
     @Transactional

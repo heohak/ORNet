@@ -350,6 +350,10 @@ public class SoftwareService {
         return softwareMapper.toDtoList(softwareRepo.findByClientId(clientId));
     }
 
+    public List<SoftwareDTO> getNotUsedSoftware() {
+        return softwareMapper.toDtoList(softwareRepo.findByClientIsNull());
+    }
+
     public SoftwareDTO getSoftwareById(Integer softwareId) {
         return softwareMapper.toDto(softwareRepo.getReferenceById(softwareId));
     }
