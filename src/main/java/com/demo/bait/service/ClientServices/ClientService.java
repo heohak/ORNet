@@ -63,7 +63,7 @@ public class ClientService {
             client.setEditorClient(clientDTO.editorClient());
         }
 
-        client.setOtherMedicalInformation(clientDTO.otherMedicalInformation());
+        client.setOtherMedicalDevices(clientDTO.otherMedicalDevices());
         client.setLastMaintenance(clientDTO.lastMaintenance());
         client.setNextMaintenance(clientDTO.nextMaintenance());
 
@@ -94,7 +94,7 @@ public class ClientService {
         updatePathologyClient(client, clientDTO);
         updateSurgeryClient(client, clientDTO);
         updateEditorClient(client, clientDTO);
-        updateOtherMedicalInformation(client, clientDTO);
+        updateOtherMedicalDevices(client, clientDTO);
         updateLastMaintenance(client, clientDTO);
         updateNextMaintenance(client, clientDTO);
         clientMaintenanceService.updateMaintenances(client, clientDTO);
@@ -133,9 +133,9 @@ public class ClientService {
         }
     }
 
-    public void updateOtherMedicalInformation(Client client, ClientDTO clientDTO) {
-        if (clientDTO.otherMedicalInformation() != null) {
-            client.setOtherMedicalInformation(clientDTO.otherMedicalInformation());
+    public void updateOtherMedicalDevices(Client client, ClientDTO clientDTO) {
+        if (clientDTO.otherMedicalDevices() != null) {
+            client.setOtherMedicalDevices(clientDTO.otherMedicalDevices());
         }
     }
 
