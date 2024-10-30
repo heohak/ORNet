@@ -46,7 +46,7 @@ public class Client {
     private Boolean pathologyClient;
     private Boolean surgeryClient;
     private Boolean editorClient;
-    private String otherMedicalInformation;
+    private Boolean otherMedicalDevices;
     private LocalDate lastMaintenance;
     private LocalDate nextMaintenance;
 
