@@ -9,6 +9,8 @@ import org.hibernate.envers.Audited;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -23,4 +25,11 @@ public class Comment {
     @Column(columnDefinition = "TEXT")
     private String comment;
     private LocalDateTime timestamp;
+    @ManyToMany
+    @JoinTable(
+            name = "comment_location",
+            joinColumns = @JoinColumn(name = "comment_id"),
+            inverseJoinColumns = @JoinColumn(name = "location_id")
+    )
+    private Set<Location> locations = new HashSet<>();
 }

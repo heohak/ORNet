@@ -56,7 +56,6 @@ public class TicketActivityService {
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
         Ticket ticket = ticketOpt.get();
-        System.out.println(ticket.getActivities().stream().toList().get(0).getActivity());
         return activityMapper.toDtoList(
                 ticket.getActivities()
                         .stream()

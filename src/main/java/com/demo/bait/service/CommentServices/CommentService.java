@@ -30,7 +30,7 @@ public class CommentService {
     public ResponseDTO addComment(CommentDTO commentDTO) {
         Comment comment = new Comment();
         comment.setComment(commentDTO.comment());
-        comment.setTimestamp(LocalDateTime.now());
+        comment.setTimestamp(LocalDateTime.now().withNano(0));
         commentRepo.save(comment);
         return new ResponseDTO("Comment added successfully");
     }
@@ -39,7 +39,7 @@ public class CommentService {
     public Comment addComment(String newComment) {
         Comment comment = new Comment();
         comment.setComment(newComment);
-        comment.setTimestamp(LocalDateTime.now());
+        comment.setTimestamp(LocalDateTime.now().withNano(0));
         commentRepo.save(comment);
         return comment;
     }

@@ -5,6 +5,7 @@ import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.DeviceClassificator;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import com.demo.bait.mapper.DeviceMapper;
+import com.demo.bait.mapper.TicketMapper;
 import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.DeviceClassificatorRepo;
 import com.demo.bait.service.CommentServices.CommentService;
@@ -38,6 +39,8 @@ public class DeviceService {
     private EntityManager entityManager;
     private DeviceAttributeService deviceAttributeService;
     private DeviceCommentService deviceCommentService;
+    private TicketRepo ticketRepo;
+    private TicketMapper ticketMapper;
 
     @Transactional
     public ResponseDTO addDevice(DeviceDTO deviceDTO) {
@@ -345,6 +348,16 @@ public class DeviceService {
         }
 
         return deviceMapper.toDtoList(history);
+    }
+
+    public List<TicketDTO> getDeviceTickets(Integer deviceId) {
+        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+        if (deviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        }
+        Device device = deviceOpt.get();
+        List<Ticket> tickets = ticketRepo.findByDevicesContains(device);
+        return ticketMapper.toDtoList(tickets);
     }
 
     public Set<Device> deviceIdsToDevicesSet(List<Integer> deviceIds) {

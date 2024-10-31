@@ -1,6 +1,7 @@
 package com.demo.bait.repository;
 
 import com.demo.bait.entity.Activity;
+import com.demo.bait.entity.Device;
 import com.demo.bait.entity.Ticket;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -16,6 +17,7 @@ public interface TicketRepo extends JpaRepository<Ticket, Integer>, JpaSpecifica
 //    List<Ticket> findByTicketId(Integer mainTicketId);
     List<Ticket> findByStatusId(Integer statusId);
     Ticket findByActivitiesContaining(Activity activity);
+    List<Ticket> findByDevicesContains(Device device);
 
     @Query("SELECT t FROM Ticket t WHERE t.client.id = :clientId AND t.startDateTime BETWEEN :startDateTime AND :endDateTime")
     List<Ticket> findByClientAndDateRange(

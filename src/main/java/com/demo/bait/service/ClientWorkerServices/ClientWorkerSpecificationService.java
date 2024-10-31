@@ -22,7 +22,7 @@ public class ClientWorkerSpecificationService {
     private ClientWorkerMapper clientWorkerMapper;
 
     public List<ClientWorkerDTO> searchAndFilterClientWorkers(String searchTerm, Integer roleId, Integer clientId,
-                                                              Boolean favorite, Integer locationId) {
+                                                              Boolean favorite, Integer locationId, String country) {
         Specification<ClientWorker> combinedSpec = Specification.where(null);
 
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
@@ -48,6 +48,11 @@ public class ClientWorkerSpecificationService {
         if (locationId != null) {
             Specification<ClientWorker> locationSpec = ClientWorkerSpecification.hasLocationId(locationId);
             combinedSpec = combinedSpec.and(locationSpec);
+        }
+
+        if (country != null) {
+            Specification<ClientWorker> countrySpec = ClientWorkerSpecification.hasLocationCountry(country);
+            combinedSpec = combinedSpec.and(countrySpec);
         }
 
         return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll(combinedSpec,

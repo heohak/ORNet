@@ -51,4 +51,9 @@ public class LocationGetController {
     public List<CommentDTO> getLocationComments(@PathVariable Integer locationId) {
         return locationCommentService.getLocationComments(locationId);
     }
+
+    @GetMapping("/countries")
+    public List<String> getAllLocationCountries() {
+        return locationService.getAllLocationCountries();
+    }
 }
