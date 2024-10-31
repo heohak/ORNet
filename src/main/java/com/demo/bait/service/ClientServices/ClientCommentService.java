@@ -72,7 +72,6 @@ public class ClientCommentService {
         clientRepo.save(client);
 
         comment.getLocations().clear();
-        commentRepo.save(comment);
         commentRepo.delete(comment);
         return new ResponseDTO("Comment deleted from client successfully");
     }

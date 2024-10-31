@@ -120,7 +120,21 @@ public class TicketService {
 
     @Transactional
     public ResponseDTO deleteTicket(Integer ticketId) {
-        ticketRepo.deleteById(ticketId);
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        if (ticketOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket with ID " + ticketId + " not found");
+        }
+        Ticket ticket = ticketOpt.get();
+
+        ticket.setClient(null);
+        ticket.setLocation(null);
+        ticket.getContacts().clear();
+        ticket.getWorkTypes().clear();
+        ticket.getActivities().clear();
+        ticket.getFiles().clear();
+        ticket.getDevices().clear();
+
+        ticketRepo.delete(ticket);
         return new ResponseDTO("Ticket deleted successfully");
     }
 
