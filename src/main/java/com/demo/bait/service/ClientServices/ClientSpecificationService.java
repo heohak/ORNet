@@ -21,7 +21,7 @@ public class ClientSpecificationService {
     private ClientMapper clientMapper;
 
     public List<ClientDTO> searchAndFilterClients(String searchTerm, String clientType, Integer locationId,
-                                                  Integer thirdPartyId) {
+                                                  Integer thirdPartyId, String country) {
         Specification<Client> combinedSpec = Specification.where(null);
 
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
@@ -42,6 +42,11 @@ public class ClientSpecificationService {
         if (thirdPartyId != null) {
             Specification<Client> thirdPartySpec = ClientSpecification.hasThirdPartyId(thirdPartyId);
             combinedSpec = combinedSpec.and(thirdPartySpec);
+        }
+
+        if (country != null) {
+            Specification<Client> countrySpec = ClientSpecification.hasLocationCountry(country);
+            combinedSpec = countrySpec.and(countrySpec);
         }
 
         return clientMapper.toDtoList(clientRepo.findAll(combinedSpec));

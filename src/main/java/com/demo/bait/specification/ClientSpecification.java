@@ -43,6 +43,13 @@ public class ClientSpecification implements Specification<Client> {
         };
     }
 
+    public static Specification<Client> hasLocationCountry(String country) {
+        return (root, query, criteriaBuilder) -> {
+            Join<Client, Location> locationJoin = root.join("locations", JoinType.LEFT);
+            return criteriaBuilder.equal(criteriaBuilder.lower(locationJoin.get("country")), country.toLowerCase());
+        };
+    }
+
     @Override
     public Predicate toPredicate(Root<Client> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {

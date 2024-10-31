@@ -39,6 +39,13 @@ public class ClientWorkerSpecification implements Specification<ClientWorker> {
         return (root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("favorite"), true);
     }
 
+    public static Specification<ClientWorker> hasLocationCountry(String country) {
+        return (root, query, criteriaBuilder) -> {
+            Join<ClientWorker, Location> locationJoin = root.join("location", JoinType.LEFT);
+            return criteriaBuilder.equal(criteriaBuilder.lower(locationJoin.get("country")), country.toLowerCase());
+        };
+    }
+
     @Override
     public Predicate toPredicate(Root<ClientWorker> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {

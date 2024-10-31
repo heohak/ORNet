@@ -55,8 +55,9 @@ public class ClientGetController {
             @RequestParam(value = "q", required = false) String query,
             @RequestParam(value = "clientType", required = false) String clientType,
             @RequestParam(value = "locationId", required = false) Integer locationId,
-            @RequestParam(value = "thirdPartyId", required = false) Integer thirdPartyId) {
-        return clientSpecificationService.searchAndFilterClients(query, clientType, locationId, thirdPartyId);
+            @RequestParam(value = "thirdPartyId", required = false) Integer thirdPartyId,
+            @RequestParam(value = "country", required = false) String country) {
+        return clientSpecificationService.searchAndFilterClients(query, clientType, locationId, thirdPartyId, country);
     }
 
     @GetMapping("/history/{clientId}")
