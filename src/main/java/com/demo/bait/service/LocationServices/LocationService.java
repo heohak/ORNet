@@ -18,6 +18,7 @@ import org.hibernate.envers.AuditReaderFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -176,5 +177,22 @@ public class LocationService {
             history.add(LocationVersion);
         }
         return locationMapper.toDtoList(history);
+    }
+
+    public List<String> getAllLocationCountries() {
+        List<Location> locations = locationRepo.findAll();
+
+        return locations.stream()
+                .map(Location::getCountry)
+                .filter(country -> country != null && !country.isEmpty())
+                .map(country -> capitalize(country.toLowerCase()))
+                .collect(Collectors.toSet())
+                .stream()
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    private String capitalize(String country) {
+        return Character.toUpperCase(country.charAt(0)) + country.substring(1);
     }
 }
