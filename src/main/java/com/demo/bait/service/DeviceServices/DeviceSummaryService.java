@@ -53,7 +53,7 @@ public class DeviceSummaryService {
 
         Specification<Device> clientSpec = DeviceSpecification.hasClientId(clientId);
         List<Device> allClientDevices = deviceRepo.findAll(clientSpec);
-        clientSummaryMap.put("All Client Devices", allClientDevices.size());
+        clientSummaryMap.put("All Customer Devices", allClientDevices.size());
 
         for (DeviceClassificator classificator : deviceClassificatorRepo.findAll()) {
             Specification<Device> classificatorSpec = DeviceSpecification.hasClassificatorId(classificator.getId());
