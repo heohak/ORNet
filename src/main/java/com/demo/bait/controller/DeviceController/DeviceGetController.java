@@ -1,9 +1,6 @@
 package com.demo.bait.controller.DeviceController;
 
-import com.demo.bait.dto.CommentDTO;
-import com.demo.bait.dto.DeviceDTO;
-import com.demo.bait.dto.FileUploadDTO;
-import com.demo.bait.dto.MaintenanceDTO;
+import com.demo.bait.dto.*;
 import com.demo.bait.service.DeviceServices.*;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -76,5 +73,10 @@ public class DeviceGetController {
     @GetMapping("/history/{deviceId}")
     public List<DeviceDTO> getDeviceHistory(@PathVariable Integer deviceId) {
         return deviceService.getDeviceHistory(deviceId);
+    }
+
+    @GetMapping("/tickets/{deviceId}")
+    public List<TicketDTO> getDeviceTickets(@PathVariable Integer deviceId) {
+        return deviceService.getDeviceTickets(deviceId);
     }
 }
