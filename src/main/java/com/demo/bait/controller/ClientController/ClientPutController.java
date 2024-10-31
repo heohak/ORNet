@@ -1,13 +1,14 @@
 package com.demo.bait.controller.ClientController;
 
 import com.demo.bait.dto.ClientDTO;
+import com.demo.bait.dto.CommentDTO;
 import com.demo.bait.dto.ResponseDTO;
-import com.demo.bait.service.ClientServices.ClientLocationService;
-import com.demo.bait.service.ClientServices.ClientMaintenanceService;
-import com.demo.bait.service.ClientServices.ClientService;
-import com.demo.bait.service.ClientServices.ClientThirdPartyITService;
+import com.demo.bait.service.ClientServices.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -18,6 +19,7 @@ public class ClientPutController {
     public final ClientThirdPartyITService clientThirdPartyITService;
     public final ClientMaintenanceService clientMaintenanceService;
     public final ClientLocationService clientLocationService;
+    public final ClientCommentService clientCommentService;
 
     @PutMapping("/{clientId}/{locationId}")
     public ResponseDTO addLocationToClient(@PathVariable Integer clientId, @PathVariable Integer locationId) {
@@ -37,5 +39,11 @@ public class ClientPutController {
     @PutMapping("/update/{clientId}")
     public ResponseDTO updateClient(@PathVariable Integer clientId, @RequestBody ClientDTO clientDTO) {
         return clientService.updateClient(clientId, clientDTO);
+    }
+
+    @PutMapping("/comment/{clientId}")
+    public ResponseDTO addCommentToClient(@PathVariable Integer clientId,
+                                          @RequestBody CommentDTO commentDTO) {
+        return clientCommentService.addCommentToClient(clientId, commentDTO);
     }
 }

@@ -1,9 +1,6 @@
 package com.demo.bait.controller.ClientController;
 
-import com.demo.bait.dto.ClientDTO;
-import com.demo.bait.dto.LocationDTO;
-import com.demo.bait.dto.MaintenanceDTO;
-import com.demo.bait.dto.ThirdPartyITDTO;
+import com.demo.bait.dto.*;
 import com.demo.bait.service.ClientServices.*;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +18,7 @@ public class ClientGetController {
     public final ClientMaintenanceService clientMaintenanceService;
     public final ClientSpecificationService clientSpecificationService;
     public final ClientLocationService clientLocationService;
+    public final ClientCommentService clientCommentService;
 
     @GetMapping("/all")
     public List<ClientDTO> getAllClients() {
@@ -64,6 +62,11 @@ public class ClientGetController {
     @GetMapping("/history/{clientId}")
     public List<ClientDTO> getClientHistory(@PathVariable Integer clientId) {
         return clientService.getClientHistory(clientId);
+    }
+
+    @GetMapping("/comments/{clientId}")
+    public List<CommentDTO> getClientComments(@PathVariable Integer clientId) {
+        return clientCommentService.getClientComments(clientId);
     }
 
 //    @GetMapping("/location/history/{clientId}")
