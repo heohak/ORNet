@@ -24,6 +24,7 @@ public class Client {
     private Integer id;
     private String fullName;
     private String shortName;
+    private String country;
 //    private String thirdPartyIT;
     // locationi ja third party IT-d peab saama siduda mugavalt linnukesega
 
@@ -47,6 +48,8 @@ public class Client {
     private Boolean surgeryClient;
     private Boolean editorClient;
     private Boolean otherMedicalDevices;
+    private Boolean prospect;
+    private Boolean agreement;
     private LocalDate lastMaintenance;
     private LocalDate nextMaintenance;
 
