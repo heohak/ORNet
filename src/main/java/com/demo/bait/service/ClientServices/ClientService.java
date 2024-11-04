@@ -40,6 +40,7 @@ public class ClientService {
         Client client = new Client();
         client.setFullName(clientDTO.fullName());
         client.setShortName(clientDTO.shortName());
+        client.setCountry(clientDTO.country());
 
         clientLocationService.updateLocations(client, clientDTO);
 
@@ -77,6 +78,7 @@ public class ClientService {
 
         updateFullName(client, clientDTO);
         updateShortName(client, clientDTO);
+        updateCountry(client, clientDTO);
         clientLocationService.updateLocations(client, clientDTO);
         clientThirdPartyITService.updateThirdPartyITs(client, clientDTO);
         updatePathologyClient(client, clientDTO);
@@ -102,6 +104,12 @@ public class ClientService {
     public void updateShortName(Client client, ClientDTO clientDTO) {
         if (clientDTO.shortName() != null) {
             client.setShortName(clientDTO.shortName());
+        }
+    }
+
+    public void updateCountry(Client client, ClientDTO clientDTO) {
+        if (clientDTO.country() != null) {
+            client.setCountry(clientDTO.country());
         }
     }
 

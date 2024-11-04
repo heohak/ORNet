@@ -24,6 +24,7 @@ public class Client {
     private Integer id;
     private String fullName;
     private String shortName;
+    private String country;
 //    private String thirdPartyIT;
     // locationi ja third party IT-d peab saama siduda mugavalt linnukesega
 
