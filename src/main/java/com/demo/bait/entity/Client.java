@@ -47,6 +47,8 @@ public class Client {
     private Boolean surgeryClient;
     private Boolean editorClient;
     private Boolean otherMedicalDevices;
+    private Boolean prospect;
+    private Boolean agreement;
     private LocalDate lastMaintenance;
     private LocalDate nextMaintenance;
 

@@ -45,25 +45,13 @@ public class ClientService {
 
         clientThirdPartyITService.updateThirdPartyITs(client, clientDTO);
 
-        if (clientDTO.pathologyClient() == null) {
-            client.setPathologyClient(false);
-        } else {
-            client.setPathologyClient(clientDTO.pathologyClient());
-        }
+        client.setPathologyClient(Boolean.TRUE.equals(clientDTO.pathologyClient()));
+        client.setSurgeryClient(Boolean.TRUE.equals(clientDTO.surgeryClient()));
+        client.setEditorClient(Boolean.TRUE.equals(clientDTO.editorClient()));
+        client.setOtherMedicalDevices(Boolean.TRUE.equals(clientDTO.otherMedicalDevices()));
+        client.setProspect(Boolean.TRUE.equals(clientDTO.prospect()));
+        client.setAgreement(Boolean.TRUE.equals(clientDTO.agreement()));
 
-        if (clientDTO.surgeryClient() == null) {
-            client.setSurgeryClient(false);
-        } else {
-            client.setSurgeryClient(clientDTO.surgeryClient());
-        }
-
-        if (clientDTO.editorClient() == null) {
-            client.setEditorClient(false);
-        } else {
-            client.setEditorClient(clientDTO.editorClient());
-        }
-
-        client.setOtherMedicalDevices(clientDTO.otherMedicalDevices());
         client.setLastMaintenance(clientDTO.lastMaintenance());
         client.setNextMaintenance(clientDTO.nextMaintenance());
 
@@ -95,6 +83,8 @@ public class ClientService {
         updateSurgeryClient(client, clientDTO);
         updateEditorClient(client, clientDTO);
         updateOtherMedicalDevices(client, clientDTO);
+        updateProspect(client, clientDTO);
+        updateAgreement(client, clientDTO);
         updateLastMaintenance(client, clientDTO);
         updateNextMaintenance(client, clientDTO);
         clientMaintenanceService.updateMaintenances(client, clientDTO);
@@ -136,6 +126,18 @@ public class ClientService {
     public void updateOtherMedicalDevices(Client client, ClientDTO clientDTO) {
         if (clientDTO.otherMedicalDevices() != null) {
             client.setOtherMedicalDevices(clientDTO.otherMedicalDevices());
+        }
+    }
+
+    public void updateProspect(Client client, ClientDTO clientDTO) {
+        if (clientDTO.prospect() != null) {
+            client.setProspect(clientDTO.prospect());
+        }
+    }
+
+    public void updateAgreement(Client client, ClientDTO clientDTO) {
+        if (clientDTO.agreement() != null) {
+            client.setAgreement(clientDTO.agreement());
         }
     }
 

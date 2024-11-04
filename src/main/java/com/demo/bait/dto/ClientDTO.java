@@ -10,7 +10,8 @@ import java.util.List;
 public record ClientDTO(Integer id, String fullName, String shortName,
                         List<Integer> locationIds, List<Integer> thirdPartyIds,
                         Boolean pathologyClient, Boolean surgeryClient, Boolean editorClient,
-                        Boolean otherMedicalDevices, LocalDate lastMaintenance, LocalDate nextMaintenance,
+                        Boolean otherMedicalDevices, Boolean prospect, Boolean agreement,
+                        LocalDate lastMaintenance, LocalDate nextMaintenance,
                         List<Integer> maintenanceIds, List<Integer> commentIds) {
 
 }
