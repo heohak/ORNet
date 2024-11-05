@@ -58,7 +58,6 @@ public class ClientSpecification implements Specification<Client> {
         String likePattern = "%" + searchTerm.toLowerCase() + "%";
         Predicate titlePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("fullName")), likePattern);
         Predicate descriptionPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("shortName")), likePattern);
-        Predicate workTypePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("otherMedicalInformation")), likePattern);
 
         Join<Client, Location> locationJoin = root.join("locations", JoinType.LEFT);
         Predicate locationPredicate = criteriaBuilder.like(criteriaBuilder.lower(locationJoin.get("name")), likePattern);
@@ -66,6 +65,6 @@ public class ClientSpecification implements Specification<Client> {
         Join<Client, ThirdPartyIT> thirdPartyITJoin = root.join("thirdPartyITs", JoinType.LEFT);
         Predicate thirdPartyITPredicate = criteriaBuilder.like(criteriaBuilder.lower(thirdPartyITJoin.get("name")), likePattern);
 
-        return criteriaBuilder.or(titlePredicate, descriptionPredicate, workTypePredicate, locationPredicate, thirdPartyITPredicate);
+        return criteriaBuilder.or(titlePredicate, descriptionPredicate, locationPredicate, thirdPartyITPredicate);
     }
 }
