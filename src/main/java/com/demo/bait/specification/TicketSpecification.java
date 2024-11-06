@@ -56,7 +56,6 @@ public class TicketSpecification implements Specification<Ticket> {
         Predicate descriptionPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("description")), likePattern);
         Predicate baitNumerationPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("baitNumeration")), likePattern);
         Predicate clientNumerationPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("clientNumeration")), likePattern);
-        Predicate responsePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("response")), likePattern);
         Predicate insideInfoPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("insideInfo")), likePattern);
         Predicate rootCausePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("rootCause")), likePattern);
 
@@ -78,23 +77,20 @@ public class TicketSpecification implements Specification<Ticket> {
 
 //        Join<Ticket, Comment> commentJoin = root.join("comments", JoinType.LEFT);
 //        Predicate commentPredicate = criteriaBuilder.like(criteriaBuilder.lower(commentJoin.get("comment")), likePattern);
-        Join<Ticket, Activity> activityJoin = root.join("activity", JoinType.LEFT);
+        Join<Ticket, Activity> activityJoin = root.join("activities", JoinType.LEFT);
         Predicate activityPredicate = criteriaBuilder.like(criteriaBuilder.lower(activityJoin.get("activity")), likePattern);
-
-        Join<Ticket, Maintenance> maintenanceJoin = root.join("maintenances", JoinType.LEFT);
-        Predicate maintenancePredicate = criteriaBuilder.like(criteriaBuilder.lower(maintenanceJoin.get("maintenanceName")), likePattern);
 
         Join<Ticket, FileUpload> fileUploadJoin = root.join("files", JoinType.LEFT);
         Predicate fileUploadPredicate = criteriaBuilder.like(criteriaBuilder.lower(fileUploadJoin.get("fileName")), likePattern);
 
         return criteriaBuilder.or(titlePredicate, descriptionPredicate, baitNumerationPredicate,
-                clientNumerationPredicate, responsePredicate, insideInfoPredicate, rootCausePredicate,
+                clientNumerationPredicate, insideInfoPredicate, rootCausePredicate,
                 clientFullNamePredicate, clientShortNamePredicate, locationPredicate, contactsFirstNamePredicate,
                 contactsLastNamePredicate, contactsTitlePredicate, baitWorkerFirstNamePredicate,
                 baitWorkerLastNamePredicate,
 //                commentPredicate,
                 activityPredicate,
-                maintenancePredicate, fileUploadPredicate);
+                fileUploadPredicate);
     }
 
 }
