@@ -30,10 +30,12 @@ public class DataInitializerService {
 
             TicketStatusClassificator ticketOpenStatus = new TicketStatusClassificator();
             ticketOpenStatus.setStatus("Open");
+            ticketOpenStatus.setColor("#28a745");
             ticketStatusClassificatorRepo.save(ticketOpenStatus);
 
             TicketStatusClassificator ticketClosedStatus = new TicketStatusClassificator();
             ticketClosedStatus.setStatus("Closed");
+            ticketClosedStatus.setColor("#dc3545");
             ticketStatusClassificatorRepo.save(ticketClosedStatus);
         }
     }
