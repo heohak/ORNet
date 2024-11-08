@@ -60,12 +60,4 @@ public class Client {
             inverseJoinColumns = @JoinColumn(name = "maintenance_id")
     )
     private Set<Maintenance> maintenances = new HashSet<>();
-
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "client_comment",
-            joinColumns = @JoinColumn(name = "client_id"),
-            inverseJoinColumns = @JoinColumn(name = "comment_id")
-    )
-    private Set<Comment> comments = new HashSet<>();
 }
