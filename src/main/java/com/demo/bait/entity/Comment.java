@@ -25,11 +25,4 @@ public class Comment {
     @Column(columnDefinition = "TEXT")
     private String comment;
     private LocalDateTime timestamp;
-    @ManyToMany
-    @JoinTable(
-            name = "comment_location",
-            joinColumns = @JoinColumn(name = "comment_id"),
-            inverseJoinColumns = @JoinColumn(name = "location_id")
-    )
-    private Set<Location> locations = new HashSet<>();
 }

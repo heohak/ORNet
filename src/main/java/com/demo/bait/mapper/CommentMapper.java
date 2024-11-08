@@ -18,12 +18,5 @@ public interface CommentMapper {
 
     List<CommentDTO> toDtoList(List<Comment> comments);
 
-    @Mapping(target = "locationIds", expression = "java(mapLocationsToIds(comment.getLocations()))")
     CommentDTO toDto(Comment comment);
-
-    default List<Integer> mapLocationsToIds(Set<Location> locations) {
-        return locations.stream()
-                .map(Location::getId)
-                .collect(Collectors.toList());
-    }
 }

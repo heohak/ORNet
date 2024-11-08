@@ -22,7 +22,6 @@ public interface ClientMapper {
     @Mapping(target = "locationIds", expression = "java(mapLocationsToIds(client.getLocations()))")
     @Mapping(target = "thirdPartyIds", expression = "java(mapThirdPartyITsToIds(client.getThirdPartyITs()))")
     @Mapping(target = "maintenanceIds", expression = "java(mapMaintenancesToIds(client.getMaintenances()))")
-    @Mapping(target = "commentIds", expression = "java(mapCommentsToIds(client.getComments()))")
     ClientDTO toDto(Client client);
 
     default List<Integer> mapLocationsToIds(Set<Location> locations) {
@@ -40,12 +39,6 @@ public interface ClientMapper {
     default List<Integer> mapMaintenancesToIds(Set<Maintenance> maintenances) {
         return maintenances.stream()
                 .map(Maintenance::getId)
-                .collect(Collectors.toList());
-    }
-
-    default List<Integer> mapCommentsToIds(Set<Comment> comments) {
-        return comments.stream()
-                .map(Comment::getId)
                 .collect(Collectors.toList());
     }
 }

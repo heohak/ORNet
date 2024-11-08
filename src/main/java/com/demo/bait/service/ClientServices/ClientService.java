@@ -3,11 +3,9 @@ package com.demo.bait.service.ClientServices;
 import com.demo.bait.dto.*;
 import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
+import com.demo.bait.mapper.ClientActivityMapper;
 import com.demo.bait.mapper.ClientMapper;
-import com.demo.bait.repository.ClientRepo;
-import com.demo.bait.repository.LocationRepo;
-import com.demo.bait.repository.MaintenanceRepo;
-import com.demo.bait.repository.ThirdPartyITRepo;
+import com.demo.bait.repository.*;
 import com.demo.bait.service.LocationServices.LocationService;
 import com.demo.bait.service.MaintenanceServices.MaintenanceService;
 import com.demo.bait.service.ThirdPartyITServices.ThirdPartyITService;
@@ -34,6 +32,8 @@ public class ClientService {
     private ClientThirdPartyITService clientThirdPartyITService;
     private ClientMaintenanceService clientMaintenanceService;
     private EntityManager entityManager;
+    private ClientActivityRepo clientActivityRepo;
+    private ClientActivityMapper clientActivityMapper;
 
     @Transactional
     public ResponseDTO addClient(ClientDTO clientDTO) {
@@ -64,7 +64,7 @@ public class ClientService {
 
     @Transactional
     public ResponseDTO deleteClient(Integer id) {
-        clientRepo.deleteById(id);
+        clientRepo.deleteById(id); // see ei tohiks tootada prq
         return new ResponseDTO("Client deleted successfully");
     }
 
@@ -184,5 +184,9 @@ public class ClientService {
             history.add(clientVersion);
         }
         return clientMapper.toDtoList(history);
+    }
+
+    public List<ClientActivityDTO> getClientActivitiesForClient(Integer clientId) {
+        return clientActivityMapper.toDtoList(clientActivityRepo.findByClientId(clientId));
     }
 }
