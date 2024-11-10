@@ -12,6 +12,6 @@ public record ClientDTO(Integer id, String fullName, String shortName, String co
                         Boolean pathologyClient, Boolean surgeryClient, Boolean editorClient,
                         Boolean otherMedicalDevices, Boolean prospect, Boolean agreement,
                         LocalDate lastMaintenance, LocalDate nextMaintenance,
-                        List<Integer> maintenanceIds, List<Integer> commentIds) {
+                        List<Integer> maintenanceIds) {
 
 }

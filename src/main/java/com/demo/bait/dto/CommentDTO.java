@@ -7,5 +7,5 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public record CommentDTO(Integer id, String comment, LocalDateTime timestamp, List<Integer> locationIds) {
+public record CommentDTO(Integer id, String comment, LocalDateTime timestamp) {
 }

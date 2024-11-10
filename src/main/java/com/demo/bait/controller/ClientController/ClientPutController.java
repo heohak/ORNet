@@ -19,7 +19,6 @@ public class ClientPutController {
     public final ClientThirdPartyITService clientThirdPartyITService;
     public final ClientMaintenanceService clientMaintenanceService;
     public final ClientLocationService clientLocationService;
-    public final ClientCommentService clientCommentService;
 
     @PutMapping("/{clientId}/{locationId}")
     public ResponseDTO addLocationToClient(@PathVariable Integer clientId, @PathVariable Integer locationId) {
@@ -39,11 +38,5 @@ public class ClientPutController {
     @PutMapping("/update/{clientId}")
     public ResponseDTO updateClient(@PathVariable Integer clientId, @RequestBody ClientDTO clientDTO) {
         return clientService.updateClient(clientId, clientDTO);
-    }
-
-    @PutMapping("/comment/{clientId}")
-    public ResponseDTO addCommentToClient(@PathVariable Integer clientId,
-                                          @RequestBody CommentDTO commentDTO) {
-        return clientCommentService.addCommentToClient(clientId, commentDTO);
     }
 }
