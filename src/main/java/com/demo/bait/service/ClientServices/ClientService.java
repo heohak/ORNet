@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -52,6 +53,7 @@ public class ClientService {
         client.setOtherMedicalDevices(Boolean.TRUE.equals(clientDTO.otherMedicalDevices()));
         client.setProspect(Boolean.TRUE.equals(clientDTO.prospect()));
         client.setAgreement(Boolean.TRUE.equals(clientDTO.agreement()));
+        client.setActiveCustomer(Boolean.TRUE.equals(clientDTO.activeCustomer()));
 
         client.setLastMaintenance(clientDTO.lastMaintenance());
         client.setNextMaintenance(clientDTO.nextMaintenance());
@@ -87,6 +89,7 @@ public class ClientService {
         updateOtherMedicalDevices(client, clientDTO);
         updateProspect(client, clientDTO);
         updateAgreement(client, clientDTO);
+        updateActiveCustomer(client, clientDTO);
         updateLastMaintenance(client, clientDTO);
         updateNextMaintenance(client, clientDTO);
         clientMaintenanceService.updateMaintenances(client, clientDTO);
@@ -149,6 +152,12 @@ public class ClientService {
         }
     }
 
+    public void updateActiveCustomer(Client client, ClientDTO clientDTO) {
+        if (clientDTO.activeCustomer() != null) {
+            client.setActiveCustomer(clientDTO.activeCustomer());
+        }
+    }
+
     public void updateLastMaintenance(Client client, ClientDTO clientDTO) {
         if (clientDTO.lastMaintenance() != null) {
             client.setLastMaintenance(clientDTO.lastMaintenance());
@@ -188,5 +197,15 @@ public class ClientService {
 
     public List<ClientActivityDTO> getClientActivitiesForClient(Integer clientId) {
         return clientActivityMapper.toDtoList(clientActivityRepo.findByClientId(clientId));
+    }
+
+    public List<String> getAllClientCountries() {
+        return clientRepo.findAll().stream()
+                .map(Client::getCountry)
+                .filter(country -> country != null && !country.isEmpty())
+                .map(country -> country.substring(0, 1).toUpperCase() + country.substring(1).toLowerCase())
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
     }
 }

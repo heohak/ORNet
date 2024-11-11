@@ -121,7 +121,9 @@ public class ClientActivityService {
         }
         ClientActivity clientActivity = clientActivityOpt.get();
 
-        clientActivity.setEndDateTime(clientActivityDTO.endDateTime());
+        if (clientActivityDTO.endDateTime() != null) {
+            clientActivity.setEndDateTime(clientActivityDTO.endDateTime());
+        }
 
         if (clientActivityDTO.title() != null) {
             clientActivity.setTitle(clientActivityDTO.title());
