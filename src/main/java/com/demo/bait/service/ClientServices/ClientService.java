@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -188,5 +189,15 @@ public class ClientService {
 
     public List<ClientActivityDTO> getClientActivitiesForClient(Integer clientId) {
         return clientActivityMapper.toDtoList(clientActivityRepo.findByClientId(clientId));
+    }
+
+    public List<String> getAllClientCountries() {
+        return clientRepo.findAll().stream()
+                .map(Client::getCountry)
+                .filter(country -> country != null && !country.isEmpty())
+                .map(country -> country.substring(0, 1).toUpperCase() + country.substring(1).toLowerCase())
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
     }
 }

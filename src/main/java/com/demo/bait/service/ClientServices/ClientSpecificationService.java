@@ -45,7 +45,7 @@ public class ClientSpecificationService {
         }
 
         if (country != null) {
-            Specification<Client> countrySpec = ClientSpecification.hasLocationCountry(country);
+            Specification<Client> countrySpec = ClientSpecification.hasCountry(country);
             combinedSpec = countrySpec.and(countrySpec);
         }
 
