@@ -69,6 +69,11 @@ public class ClientGetController {
         return clientService.getClientActivitiesForClient(clientId);
     }
 
+    @GetMapping("/countries")
+    public List<String> getAllClientCountries() {
+        return clientService.getAllClientCountries();
+    }
+
 
 //    @GetMapping("/location/history/{clientId}")
 //    public List<ClientLocationHistoryDTO> getClientLocationHistory(@PathVariable Integer clientId) {
