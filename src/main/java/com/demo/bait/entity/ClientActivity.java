@@ -37,15 +37,15 @@ public class ClientActivity {
     private Location location;
     @ManyToMany
     @JoinTable(
-            name = "ticket_client_worker",
-            joinColumns = @JoinColumn(name = "ticket_id"),
+            name = "client_activity_client_worker",
+            joinColumns = @JoinColumn(name = "client_activity_id"),
             inverseJoinColumns = @JoinColumn(name = "client_worker_id")
     )
     private Set<ClientWorker> contacts = new HashSet<>();
     @ManyToMany
     @JoinTable(
-            name = "ticket_work_type_classificator",
-            joinColumns = @JoinColumn(name = "ticket_id"),
+            name = "client_activity_work_type_classificator",
+            joinColumns = @JoinColumn(name = "client_activity_id"),
             inverseJoinColumns = @JoinColumn(name = "work_type_id")
     )
     private Set<WorkTypeClassificator> workTypes = new HashSet<>();
@@ -60,8 +60,8 @@ public class ClientActivity {
     private LocalDateTime updateDateTime;
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
-            name = "ticket_file_upload",
-            joinColumns = @JoinColumn(name = "ticket_id"),
+            name = "client_activity_file_upload",
+            joinColumns = @JoinColumn(name = "client_activity_id"),
             inverseJoinColumns = @JoinColumn(name = "file_upload_id")
     )
     private Set<FileUpload> files = new HashSet<>();
@@ -69,8 +69,8 @@ public class ClientActivity {
     private Boolean settled;
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
-            name = "ticket_device",
-            joinColumns = @JoinColumn(name = "ticket_id"),
+            name = "client_activity_device",
+            joinColumns = @JoinColumn(name = "client_activity_id"),
             inverseJoinColumns = @JoinColumn(name = "device_id")
     )
     private Set<Device> devices = new HashSet<>();
