@@ -53,6 +53,7 @@ public class ClientService {
         client.setOtherMedicalDevices(Boolean.TRUE.equals(clientDTO.otherMedicalDevices()));
         client.setProspect(Boolean.TRUE.equals(clientDTO.prospect()));
         client.setAgreement(Boolean.TRUE.equals(clientDTO.agreement()));
+        client.setActiveCustomer(Boolean.TRUE.equals(clientDTO.activeCustomer()));
 
         client.setLastMaintenance(clientDTO.lastMaintenance());
         client.setNextMaintenance(clientDTO.nextMaintenance());
@@ -88,6 +89,7 @@ public class ClientService {
         updateOtherMedicalDevices(client, clientDTO);
         updateProspect(client, clientDTO);
         updateAgreement(client, clientDTO);
+        updateActiveCustomer(client, clientDTO);
         updateLastMaintenance(client, clientDTO);
         updateNextMaintenance(client, clientDTO);
         clientMaintenanceService.updateMaintenances(client, clientDTO);
@@ -147,6 +149,12 @@ public class ClientService {
     public void updateAgreement(Client client, ClientDTO clientDTO) {
         if (clientDTO.agreement() != null) {
             client.setAgreement(clientDTO.agreement());
+        }
+    }
+
+    public void updateActiveCustomer(Client client, ClientDTO clientDTO) {
+        if (clientDTO.activeCustomer() != null) {
+            client.setActiveCustomer(clientDTO.activeCustomer());
         }
     }
 
