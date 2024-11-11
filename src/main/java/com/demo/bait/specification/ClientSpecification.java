@@ -48,6 +48,11 @@ public class ClientSpecification implements Specification<Client> {
                 criteriaBuilder.equal(criteriaBuilder.lower(root.get("country")), country.toLowerCase());
     }
 
+    public static Specification<Client> isActiveCustomer(Boolean isActive) {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("activeCustomer"), isActive);
+    }
+
     public static Specification<Client> hasLocationCountry(String country) {
         return (root, query, criteriaBuilder) -> {
             Join<Client, Location> locationJoin = root.join("locations", JoinType.LEFT);
