@@ -228,13 +228,11 @@ public class ClientService {
                     .map(ClientActivity::getEndDateTime)
                     .filter(Objects::nonNull)
                     .reduce((closest, current) -> {
-                        if (current.isAfter(today) && (closest == null || current.isBefore(closest))) {
-                            return current;
-                        } else if (current.isBefore(today)
-                                && (closest == null || closest.isBefore(today) && current.isAfter(closest))) {
-                            return current;
+                        if (current.isAfter(today)) {
+                            return (closest == null || closest.isBefore(today) || current.isBefore(closest)) ? current : closest;
+                        } else {
+                            return (closest == null || current.isBefore(closest)) ? current : closest;
                         }
-                        return closest;
                     })
                     .orElse(null);
 
