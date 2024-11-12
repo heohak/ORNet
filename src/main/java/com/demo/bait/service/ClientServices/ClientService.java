@@ -19,6 +19,7 @@ import org.hibernate.envers.AuditReaderFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -207,5 +208,54 @@ public class ClientService {
                 .distinct()
                 .sorted()
                 .collect(Collectors.toList());
+    }
+
+    public Map<Integer, Map<String, LocalDateTime>> getClientsActivityDates() {
+        Map<Integer, Map<String, LocalDateTime>> clientActivityDates = new HashMap<>();
+        LocalDateTime today = LocalDateTime.now();
+
+        List<ClientActivity> activities = clientActivityRepo.findAll();
+
+        Map<Integer, List<ClientActivity>> activitiesByClient = activities.stream()
+                .filter(activity -> activity.getClient() != null)
+                .collect(Collectors.groupingBy(activity -> activity.getClient().getId()));
+
+        for (Map.Entry<Integer, List<ClientActivity>> entry : activitiesByClient.entrySet()) {
+            Integer clientId = entry.getKey();
+            List<ClientActivity> clientActivities = entry.getValue();
+
+            LocalDateTime endDateTime = clientActivities.stream()
+                    .map(ClientActivity::getEndDateTime)
+                    .filter(Objects::nonNull)
+                    .reduce((closest, current) -> {
+                        if (closest == null) {
+                            return current;
+                        }
+                        if (current.isBefore(today) && closest.isBefore(today)) {
+                            return current.isBefore(closest) ? current : closest;
+                        } else if (current.isBefore(today)) {
+                            return current;
+                        } else if (closest.isBefore(today)) {
+                            return closest;
+                        } else {
+                            return current.isBefore(closest) ? current : closest;
+                        }
+                    })
+                    .orElse(null);
+
+            LocalDateTime updateDateTime = clientActivities.stream()
+                    .map(ClientActivity::getUpdateDateTime)
+                    .filter(Objects::nonNull)
+                    .max(LocalDateTime::compareTo)
+                    .orElse(null);
+
+            Map<String, LocalDateTime> dateMap = new HashMap<>();
+            dateMap.put("endDateTime", endDateTime);
+            dateMap.put("updateDateTime", updateDateTime);
+
+            clientActivityDates.put(clientId, dateMap);
+        }
+
+        return clientActivityDates;
     }
 }

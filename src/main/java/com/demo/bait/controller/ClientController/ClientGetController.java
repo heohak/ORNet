@@ -5,7 +5,10 @@ import com.demo.bait.service.ClientServices.*;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -74,6 +77,11 @@ public class ClientGetController {
     @GetMapping("/countries")
     public List<String> getAllClientCountries() {
         return clientService.getAllClientCountries();
+    }
+
+    @GetMapping("/activity/dates")
+    public Map<Integer, Map<String, LocalDateTime>> getClientsActivityDates() {
+        return clientService.getClientsActivityDates();
     }
 
 
