@@ -31,37 +31,40 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.*;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Slf4j
 @Service
 @AllArgsConstructor
 public class FileUploadService {
 
-    private FileUploadRepo fileUploadRepo;
-    private FileUploadMapper fileUploadMapper;
+    private final FileUploadRepo fileUploadRepo;
+    private final FileUploadMapper fileUploadMapper;
     private static final String UPLOAD_DIR = "uploads";
 
     @Transactional
     public Set<FileUpload> uploadFiles(List<MultipartFile> files) throws IOException {
         Set<FileUpload> uploadedFiles = new HashSet<>();
-        for (MultipartFile file : files) {
-            File uploadDir = new File(UPLOAD_DIR);
-            if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
-            }
+        File uploadDir = new File(UPLOAD_DIR);
 
-            Path filePath = Paths.get(UPLOAD_DIR, file.getOriginalFilename());
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
+
+        for (MultipartFile file : files) {
+            String uniqueFileName = UUID.randomUUID().toString();
+            String fileExtension = getFileExtension(file.getOriginalFilename());
+            String storedFileName = uniqueFileName + fileExtension;
+
+            Path filePath = Paths.get(UPLOAD_DIR, storedFileName);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-            // Thumbnailator
             byte[] thumbnail = generateThumbnail(file);
 
             FileUpload fileUpload = new FileUpload();
             fileUpload.setFileName(file.getOriginalFilename());
+            fileUpload.setStoredFileName(storedFileName);
             fileUpload.setFilePath(filePath.toString());
             fileUpload.setFileSize(file.getSize());
             fileUpload.setFileType(file.getContentType());
@@ -71,6 +74,13 @@ public class FileUploadService {
             uploadedFiles.add(fileUpload);
         }
         return uploadedFiles;
+    }
+
+    private String getFileExtension(String fileName) {
+        if (fileName == null || !fileName.contains(".")) {
+            return "";
+        }
+        return fileName.substring(fileName.lastIndexOf('.'));
     }
 
     private byte[] generateThumbnail(MultipartFile file) {
@@ -84,7 +94,7 @@ public class FileUploadService {
                         .toOutputStream(thumbnailOutputStream);
                 return thumbnailOutputStream.toByteArray();
             } else {
-                return generatePlaceholderImage(file.getOriginalFilename(), contentType);
+                return generatePlaceholderImage(file.getOriginalFilename());
             }
         } catch (IOException e) {
             log.error("Error generating thumbnail for file: {}", file.getOriginalFilename(), e);
@@ -92,7 +102,7 @@ public class FileUploadService {
         }
     }
 
-    private byte[] generatePlaceholderImage(String fileName, String contentType) {
+    private byte[] generatePlaceholderImage(String fileName) {
         try {
             BufferedImage placeholder = new BufferedImage(150, 150, BufferedImage.TYPE_INT_RGB);
             Graphics2D g2d = placeholder.createGraphics();

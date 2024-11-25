@@ -23,14 +23,14 @@ public class FileUpload {
     private Integer id;
 
     private String fileName;
+
+    private String storedFileName;
+
     private String filePath;
+
     private Long fileSize;
     private String fileType;
 
     @Lob
     private byte[] thumbnail;
-
-//    @CreationTimestamp
-//    private Timestamp uploadTime;
-
 }
