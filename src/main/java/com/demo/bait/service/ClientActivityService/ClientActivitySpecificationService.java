@@ -25,12 +25,17 @@ public class ClientActivitySpecificationService {
     private ClientActivityMapper clientActivityMapper;
     private ClientActivityRepo clientActivityRepo;
 
-    public List<ClientActivityDTO> searchAndFilterClientActivities(Integer statusId) {
+    public List<ClientActivityDTO> searchAndFilterClientActivities(Integer statusId, Integer clientId) {
         Specification<ClientActivity> combinedSpec = Specification.where(null);
 
         if (statusId != null) {
             Specification<ClientActivity> statusSpec = ClientActivitySpecification.hasStatusId(statusId);
             combinedSpec = combinedSpec.and(statusSpec);
+        }
+
+        if (clientId != null) {
+            Specification<ClientActivity> clientSpec = ClientActivitySpecification.hasClientId(clientId);
+            combinedSpec = combinedSpec.and(clientSpec);
         }
         return clientActivityMapper.toDtoList(clientActivityRepo.findAll(combinedSpec));
     }
