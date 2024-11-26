@@ -24,7 +24,8 @@ public class ClientActivityGetController {
 
     @GetMapping("/search")
     public List<ClientActivityDTO> searchClientActivities(
-            @RequestParam(value = "statusId", required = false) Integer statusId) {
-        return clientActivitySpecificationService.searchAndFilterClientActivities(statusId);
+            @RequestParam(value = "statusId", required = false) Integer statusId,
+            @RequestParam(value = "clientId", required = false) Integer clientId) {
+        return clientActivitySpecificationService.searchAndFilterClientActivities(statusId, clientId);
     }
 }
