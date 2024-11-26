@@ -361,4 +361,16 @@ public class SoftwareService {
     public List<SoftwareDTO> getAllSoftwareVariations() {
         return softwareMapper.toDtoList(softwareRepo.findAll());
     }
+
+    @Transactional
+    public ResponseDTO removeClientFromSoftware(Integer softwareId) {
+        Optional<Software> softwareOpt = softwareRepo.findById(softwareId);
+        if (softwareOpt.isEmpty()) {
+            throw new EntityNotFoundException("Software with id " + softwareId + " not found");
+        }
+        Software software = softwareOpt.get();
+        software.setClient(null);
+        softwareRepo.save(software);
+        return new ResponseDTO("Software removed from client");
+    }
 }
