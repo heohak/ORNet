@@ -22,4 +22,9 @@ public class SoftwarePutController {
     public ResponseDTO updateSoftware(@PathVariable Integer softwareId, @RequestBody SoftwareDTO softwareDTO) {
         return softwareService.updateSoftware(softwareId, softwareDTO);
     }
+
+    @PutMapping("/remove/{softwareId}")
+    public ResponseDTO removeClientFromSoftware(@PathVariable Integer softwareId) {
+        return softwareService.removeClientFromSoftware(softwareId);
+    }
 }

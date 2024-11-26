@@ -1,12 +1,11 @@
 package com.demo.bait.controller.ClientActivityController;
 
+import com.demo.bait.dto.ClientActivityDTO;
 import com.demo.bait.dto.FileUploadDTO;
 import com.demo.bait.service.ClientActivityService.ClientActivityFileUploadService;
+import com.demo.bait.service.ClientActivityService.ClientActivitySpecificationService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,9 +15,17 @@ import java.util.List;
 public class ClientActivityGetController {
 
     public final ClientActivityFileUploadService clientActivityFileUploadService;
+    public final ClientActivitySpecificationService clientActivitySpecificationService;
 
     @GetMapping("/files/{clientActivityId}")
     public List<FileUploadDTO> getClientActivityFiles(@PathVariable Integer clientActivityId) {
         return clientActivityFileUploadService.getClientActivityFiles(clientActivityId);
+    }
+
+    @GetMapping("/search")
+    public List<ClientActivityDTO> searchClientActivities(
+            @RequestParam(value = "statusId", required = false) Integer statusId,
+            @RequestParam(value = "clientId", required = false) Integer clientId) {
+        return clientActivitySpecificationService.searchAndFilterClientActivities(statusId, clientId);
     }
 }
