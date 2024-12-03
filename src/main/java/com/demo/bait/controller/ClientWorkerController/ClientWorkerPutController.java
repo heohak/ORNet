@@ -46,4 +46,9 @@ public class ClientWorkerPutController {
     public ResponseDTO updateFavorite(@PathVariable Integer workerId) {
         return clientWorkerService.toggleFavorite(workerId);
     }
+
+    @PutMapping("/remove/{workerId}")
+    public ResponseDTO removeClientFromWorker(@PathVariable Integer workerId) {
+        return clientWorkerService.removeClientFromWorker(workerId);
+    }
 }

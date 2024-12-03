@@ -227,6 +227,7 @@ public class ClientWorkerService {
         return contacts;
     }
 
+    @Transactional
     public ResponseDTO toggleFavorite(Integer workerId) {
         Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
         if (workerOpt.isEmpty()) {
@@ -239,5 +240,16 @@ public class ClientWorkerService {
         worker.setFavorite(!worker.getFavorite());
         clientWorkerRepo.save(worker);
         return new ResponseDTO("Worker favorite changed");
+    }
+
+    public ResponseDTO removeClientFromWorker(Integer workerId) {
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        if (workerOpt.isEmpty()) {
+            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        }
+        ClientWorker worker = workerOpt.get();
+        worker.setClient(null);
+        clientWorkerRepo.save(worker);
+        return new ResponseDTO("Worker removed from client");
     }
 }
