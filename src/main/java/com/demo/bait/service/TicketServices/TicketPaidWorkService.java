@@ -1,12 +1,8 @@
 package com.demo.bait.service.TicketServices;
 
-import com.demo.bait.dto.PaidWorkDTO;
 import com.demo.bait.dto.ResponseDTO;
-import com.demo.bait.entity.PaidWork;
 import com.demo.bait.entity.Ticket;
-import com.demo.bait.mapper.PaidWorkMapper;
 import com.demo.bait.repository.TicketRepo;
-import com.demo.bait.service.PaidWorkServices.PaidWorkService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;

@@ -52,4 +52,17 @@ public class WikiService {
         }
         return wikiMapper.toDto(wikiOpt.get());
     }
+
+    @Transactional
+    public ResponseDTO updateWiki(Integer wikiId, WikiDTO wikiDTO) {
+        Optional<Wiki> wikiOpt = wikiRepo.findById(wikiId);
+        if (wikiOpt.isEmpty()) {
+            throw new EntityNotFoundException("Wiki with id " + wikiId + " not found");
+        }
+        Wiki wiki = wikiOpt.get();
+        wiki.setSolution(wikiDTO.solution());
+        wiki.setProblem(wikiDTO.problem());
+        wikiRepo.save(wiki);
+        return new ResponseDTO("Wiki updated successfully");
+    }
 }
