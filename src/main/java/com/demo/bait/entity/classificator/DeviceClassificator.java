@@ -17,7 +17,7 @@ import org.hibernate.envers.Audited;
 public class DeviceClassificator {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String name;

@@ -22,7 +22,7 @@ import java.util.Set;
 public class ClientActivity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @ManyToOne
     @JoinColumn(name = "client_id", referencedColumnName = "id")
