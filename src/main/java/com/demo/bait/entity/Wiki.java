@@ -14,7 +14,7 @@ import org.hibernate.envers.Audited;
 public class Wiki {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(columnDefinition = "TEXT")
     private String problem;
