@@ -18,7 +18,7 @@ import org.hibernate.envers.Audited;
 public class WorkTypeClassificator {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String workType;

@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public class Activity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     @Column(columnDefinition = "TEXT")
     private String activity;
@@ -26,4 +26,5 @@ public class Activity {
     @Convert(converter = DurationConverter.class)
     private Duration timeSpent;
     private Boolean paid;
+//    private String username;
 }

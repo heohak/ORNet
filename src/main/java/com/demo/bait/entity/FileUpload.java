@@ -19,7 +19,7 @@ import java.sql.Timestamp;
 public class FileUpload {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String fileName;

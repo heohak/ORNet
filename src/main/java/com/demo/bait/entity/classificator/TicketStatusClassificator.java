@@ -14,9 +14,7 @@ import org.hibernate.envers.Audited;
 public class TicketStatusClassificator {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ticket_status_classificator_seq")
-    @SequenceGenerator(name = "ticket_status_classificator_seq", sequenceName = "ticket_status_classificator_seq",
-            allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String status;

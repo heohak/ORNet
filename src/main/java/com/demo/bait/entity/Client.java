@@ -20,7 +20,7 @@ import java.util.Set;
 public class Client {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String fullName;
     private String shortName;

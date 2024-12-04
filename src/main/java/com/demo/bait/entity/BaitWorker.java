@@ -19,7 +19,7 @@ import org.hibernate.envers.Audited;
 public class BaitWorker {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String firstName;
     private String lastName;

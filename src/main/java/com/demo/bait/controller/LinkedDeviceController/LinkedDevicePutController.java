@@ -41,4 +41,9 @@ public class LinkedDevicePutController {
                                           @RequestBody LinkedDeviceDTO linkedDeviceDTO) {
         return linkedDeviceService.updateLinkedDevice(linkedDeviceId, linkedDeviceDTO);
     }
+
+    @PutMapping("/remove/{linkedDeviceId}")
+    public ResponseDTO removeDeviceFromLinkedDevice(@PathVariable Integer linkedDeviceId) {
+        return linkedDeviceService.removeDeviceFromLinkedDevice(linkedDeviceId);
+    }
 }
