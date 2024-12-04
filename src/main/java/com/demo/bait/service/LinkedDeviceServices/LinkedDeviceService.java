@@ -173,4 +173,16 @@ public class LinkedDeviceService {
         LinkedDevice linkedDevice = linkedDeviceOpt.get();
         return deviceMapper.toDto(linkedDevice.getDevice());
     }
+
+    @Transactional
+    public ResponseDTO removeDeviceFromLinkedDevice(Integer linkedDeviceId) {
+        Optional<LinkedDevice> linkedDeviceOpt = linkedDeviceRepo.findById(linkedDeviceId);
+        if (linkedDeviceOpt.isEmpty()) {
+            throw new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
+        }
+        LinkedDevice linkedDevice = linkedDeviceOpt.get();
+        linkedDevice.setDevice(null);
+        linkedDeviceRepo.save(linkedDevice);
+        return new ResponseDTO("Device removed from linked device successfully");
+    }
 }
