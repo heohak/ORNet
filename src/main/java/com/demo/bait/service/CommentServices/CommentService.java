@@ -14,8 +14,8 @@ import com.demo.bait.repository.LocationRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+//import org.springframework.security.core.Authentication;
+//import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,14 +63,14 @@ public class CommentService {
         return comment;
     }
 
-    public String getUsername() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()
-                || authentication.getName().equals("anonymousUser")) {
-            throw new SecurityException("User is not authenticated");
-        }
-        return authentication.getName();
-    }
+//    public String getUsername() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication == null || !authentication.isAuthenticated()
+//                || authentication.getName().equals("anonymousUser")) {
+//            throw new SecurityException("User is not authenticated");
+//        }
+//        return authentication.getName();
+//    }
 
     public List<CommentDTO> getAllComments() {
         return commentMapper.toDtoList(commentRepo.findAll());
