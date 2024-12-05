@@ -3,8 +3,12 @@ package com.demo.bait.service.BaitWorkerServices;
 import com.demo.bait.dto.BaitWorkerDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.BaitWorker;
+import com.demo.bait.entity.ClientActivity;
+import com.demo.bait.entity.Ticket;
 import com.demo.bait.mapper.BaitWorkerMapper;
 import com.demo.bait.repository.BaitWorkerRepo;
+import com.demo.bait.repository.ClientActivityRepo;
+import com.demo.bait.repository.TicketRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -22,6 +26,8 @@ public class BaitWorkerService {
 
     private BaitWorkerRepo baitWorkerRepo;
     private BaitWorkerMapper baitWorkerMapper;
+    private TicketRepo ticketRepo;
+    private ClientActivityRepo clientActivityRepo;
 
     @Transactional
     public ResponseDTO addWorker(BaitWorkerDTO workerDTO) {
@@ -37,7 +43,25 @@ public class BaitWorkerService {
 
     @Transactional
     public ResponseDTO deleteBaitWorker(Integer baitWorkerId) {
-        baitWorkerRepo.deleteById(baitWorkerId);
+        Optional<BaitWorker> baitWorkerOpt = baitWorkerRepo.findById(baitWorkerId);
+        if (baitWorkerOpt.isEmpty()) {
+            throw new EntityNotFoundException("Bait Worker with id " + baitWorkerId + " not found");
+        }
+        BaitWorker baitWorker = baitWorkerOpt.get();
+
+        List<Ticket> tickets = ticketRepo.findByBaitWorker(baitWorker);
+        for (Ticket ticket : tickets) {
+            ticket.setBaitWorker(null);
+            ticketRepo.save(ticket);
+        }
+
+        List<ClientActivity> clientActivities = clientActivityRepo.findByBaitWorker(baitWorker);
+        for (ClientActivity clientActivity : clientActivities) {
+            clientActivity.setBaitWorker(null);
+            clientActivityRepo.save(clientActivity);
+        }
+
+        baitWorkerRepo.delete(baitWorker);
         return new ResponseDTO("Bait Worker deleted successfully");
     }
 

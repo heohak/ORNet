@@ -14,8 +14,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/worker")
-//@RequestMapping("/api/worker")
+@RequestMapping("/api/worker")
 public class ClientWorkerGetController {
 
     public final ClientWorkerService clientWorkerService;

@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/worker/classificator")
+@RequestMapping("/api/worker/classificator")
 public class ClientWorkerRoleClassificatorController {
 
     public final ClientWorkerRoleClassificatorService workerRoleClassificatorService;

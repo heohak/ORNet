@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/predefined")
+@RequestMapping("/api/predefined")
 public class PredefinedDeviceNameController {
 
     private PredefinedDeviceNameService predefinedDeviceNameService;

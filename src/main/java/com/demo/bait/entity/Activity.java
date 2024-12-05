@@ -26,5 +26,5 @@ public class Activity {
     @Convert(converter = DurationConverter.class)
     private Duration timeSpent;
     private Boolean paid;
-//    private String username;
+    private String username;
 }

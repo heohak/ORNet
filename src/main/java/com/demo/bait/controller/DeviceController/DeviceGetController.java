@@ -10,7 +10,7 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/device")
+@RequestMapping("/api/device")
 public class DeviceGetController {
 
     public final DeviceService deviceService;

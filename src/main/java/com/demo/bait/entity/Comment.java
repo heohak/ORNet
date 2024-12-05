@@ -25,5 +25,5 @@ public class Comment {
     @Column(columnDefinition = "TEXT")
     private String comment;
     private LocalDateTime timestamp;
-//    private String username;
+    private String username;
 }

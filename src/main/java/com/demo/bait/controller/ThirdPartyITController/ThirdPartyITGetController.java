@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/third-party")
+@RequestMapping("/api/third-party")
 public class ThirdPartyITGetController {
 
     public final ThirdPartyITService thirdPartyITService;

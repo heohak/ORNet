@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/linked/device")
+@RequestMapping("/api/linked/device")
 public class LinkedDeviceGetController {
 
     public final LinkedDeviceService linkedDeviceService;

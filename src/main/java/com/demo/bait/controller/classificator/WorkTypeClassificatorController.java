@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/work-type/classificator")
+@RequestMapping("/api/work-type/classificator")
 public class WorkTypeClassificatorController {
 
     public final WorkTypeClassificatorService workTypeClassificatorService;

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/activity")
+@RequestMapping("/api/activity")
 public class ActivityPutController {
 
     public final ActivityService activityService;
