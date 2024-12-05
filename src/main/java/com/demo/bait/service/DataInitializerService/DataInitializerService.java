@@ -1,8 +1,10 @@
 package com.demo.bait.service.DataInitializerService;
 
 import com.demo.bait.entity.PredefinedDeviceName;
+import com.demo.bait.entity.classificator.DeviceClassificator;
 import com.demo.bait.entity.classificator.TicketStatusClassificator;
 import com.demo.bait.repository.PredefinedDeviceNameRepo;
+import com.demo.bait.repository.classificator.DeviceClassificatorRepo;
 import com.demo.bait.repository.classificator.TicketStatusClassificatorRepo;
 import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
@@ -19,6 +21,7 @@ public class DataInitializerService {
 
     private TicketStatusClassificatorRepo ticketStatusClassificatorRepo;
     private PredefinedDeviceNameRepo predefinedDeviceNameRepo;
+    private DeviceClassificatorRepo deviceClassificatorRepo;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -53,6 +56,20 @@ public class DataInitializerService {
             PredefinedDeviceName predefinedDeviceNameORNetEditor = new PredefinedDeviceName();
             predefinedDeviceNameORNetEditor.setName("ORNet Editor");
             predefinedDeviceNameRepo.save(predefinedDeviceNameORNetEditor);
+        }
+
+        if (deviceClassificatorRepo.count() == 0) {
+            DeviceClassificator deviceClassificatorORNetPathology = new DeviceClassificator();
+            deviceClassificatorORNetPathology.setName("ORNet Pathology");
+            deviceClassificatorRepo.save(deviceClassificatorORNetPathology);
+
+            DeviceClassificator deviceClassificatorORNetSurgery = new DeviceClassificator();
+            deviceClassificatorORNetSurgery.setName("ORNet Surgery");
+            deviceClassificatorRepo.save(deviceClassificatorORNetSurgery);
+
+            DeviceClassificator deviceClassificatorORNetEditor = new DeviceClassificator();
+            deviceClassificatorORNetEditor.setName("ORNet Editor");
+            deviceClassificatorRepo.save(deviceClassificatorORNetEditor);
         }
     }
 }
