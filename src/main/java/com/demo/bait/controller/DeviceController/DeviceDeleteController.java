@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/device")
+@RequestMapping("/api/device")
 public class DeviceDeleteController {
 
     public final DeviceService deviceService;

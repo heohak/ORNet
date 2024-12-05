@@ -2,8 +2,12 @@ package com.demo.bait.service.classificator;
 
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.WorkTypeClassificatorDTO;
+import com.demo.bait.entity.ClientActivity;
+import com.demo.bait.entity.Ticket;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import com.demo.bait.mapper.classificator.WorkTypeClassificatorMapper;
+import com.demo.bait.repository.ClientActivityRepo;
+import com.demo.bait.repository.TicketRepo;
 import com.demo.bait.repository.classificator.WorkTypeClassificatorRepo;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -30,6 +34,8 @@ public class WorkTypeClassificatorService {
     private WorkTypeClassificatorRepo workTypeClassificatorRepo;
     private WorkTypeClassificatorMapper workTypeClassificatorMapper;
     private EntityManager entityManager;
+    private TicketRepo ticketRepo;
+    private ClientActivityRepo clientActivityRepo;
 
     @Transactional
     public WorkTypeClassificatorDTO addWorkTypeClassificator(WorkTypeClassificatorDTO workTypeClassificatorDTO) {
@@ -57,7 +63,25 @@ public class WorkTypeClassificatorService {
 
     @Transactional
     public ResponseDTO deleteWorkTypeClassificator(Integer workTypeId) {
-        workTypeClassificatorRepo.deleteById(workTypeId);
+        Optional<WorkTypeClassificator> workTypeOpt = workTypeClassificatorRepo.findById(workTypeId);
+        if (workTypeOpt.isEmpty()) {
+            throw new EntityNotFoundException("Work type classificator with id " + workTypeId + " not found");
+        }
+        WorkTypeClassificator workType = workTypeOpt.get();
+
+        List<ClientActivity> clientActivities = clientActivityRepo.findByWorkTypesContaining(workType);
+        for (ClientActivity clientActivity : clientActivities) {
+            clientActivity.getWorkTypes().remove(workType);
+            clientActivityRepo.save(clientActivity);
+        }
+
+        List<Ticket> tickets = ticketRepo.findByWorkTypesContaining(workType);
+        for (Ticket ticket : tickets) {
+            ticket.getWorkTypes().remove(workType);
+            ticketRepo.save(ticket);
+        }
+
+        workTypeClassificatorRepo.delete(workType);
         return new ResponseDTO("Work type deleted successfully");
     }
 

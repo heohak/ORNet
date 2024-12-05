@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/client-activity")
+@RequestMapping("/api/client-activity")
 public class ClientActivityPostController {
 
     public final ClientActivityService clientActivityService;

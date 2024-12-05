@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/activity")
+@RequestMapping("/api/activity")
 public class ActivityDeleteController {
 
     public final ActivityService activityService;

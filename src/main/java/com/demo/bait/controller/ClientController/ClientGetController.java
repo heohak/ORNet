@@ -13,7 +13,7 @@ import java.util.Objects;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/client")
+@RequestMapping("/api/client")
 public class ClientGetController {
 
     public final ClientService clientService;

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/worker")
+@RequestMapping("/api/worker")
 public class ClientWorkerPutController {
 
     public final ClientWorkerService clientWorkerService;

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/bait/worker")
+@RequestMapping("/api/bait/worker")
 public class BaitWorkerDeleteController {
 
     public final BaitWorkerService baitWorkerService;

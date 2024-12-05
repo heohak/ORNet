@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/software")
+@RequestMapping("/api/software")
 public class SoftwarePutController {
 
     public final SoftwareService softwareService;

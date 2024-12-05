@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/linked/device")
+@RequestMapping("/api/linked/device")
 public class LinkedDevicePostController {
 
     public final LinkedDeviceService linkedDeviceService;

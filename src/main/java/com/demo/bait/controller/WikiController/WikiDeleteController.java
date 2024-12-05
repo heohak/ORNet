@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/wiki")
+@RequestMapping("/api/wiki")
 public class WikiDeleteController {
 
     public final WikiService wikiService;

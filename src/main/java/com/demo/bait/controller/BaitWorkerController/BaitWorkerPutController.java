@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/bait/worker")
+@RequestMapping("/api/bait/worker")
 public class BaitWorkerPutController {
 
     public final BaitWorkerService baitWorkerService;

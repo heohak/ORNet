@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/file")
+@RequestMapping("/api/file")
 public class FileUploadPostController {
 
     public final FileUploadService fileUploadService;

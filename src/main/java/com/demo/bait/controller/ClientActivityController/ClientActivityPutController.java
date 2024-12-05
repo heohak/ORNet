@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/client-activity")
+@RequestMapping("/api/client-activity")
 public class ClientActivityPutController {
 
     public final ClientActivityService clientActivityService;

@@ -15,7 +15,7 @@ import java.time.LocalDate;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/report")
+@RequestMapping("/api/report")
 public class ReportController {
 
     private ClientTicketReportService clientTicketReportService;

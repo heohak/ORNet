@@ -1,8 +1,11 @@
 package com.demo.bait.repository;
 
 import com.demo.bait.entity.Activity;
+import com.demo.bait.entity.BaitWorker;
 import com.demo.bait.entity.Device;
 import com.demo.bait.entity.Ticket;
+import com.demo.bait.entity.classificator.TicketStatusClassificator;
+import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -14,8 +17,6 @@ import java.util.List;
 public interface TicketRepo extends JpaRepository<Ticket, Integer>, JpaSpecificationExecutor<Ticket> {
 
     List<Ticket> findByClientId(Integer clientId);
-//    List<Ticket> findByTicketId(Integer mainTicketId);
-    List<Ticket> findByStatusId(Integer statusId);
     Ticket findByActivitiesContaining(Activity activity);
     List<Ticket> findByDevicesContains(Device device);
 
@@ -24,4 +25,9 @@ public interface TicketRepo extends JpaRepository<Ticket, Integer>, JpaSpecifica
             @Param("clientId") Integer clientId,
             @Param("startDateTime") LocalDateTime startDateTime,
             @Param("endDateTime") LocalDateTime endDateTime);
+
+    List<Ticket> findByBaitWorker(BaitWorker baitWorker);
+    List<Ticket> findByStatus(TicketStatusClassificator status);
+    List<Ticket> findByWorkTypesContaining(WorkTypeClassificator workType);
+
 }

@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/maintenance")
+@RequestMapping("/api/maintenance")
 public class MaintenancePutController {
 
     public final MaintenanceService maintenanceService;

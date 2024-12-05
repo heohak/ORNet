@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/wiki")
+@RequestMapping("/api/wiki")
 public class WikiGetController {
 
     public final WikiService wikiService;

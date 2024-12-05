@@ -3,10 +3,12 @@ package com.demo.bait.service.classificator;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.DeviceClassificatorDTO;
 import com.demo.bait.entity.Client;
+import com.demo.bait.entity.Device;
 import com.demo.bait.entity.classificator.DeviceClassificator;
 import com.demo.bait.entity.classificator.TicketStatusClassificator;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import com.demo.bait.mapper.classificator.DeviceClassificatorMapper;
+import com.demo.bait.repository.DeviceRepo;
 import com.demo.bait.repository.classificator.DeviceClassificatorRepo;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -33,6 +35,7 @@ public class DeviceClassificatorService {
     private DeviceClassificatorRepo deviceClassificatorRepo;
     private DeviceClassificatorMapper deviceClassificatorMapper;
     private EntityManager entityManager;
+    private DeviceRepo deviceRepo;
 
     @Transactional
     public DeviceClassificatorDTO addDeviceClassificator(DeviceClassificatorDTO deviceClassificatorDTO) {
@@ -63,7 +66,19 @@ public class DeviceClassificatorService {
 
     @Transactional
     public ResponseDTO deleteDeviceClassificator(Integer deviceClassificatorId) {
-        deviceClassificatorRepo.deleteById(deviceClassificatorId);
+        Optional<DeviceClassificator> classificatorOpt = deviceClassificatorRepo.findById(deviceClassificatorId);
+        if (classificatorOpt.isEmpty()) {
+            throw new EntityNotFoundException("Device classificator with id " + deviceClassificatorId + " not found");
+        }
+        DeviceClassificator classificator = classificatorOpt.get();
+
+        List<Device> associatedDevices = deviceRepo.findByClassificator(classificator);
+        for (Device device : associatedDevices) {
+            device.setClassificator(null);
+            deviceRepo.save(device);
+        }
+
+        deviceClassificatorRepo.delete(classificator);
         return new ResponseDTO("Device classificator deleted successfully");
     }
 

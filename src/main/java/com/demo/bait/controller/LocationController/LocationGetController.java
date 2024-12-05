@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/location")
+@RequestMapping("/api/location")
 public class LocationGetController {
 
     public final LocationService locationService;

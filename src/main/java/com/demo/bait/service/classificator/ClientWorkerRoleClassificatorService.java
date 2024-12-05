@@ -2,9 +2,11 @@ package com.demo.bait.service.classificator;
 
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.ClientWorkerRoleClassificatorDTO;
+import com.demo.bait.entity.ClientWorker;
 import com.demo.bait.entity.classificator.ClientWorkerRoleClassificator;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import com.demo.bait.mapper.classificator.ClientWorkerRoleClassificatorMapper;
+import com.demo.bait.repository.ClientWorkerRepo;
 import com.demo.bait.repository.classificator.ClientWorkerRoleClassificatorRepo;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -29,6 +31,7 @@ public class ClientWorkerRoleClassificatorService {
     private ClientWorkerRoleClassificatorRepo workerRoleClassificatorRepo;
     private ClientWorkerRoleClassificatorMapper workerRoleClassificatorMapper;
     private EntityManager entityManager;
+    private ClientWorkerRepo clientWorkerRepo;
 
     @Transactional
     public ClientWorkerRoleClassificatorDTO addWorkerRoleClassificator(ClientWorkerRoleClassificatorDTO workerRoleClassificatorDTO) {
@@ -55,7 +58,19 @@ public class ClientWorkerRoleClassificatorService {
 
     @Transactional
     public ResponseDTO deleteWorkerRoleClassificator(Integer roleId) {
-        workerRoleClassificatorRepo.deleteById(roleId);
+        Optional<ClientWorkerRoleClassificator> roleClassificatorOpt = workerRoleClassificatorRepo.findById(roleId);
+        if (roleClassificatorOpt.isEmpty()) {
+            throw new EntityNotFoundException("Worker role classificator with id " + roleId + " not found");
+        }
+        ClientWorkerRoleClassificator roleClassificator = roleClassificatorOpt.get();
+
+        List<ClientWorker> associatedWorkers = clientWorkerRepo.findByRolesContaining(roleClassificator);
+        for (ClientWorker worker : associatedWorkers) {
+            worker.getRoles().remove(roleClassificator);
+            clientWorkerRepo.save(worker);
+        }
+
+        workerRoleClassificatorRepo.delete(roleClassificator);
         return new ResponseDTO("Worker role classificator deleted successfully");
     }
 

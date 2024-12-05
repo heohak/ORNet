@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/software")
+@RequestMapping("/api/software")
 public class SoftwareDeleteController {
 
     public final SoftwareService softwareService;
