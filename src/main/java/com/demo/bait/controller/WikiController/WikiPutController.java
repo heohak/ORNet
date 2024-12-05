@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/wiki")
+@RequestMapping("/api/wiki")
 public class WikiPutController {
 
     public final WikiService wikiService;

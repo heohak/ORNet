@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/bait/worker")
+@RequestMapping("/api/bait/worker")
 public class BaitWorkerGetController {
 
     public final BaitWorkerService baitWorkerService;

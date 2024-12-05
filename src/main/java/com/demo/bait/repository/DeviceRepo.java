@@ -1,7 +1,9 @@
 package com.demo.bait.repository;
 
+import com.demo.bait.entity.Comment;
 import com.demo.bait.entity.Device;
 import com.demo.bait.entity.Maintenance;
+import com.demo.bait.entity.classificator.DeviceClassificator;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +22,7 @@ public interface DeviceRepo extends JpaRepository<Device, Integer>, JpaSpecifica
     List<Maintenance> findMaintenancesByDeviceAndDateRange(@Param("deviceId") Integer deviceId,
                                                            @Param("startDate") LocalDate startDate,
                                                            @Param("endDate") LocalDate endDate);
+
+    List<Device> findByClassificator(DeviceClassificator classificator);
+    Device findByCommentsContaining(Comment comment);
 }

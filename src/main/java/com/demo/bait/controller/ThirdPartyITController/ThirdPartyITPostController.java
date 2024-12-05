@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/third-party")
+@RequestMapping("/api/third-party")
 public class ThirdPartyITPostController {
 
     public final ThirdPartyITService thirdPartyITService;

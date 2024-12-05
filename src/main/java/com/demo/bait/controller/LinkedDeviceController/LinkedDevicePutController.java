@@ -12,7 +12,7 @@ import java.util.Map;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/linked/device")
+@RequestMapping("/api/linked/device")
 public class LinkedDevicePutController {
 
     public final LinkedDeviceService linkedDeviceService;

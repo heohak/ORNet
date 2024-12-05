@@ -1,5 +1,6 @@
 package com.demo.bait.repository;
 
+import com.demo.bait.entity.Comment;
 import com.demo.bait.entity.Location;
 import com.demo.bait.entity.Maintenance;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,4 +18,6 @@ public interface LocationRepo extends JpaRepository<Location, Integer>, JpaSpeci
     List<Maintenance> findMaintenancesByLocationAndDateRange(@Param("locationId") Integer locationId,
                                                              @Param("startDate") LocalDate startDate,
                                                              @Param("endDate") LocalDate endDate);
+
+    Location findByCommentsContaining(Comment comment);
 }

@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/software")
+@RequestMapping("/api/software")
 public class SoftwareGetController {
 
     public final SoftwareService softwareService;

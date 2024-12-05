@@ -14,7 +14,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/worker")
+@RequestMapping("/api/worker")
 public class ClientWorkerGetController {
 
     public final ClientWorkerService clientWorkerService;
@@ -56,5 +56,10 @@ public class ClientWorkerGetController {
     @GetMapping("/employer/{workerId}")
     public ClientDTO getWorkerEmployer(@PathVariable Integer workerId) {
         return clientWorkerService.getWorkerEmployer(workerId);
+    }
+
+    @GetMapping("/not-used")
+    public List<ClientWorkerDTO> getNotUsedContacts() {
+        return clientWorkerService.getNotUsedContacts();
     }
 }

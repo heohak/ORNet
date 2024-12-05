@@ -3,8 +3,12 @@ package com.demo.bait.service.classificator;
 
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.TicketStatusClassificatorDTO;
+import com.demo.bait.entity.ClientActivity;
+import com.demo.bait.entity.Ticket;
 import com.demo.bait.entity.classificator.TicketStatusClassificator;
 import com.demo.bait.mapper.classificator.TicketStatusClassificatorMapper;
+import com.demo.bait.repository.ClientActivityRepo;
+import com.demo.bait.repository.TicketRepo;
 import com.demo.bait.repository.classificator.TicketStatusClassificatorRepo;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,6 +36,9 @@ public class TicketStatusClassificatorService {
     private TicketStatusClassificatorRepo ticketStatusClassificatorRepo;
     private TicketStatusClassificatorMapper ticketStatusClassificatorMapper;
     private EntityManager entityManager;
+    private TicketRepo ticketRepo;
+    private ClientActivityRepo clientActivityRepo;
+
 
     @Transactional
     public ResponseDTO addTicketStatus(TicketStatusClassificatorDTO ticketStatusClassificatorDTO) {
@@ -61,7 +68,25 @@ public class TicketStatusClassificatorService {
 
     @Transactional
     public ResponseDTO deleteTicketStatus(Integer statusId) {
-        ticketStatusClassificatorRepo.deleteById(statusId);
+        Optional<TicketStatusClassificator> ticketStatusOpt = ticketStatusClassificatorRepo.findById(statusId);
+        if (ticketStatusOpt.isEmpty()) {
+            throw new EntityNotFoundException("Ticket status classificator with id " + statusId + " not found");
+        }
+        TicketStatusClassificator ticketStatus = ticketStatusOpt.get();
+
+        List<Ticket> tickets = ticketRepo.findByStatus(ticketStatus);
+        for (Ticket ticket : tickets) {
+            ticket.setStatus(null);
+            ticketRepo.save(ticket);
+        }
+
+        List<ClientActivity> clientActivities = clientActivityRepo.findByStatus(ticketStatus);
+        for (ClientActivity clientActivity : clientActivities) {
+            clientActivity.setStatus(null);
+            clientActivityRepo.save(clientActivity);
+        }
+
+        ticketStatusClassificatorRepo.delete(ticketStatus);
         return new ResponseDTO("Ticket status classificator deleted successfully");
     }
 

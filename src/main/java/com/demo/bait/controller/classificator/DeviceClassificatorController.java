@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/device/classificator")
+@RequestMapping("/api/device/classificator")
 public class DeviceClassificatorController {
 
     public final DeviceClassificatorService deviceClassificatorService;

@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/ticket/classificator")
+@RequestMapping("/api/ticket/classificator")
 public class TicketStatusClassificatorController {
 
     public final TicketStatusClassificatorService ticketStatusService;

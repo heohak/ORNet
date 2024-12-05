@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/client-activity")
+@RequestMapping("/api/client-activity")
 public class ClientActivityGetController {
 
     public final ClientActivityFileUploadService clientActivityFileUploadService;

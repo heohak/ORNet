@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/third-party")
+@RequestMapping("/api/third-party")
 public class ThirdPartyITPutController {
 
     public final ThirdPartyITService thirdPartyITService;

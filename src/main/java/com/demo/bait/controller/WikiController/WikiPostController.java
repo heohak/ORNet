@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/wiki")
+@RequestMapping("/api/wiki")
 public class WikiPostController {
 
     public final WikiService wikiService;

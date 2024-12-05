@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/third-party")
+@RequestMapping("/api/third-party")
 public class ThirdPartyITDeleteController {
 
     public final ThirdPartyITService thirdPartyITService;

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/maintenance")
+@RequestMapping("/api/maintenance")
 public class MaintenancePostController {
 
     public final MaintenanceService maintenanceService;
