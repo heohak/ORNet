@@ -252,4 +252,8 @@ public class ClientWorkerService {
         clientWorkerRepo.save(worker);
         return new ResponseDTO("Worker removed from client");
     }
+
+    public List<ClientWorkerDTO> getNotUsedContacts() {
+        return clientWorkerMapper.toDtoList(clientWorkerRepo.findByClientIsNull());
+    }
 }
