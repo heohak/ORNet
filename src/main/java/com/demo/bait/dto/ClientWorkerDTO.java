@@ -34,6 +34,7 @@ public record ClientWorkerDTO(
 
         List<Integer> roleIds,
 
-        Boolean favorite
+        Boolean favorite,
+        String comment
 ) {
 }

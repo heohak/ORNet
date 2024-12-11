@@ -62,6 +62,7 @@ public class ClientWorkerService {
 
         worker.setFavorite(workerDTO.favorite() != null ? workerDTO.favorite() : false);
 
+        worker.setComment(workerDTO.comment());
         clientWorkerRepo.save(worker);
         return new ResponseDTO(worker.getId().toString());
     }
@@ -127,8 +128,15 @@ public class ClientWorkerService {
         updateLocation(worker, clientWorkerDTO);
         updateRoles(worker, clientWorkerDTO);
         updateFavorite(worker, clientWorkerDTO);
+        updateComment(worker, clientWorkerDTO);
         clientWorkerRepo.save(worker);
         return new ResponseDTO("Client worker updated successfully");
+    }
+
+    public void updateComment(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
+        if (clientWorkerDTO.comment() != null) {
+            worker.setComment(clientWorkerDTO.comment());
+        }
     }
 
     public void updateFirstName(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
