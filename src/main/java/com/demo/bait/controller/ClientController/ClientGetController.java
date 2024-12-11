@@ -55,12 +55,12 @@ public class ClientGetController {
     @GetMapping("/search")
     public List<ClientDTO> searchAndFilterClients(
             @RequestParam(value = "q", required = false) String query,
-            @RequestParam(value = "clientType", required = false) String clientType,
+            @RequestParam(value = "clientTypes", required = false) List<String> clientTypes,
             @RequestParam(value = "locationId", required = false) Integer locationId,
             @RequestParam(value = "thirdPartyId", required = false) Integer thirdPartyId,
             @RequestParam(value = "country", required = false) String country,
             @RequestParam(value = "activeCustomer", required = false) Boolean activeCustomer) {
-        return clientSpecificationService.searchAndFilterClients(query, clientType, locationId, thirdPartyId, country,
+        return clientSpecificationService.searchAndFilterClients(query, clientTypes, locationId, thirdPartyId, country,
                 activeCustomer);
     }
 

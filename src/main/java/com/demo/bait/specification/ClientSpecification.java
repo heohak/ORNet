@@ -8,24 +8,38 @@ import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.List;
+
 @AllArgsConstructor
 public class ClientSpecification implements Specification<Client> {
 
 
     private String searchTerm;
 
-    public static Specification<Client> hasClientType(String clientType) {
+    public static Specification<Client> hasClientTypes(List<String> clientTypes) {
         return (root, query, criteriaBuilder) -> {
-            switch (clientType) {
-                case "pathology":
-                    return criteriaBuilder.isTrue(root.get("pathologyClient"));
-                case "surgery":
-                    return criteriaBuilder.isTrue(root.get("surgeryClient"));
-                case "editor":
-                    return criteriaBuilder.isTrue(root.get("editorClient"));
-                default:
-                    return criteriaBuilder.conjunction();
+            Predicate predicate = criteriaBuilder.conjunction();
+
+            for (String clientType : clientTypes) {
+                switch (clientType.toLowerCase()) {
+                    case "pathology" ->
+                            predicate = criteriaBuilder.and(predicate, criteriaBuilder.isTrue(root.get("pathologyClient")));
+                    case "surgery" ->
+                            predicate = criteriaBuilder.and(predicate, criteriaBuilder.isTrue(root.get("surgeryClient")));
+                    case "editor" ->
+                            predicate = criteriaBuilder.and(predicate, criteriaBuilder.isTrue(root.get("editorClient")));
+                    case "other" ->
+                            predicate = criteriaBuilder.and(predicate, criteriaBuilder.isTrue(root.get("otherMedicalDevices")));
+                    case "prospect" ->
+                            predicate = criteriaBuilder.and(predicate, criteriaBuilder.isTrue(root.get("prospect")));
+                    case "agreement" ->
+                            predicate = criteriaBuilder.and(predicate, criteriaBuilder.isTrue(root.get("agreement")));
+                    default -> {
+                    }
+                }
             }
+
+            return predicate;
         };
     }
 
