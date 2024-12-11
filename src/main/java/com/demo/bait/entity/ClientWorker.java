@@ -46,4 +46,6 @@ public class ClientWorker {
     )
     private Set<ClientWorkerRoleClassificator> roles = new HashSet<>();
     private Boolean favorite;
+    @Column(columnDefinition = "TEXT")
+    private String comment;
 }
