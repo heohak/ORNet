@@ -44,179 +44,258 @@ public class DeviceService {
 
     @Transactional
     public ResponseDTO addDevice(DeviceDTO deviceDTO) {
-        Device device = new Device();
+        log.info("Adding a new device: {}", deviceDTO);
+        try {
+            Device device = new Device();
 
-        updateClient(device, deviceDTO);
-        updateLocation(device, deviceDTO);
+            updateClient(device, deviceDTO);
+            updateLocation(device, deviceDTO);
 
-        device.setDeviceName(deviceDTO.deviceName());
-        device.setDepartment(deviceDTO.department());
-        device.setRoom(deviceDTO.room());
-        device.setSerialNumber(deviceDTO.serialNumber());
-        device.setLicenseNumber(deviceDTO.licenseNumber());
-        device.setVersion(deviceDTO.version());
-        device.setVersionUpdateDate(deviceDTO.versionUpdateDate());
+            device.setDeviceName(deviceDTO.deviceName());
+            device.setDepartment(deviceDTO.department());
+            device.setRoom(deviceDTO.room());
+            device.setSerialNumber(deviceDTO.serialNumber());
+            device.setLicenseNumber(deviceDTO.licenseNumber());
+            device.setVersion(deviceDTO.version());
+            device.setVersionUpdateDate(deviceDTO.versionUpdateDate());
 
-        deviceMaintenanceService.updateMaintenances(device, deviceDTO);
+            deviceMaintenanceService.updateMaintenances(device, deviceDTO);
 
-        device.setFirstIPAddress(deviceDTO.firstIPAddress());
-        device.setSecondIPAddress(deviceDTO.secondIPAddress());
-        device.setSubnetMask(deviceDTO.subnetMask());
-        device.setSoftwareKey(deviceDTO.softwareKey());
-        device.setIntroducedDate(deviceDTO.introducedDate());
-        device.setWrittenOffDate(deviceDTO.writtenOffDate());
+            device.setFirstIPAddress(deviceDTO.firstIPAddress());
+            device.setSecondIPAddress(deviceDTO.secondIPAddress());
+            device.setSubnetMask(deviceDTO.subnetMask());
+            device.setSoftwareKey(deviceDTO.softwareKey());
+            device.setIntroducedDate(deviceDTO.introducedDate());
+            device.setWrittenOffDate(deviceDTO.writtenOffDate());
 
-        if (deviceDTO.commentIds() != null) {
-            Set<Comment> comments = commentService.commentIdsToCommentsSet(deviceDTO.commentIds());
-            device.setComments(comments);
+            if (deviceDTO.commentIds() != null) {
+                log.debug("Adding comments with IDs: {}", deviceDTO.commentIds());
+                Set<Comment> comments = commentService.commentIdsToCommentsSet(deviceDTO.commentIds());
+                device.setComments(comments);
+            }
+
+            if (deviceDTO.fileIds() != null) {
+                log.debug("Adding files with IDs: {}", deviceDTO.fileIds());
+                Set<FileUpload> files = fileUploadService.fileIdsToFilesSet(deviceDTO.fileIds());
+                device.setFiles(files);
+            }
+
+            if (deviceDTO.attributes() != null) {
+                log.debug("Setting custom attributes: {}", deviceDTO.attributes());
+                device.setAttributes(deviceDTO.attributes());
+            } else {
+                device.setAttributes(new HashMap<>());
+            }
+
+            updateDeviceClassificator(device, deviceDTO);
+
+            deviceRepo.save(device);
+            log.info("Successfully added device with ID: {}", device.getId());
+            return new ResponseDTO(device.getId().toString());
+        } catch (Exception e) {
+            log.error("Error while adding device: {}", deviceDTO, e);
+            throw e;
         }
-
-        if (deviceDTO.fileIds() != null) {
-            Set<FileUpload> files = fileUploadService.fileIdsToFilesSet(deviceDTO.fileIds());
-            device.setFiles(files);
-        }
-
-        if (deviceDTO.attributes() != null) {
-            device.setAttributes(deviceDTO.attributes());
-        } else {
-            device.setAttributes(new HashMap<>());
-        }
-
-        updateDeviceClassificator(device, deviceDTO);
-
-        deviceRepo.save(device);
-        return new ResponseDTO(device.getId().toString());
     }
 
     @Transactional
     public ResponseDTO addLocationToDevice(Integer deviceId, Integer locationId) {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
-        Optional<Location> locationOpt = locationRepo.findById(locationId);
+        log.info("Adding location with ID: {} to device with ID: {}", locationId, deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            Optional<Location> locationOpt = locationRepo.findById(locationId);
 
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
-        }
-        if (locationOpt.isEmpty()) {
-            throw new EntityNotFoundException("Location with id " + locationId + "not found");
-        }
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
+            if (locationOpt.isEmpty()) {
+                log.warn("Location with ID {} not found.", locationId);
+                throw new EntityNotFoundException("Location with id " + locationId + " not found");
+            }
 
-        Device device = deviceOpt.get();
-        Location location = locationOpt.get();
-        device.setLocation(location);
-        deviceRepo.save(device);
-        return new ResponseDTO("Location added successfully to device");
+            Device device = deviceOpt.get();
+            Location location = locationOpt.get();
+            device.setLocation(location);
+            deviceRepo.save(device);
+
+            log.info("Successfully added location with ID: {} to device with ID: {}", locationId, deviceId);
+            return new ResponseDTO("Location added successfully to device");
+        } catch (Exception e) {
+            log.error("Error while adding location with ID: {} to device with ID: {}", locationId, deviceId, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO addClientToDevice(Integer deviceId, Integer clientId) {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
-        Optional<Client> clientOpt = clientRepo.findById(clientId);
+        log.info("Adding client with ID: {} to device with ID: {}", clientId, deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            Optional<Client> clientOpt = clientRepo.findById(clientId);
 
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
-        }
-        if (clientOpt.isEmpty()) {
-            throw new EntityNotFoundException("Client with id " + clientId + " not found");
-        }
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
+            if (clientOpt.isEmpty()) {
+                log.warn("Client with ID {} not found.", clientId);
+                throw new EntityNotFoundException("Client with id " + clientId + " not found");
+            }
 
-        Device device = deviceOpt.get();
-        Client client = clientOpt.get();
-        device.setClient(client);
-        deviceRepo.save(device);
-        return new ResponseDTO("Client added successfully");
+            Device device = deviceOpt.get();
+            Client client = clientOpt.get();
+            device.setClient(client);
+            deviceRepo.save(device);
+
+            log.info("Successfully added client with ID: {} to device with ID: {}", clientId, deviceId);
+            return new ResponseDTO("Client added successfully");
+        } catch (Exception e) {
+            log.error("Error while adding client with ID: {} to device with ID: {}", clientId, deviceId, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO addClassificatorToDevice(Integer deviceId, Integer classificatorId) {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
-        Optional<DeviceClassificator> deviceClassificatorOpt = deviceClassificatorRepo.findById(classificatorId);
+        log.info("Adding classificator with ID: {} to device with ID: {}", classificatorId, deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            Optional<DeviceClassificator> deviceClassificatorOpt = deviceClassificatorRepo.findById(classificatorId);
 
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
-        }
-        if (deviceClassificatorOpt.isEmpty()) {
-            throw new EntityNotFoundException("Classificator with id " + classificatorId + " not found");
-        }
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
+            if (deviceClassificatorOpt.isEmpty()) {
+                log.warn("Classificator with ID {} not found.", classificatorId);
+                throw new EntityNotFoundException("Classificator with id " + classificatorId + " not found");
+            }
 
-        Device device = deviceOpt.get();
-        DeviceClassificator deviceClassificator = deviceClassificatorOpt.get();
-        device.setClassificator(deviceClassificator);
-        deviceRepo.save(device);
-        return new ResponseDTO("Classificator added successfully");
+            Device device = deviceOpt.get();
+            DeviceClassificator deviceClassificator = deviceClassificatorOpt.get();
+            log.debug("Assigning classificator with ID: {} to device with ID: {}", classificatorId, deviceId);
+            device.setClassificator(deviceClassificator);
+            deviceRepo.save(device);
+
+            log.info("Successfully added classificator with ID: {} to device with ID: {}", classificatorId, deviceId);
+            return new ResponseDTO("Classificator added successfully");
+        } catch (Exception e) {
+            log.error("Error while adding classificator with ID: {} to device with ID: {}", classificatorId, deviceId, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO addWrittenOffDate(Integer deviceId, DeviceDTO deviceDTO, String comment) {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+        log.info("Adding written-off date to device with ID: {}", deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
 
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
+
+            Device device = deviceOpt.get();
+            device.setWrittenOffDate(deviceDTO.writtenOffDate());
+            String commentText = (comment != null ? comment : "") + " (DEVICE WRITTEN-OFF)";
+            log.debug("Adding comment: '{}' to device with ID: {}", commentText, deviceId);
+            deviceCommentService.addCommentToDevice(deviceId, commentText);
+            deviceRepo.save(device);
+
+            log.info("Successfully added written-off date to device with ID: {}", deviceId);
+            return new ResponseDTO("Written off date added successfully");
+        } catch (Exception e) {
+            log.error("Error while adding written-off date to device with ID: {}", deviceId, e);
+            throw e;
         }
-
-        Device device = deviceOpt.get();
-        device.setWrittenOffDate(deviceDTO.writtenOffDate());
-        String commentText = (comment != null ? comment : "") + " (DEVICE WRITTEN-OFF)";
-        deviceCommentService.addCommentToDevice(deviceId, commentText);
-        deviceRepo.save(device);
-        return new ResponseDTO("Written off date added successfully");
     }
 
     @Transactional
     public ResponseDTO reactivateDevice(Integer deviceId, String comment) {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        log.info("Reactivating device with ID: {}", deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
+
+            Device device = deviceOpt.get();
+
+            if (device.getWrittenOffDate() == null) {
+                log.warn("Device with ID {} has not been written off.", deviceId);
+                throw new ApplicationContextException("Device with id " + deviceId + " has not been written off");
+            }
+
+            String commentText = (comment != null ? comment : "") + " (DEVICE REACTIVATED)";
+            log.debug("Adding comment: '{}' to device with ID: {}", commentText, deviceId);
+            deviceCommentService.addCommentToDevice(deviceId, commentText);
+
+            device.setWrittenOffDate(null);
+            deviceRepo.save(device);
+
+            log.info("Successfully reactivated device with ID: {}", deviceId);
+            return new ResponseDTO("Device reactivated");
+        } catch (Exception e) {
+            log.error("Error while reactivating device with ID: {}", deviceId, e);
+            throw e;
         }
-        Device device = deviceOpt.get();
-
-        if (device.getWrittenOffDate() == null) {
-            throw new ApplicationContextException("Device with id " + deviceId + " has not been written off");
-        }
-
-        String commentText = (comment != null ? comment : "") + " (DEVICE REACTIVATED)";
-        deviceCommentService.addCommentToDevice(deviceId, commentText);
-
-        device.setWrittenOffDate(null);
-        deviceRepo.save(device);
-        return new ResponseDTO("Device reactivated");
     }
 
     @Transactional
     public ResponseDTO deleteDevice(Integer deviceId) {
-        deviceRepo.deleteById(deviceId);
-        return new ResponseDTO("Device deleted successfully");
+        log.info("Deleting device with ID: {}", deviceId);
+        try {
+            deviceRepo.deleteById(deviceId);
+            log.info("Successfully deleted device with ID: {}", deviceId);
+            return new ResponseDTO("Device deleted successfully");
+        } catch (Exception e) {
+            log.error("Error while deleting device with ID: {}", deviceId, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO updateDevice(Integer deviceId, DeviceDTO deviceDTO) {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        log.info("Updating device with ID: {}", deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
+
+            Device device = deviceOpt.get();
+
+            updateClient(device, deviceDTO);
+            updateLocation(device, deviceDTO);
+            updateDeviceName(device, deviceDTO);
+            updateDepartment(device, deviceDTO);
+            updateRoom(device, deviceDTO);
+            updateSerialNumber(device, deviceDTO);
+            updateLicenceNumber(device, deviceDTO);
+            updateVersion(device, deviceDTO);
+            updateVersionUpdateDate(device, deviceDTO);
+            deviceMaintenanceService.updateMaintenances(device, deviceDTO);
+            updateFirstIPAddress(device, deviceDTO);
+            updateSecondIPAddress(device, deviceDTO);
+            updateSubnetMask(device, deviceDTO);
+            updateSoftwareKey(device, deviceDTO);
+            updateIntroducedDate(device, deviceDTO);
+            updateWrittenOffDate(device, deviceDTO);
+            deviceAttributeService.updateDeviceAttributes(deviceId, deviceDTO.attributes());
+
+            updateDeviceClassificator(device, deviceDTO);
+
+            deviceRepo.save(device);
+            log.info("Successfully updated device with ID: {}", deviceId);
+            return new ResponseDTO("Device updated successfully");
+        } catch (Exception e) {
+            log.error("Error while updating device with ID: {}", deviceId, e);
+            throw e;
         }
-        Device device = deviceOpt.get();
-
-        updateClient(device, deviceDTO);
-        updateLocation(device, deviceDTO);
-        updateDeviceName(device, deviceDTO);
-        updateDepartment(device, deviceDTO);
-        updateRoom(device, deviceDTO);
-        updateSerialNumber(device, deviceDTO);
-        updateLicenceNumber(device, deviceDTO);
-        updateVersion(device, deviceDTO);
-        updateVersionUpdateDate(device, deviceDTO);
-        deviceMaintenanceService.updateMaintenances(device, deviceDTO);
-        updateFirstIPAddress(device, deviceDTO);
-        updateSecondIPAddress(device, deviceDTO);
-        updateSubnetMask(device, deviceDTO);
-        updateSoftwareKey(device, deviceDTO);
-        updateIntroducedDate(device, deviceDTO);
-        updateWrittenOffDate(device, deviceDTO);
-        deviceAttributeService.updateDeviceAttributes(deviceId, deviceDTO.attributes());
-
-        updateDeviceClassificator(device, deviceDTO);
-
-        deviceRepo.save(device);
-        return new ResponseDTO("Device updated successfully");
     }
 
     public void updateClient(Device device, DeviceDTO deviceDTO) {
@@ -320,53 +399,102 @@ public class DeviceService {
     }
 
     public List<DeviceDTO> getDevicesByClientId(Integer clientId) {
-        return deviceMapper.toDtoList(deviceRepo.findByClientId(clientId));
+        log.info("Fetching devices for client with ID: {}", clientId);
+        try {
+            List<DeviceDTO> devices = deviceMapper.toDtoList(deviceRepo.findByClientId(clientId));
+            log.info("Fetched {} devices for client with ID: {}", devices.size(), clientId);
+            return devices;
+        } catch (Exception e) {
+            log.error("Error while fetching devices for client with ID: {}", clientId, e);
+            throw e;
+        }
     }
 
     public List<DeviceDTO> getAllDevices() {
-        return deviceMapper.toDtoList(deviceRepo.findAll());
+        log.info("Fetching all devices.");
+        try {
+            List<DeviceDTO> devices = deviceMapper.toDtoList(deviceRepo.findAll());
+            log.info("Fetched {} devices.", devices.size());
+            return devices;
+        } catch (Exception e) {
+            log.error("Error while fetching all devices.", e);
+            throw e;
+        }
     }
 
     public DeviceDTO getDeviceById(Integer deviceId) {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        log.info("Fetching device with ID: {}", deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
+            Device device = deviceOpt.get();
+            log.info("Fetched device with ID: {}", deviceId);
+            return deviceMapper.toDto(device);
+        } catch (Exception e) {
+            log.error("Error while fetching device with ID: {}", deviceId, e);
+            throw e;
         }
-        Device device = deviceOpt.get();
-        return deviceMapper.toDto(device);
     }
 
     public List<DeviceDTO> getDeviceHistory(Integer deviceId) {
-        AuditReader auditReader = AuditReaderFactory.get(entityManager);
-        List<Number> revisions = auditReader.getRevisions(Device.class, deviceId);
+        log.info("Fetching history for device with ID: {}", deviceId);
+        try {
+            AuditReader auditReader = AuditReaderFactory.get(entityManager);
+            List<Number> revisions = auditReader.getRevisions(Device.class, deviceId);
 
-        List<Device> history = new ArrayList<>();
-        for (Number rev : revisions) {
-            Device DeviceVersion = auditReader
-                    .find(Device.class, deviceId, rev);
-            history.add(DeviceVersion);
+            List<Device> history = new ArrayList<>();
+            for (Number rev : revisions) {
+                Device deviceVersion = auditReader.find(Device.class, deviceId, rev);
+                history.add(deviceVersion);
+            }
+
+            log.info("Fetched {} revisions for device with ID: {}", history.size(), deviceId);
+            return deviceMapper.toDtoList(history);
+        } catch (Exception e) {
+            log.error("Error while fetching history for device with ID: {}", deviceId, e);
+            throw e;
         }
-
-        return deviceMapper.toDtoList(history);
     }
 
     public List<TicketDTO> getDeviceTickets(Integer deviceId) {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        log.info("Fetching tickets for device with ID: {}", deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
+
+            Device device = deviceOpt.get();
+            List<Ticket> tickets = ticketRepo.findByDevicesContains(device);
+            log.info("Fetched {} tickets for device with ID: {}", tickets.size(), deviceId);
+            return ticketMapper.toDtoList(tickets);
+        } catch (Exception e) {
+            log.error("Error while fetching tickets for device with ID: {}", deviceId, e);
+            throw e;
         }
-        Device device = deviceOpt.get();
-        List<Ticket> tickets = ticketRepo.findByDevicesContains(device);
-        return ticketMapper.toDtoList(tickets);
     }
 
     public Set<Device> deviceIdsToDevicesSet(List<Integer> deviceIds) {
-        Set<Device> devices = new HashSet<>();
-        for (Integer deviceId : deviceIds) {
-            Device device = deviceRepo.findById(deviceId)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid device ID: " + deviceId));
-            devices.add(device);
+        log.info("Converting device IDs to Device set: {}", deviceIds);
+        try {
+            Set<Device> devices = new HashSet<>();
+            for (Integer deviceId : deviceIds) {
+                Device device = deviceRepo.findById(deviceId)
+                        .orElseThrow(() -> {
+                            log.warn("Invalid device ID: {}", deviceId);
+                            return new IllegalArgumentException("Invalid device ID: " + deviceId);
+                        });
+                devices.add(device);
+            }
+            log.info("Converted {} device IDs to Device set.", devices.size());
+            return devices;
+        } catch (Exception e) {
+            log.error("Error while converting device IDs to Device set: {}", deviceIds, e);
+            throw e;
         }
-        return devices;
     }
 }

@@ -41,72 +41,96 @@ public class LinkedDeviceService {
 
     @Transactional
     public ResponseDTO addLinkedDevice(LinkedDeviceDTO linkedDeviceDTO) {
-        LinkedDevice linkedDevice = new LinkedDevice();
-//        if (linkedDeviceDTO.deviceId() != null && deviceRepo.findById(linkedDeviceDTO.deviceId()).isPresent()) {
-//            linkedDevice.setDevice(deviceRepo.getReferenceById(linkedDeviceDTO.deviceId()));
-//        }
-        updateDevice(linkedDevice, linkedDeviceDTO);
+        log.info("Adding a new linked device with details: {}", linkedDeviceDTO);
+        try {
+            LinkedDevice linkedDevice = new LinkedDevice();
+            updateDevice(linkedDevice, linkedDeviceDTO);
 
-        linkedDevice.setName(linkedDeviceDTO.name());
-        linkedDevice.setManufacturer(linkedDeviceDTO.manufacturer());
-        linkedDevice.setProductCode(linkedDeviceDTO.productCode());
-        linkedDevice.setSerialNumber(linkedDeviceDTO.serialNumber());
+            linkedDevice.setName(linkedDeviceDTO.name());
+            linkedDevice.setManufacturer(linkedDeviceDTO.manufacturer());
+            linkedDevice.setProductCode(linkedDeviceDTO.productCode());
+            linkedDevice.setSerialNumber(linkedDeviceDTO.serialNumber());
 
-        if (linkedDeviceDTO.commentIds() != null) {
-            Set<Comment> comments = commentService.commentIdsToCommentsSet(linkedDeviceDTO.commentIds());
-            linkedDevice.setComments(comments);
+            if (linkedDeviceDTO.commentIds() != null) {
+                log.debug("Adding comments to linked device");
+                Set<Comment> comments = commentService.commentIdsToCommentsSet(linkedDeviceDTO.commentIds());
+                linkedDevice.setComments(comments);
+            }
+
+            linkedDevice.setAttributes(linkedDeviceDTO.attributes() != null
+                    ? linkedDeviceDTO.attributes()
+                    : new HashMap<>());
+
+            linkedDeviceRepo.save(linkedDevice);
+            log.info("Linked device added successfully with ID: {}", linkedDevice.getId());
+            return new ResponseDTO(linkedDevice.getId().toString());
+        } catch (Exception e) {
+            log.error("Error while adding a linked device", e);
+            throw e;
         }
-
-        if (linkedDeviceDTO.attributes() != null) {
-            linkedDevice.setAttributes(linkedDeviceDTO.attributes());
-        } else {
-            linkedDevice.setAttributes(new HashMap<>());
-        }
-
-        linkedDeviceRepo.save(linkedDevice);
-        return new ResponseDTO(linkedDevice.getId().toString());
     }
 
     @Transactional
     public ResponseDTO linkDevice(Integer linkedDeviceId, Integer deviceId) {
-        Optional<LinkedDevice> linkedDeviceOpt = linkedDeviceRepo.findById(linkedDeviceId);
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+        log.info("Linking device with ID: {} to linked device with ID: {}", deviceId, linkedDeviceId);
+        try {
+            LinkedDevice linkedDevice = linkedDeviceRepo.findById(linkedDeviceId)
+                    .orElseThrow(() -> {
+                        log.warn("Linked Device with ID {} not found", linkedDeviceId);
+                        return new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
+                    });
+            Device device = deviceRepo.findById(deviceId)
+                    .orElseThrow(() -> {
+                        log.warn("Device with ID {} not found", deviceId);
+                        return new EntityNotFoundException("Device with id " + deviceId + " not found");
+                    });
 
-        if (linkedDeviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
+            linkedDevice.setDevice(device);
+            linkedDeviceRepo.save(linkedDevice);
+            log.info("Device linked successfully to linked device ID: {}", linkedDeviceId);
+            return new ResponseDTO("Device linked successfully");
+        } catch (Exception e) {
+            log.error("Error while linking device to linked device", e);
+            throw e;
         }
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
-        }
-
-        LinkedDevice linkedDevice = linkedDeviceOpt.get();
-        Device device = deviceOpt.get();
-        linkedDevice.setDevice(device);
-        linkedDeviceRepo.save(linkedDevice);
-        return new ResponseDTO("Device linked successfully");
     }
 
     @Transactional
     public ResponseDTO deleteLinkedDevice(Integer linkedDeviceId) {
-        linkedDeviceRepo.deleteById(linkedDeviceId);
-        return new ResponseDTO("Linked Device deleted");
+        log.info("Deleting linked device with ID: {}", linkedDeviceId);
+        try {
+            linkedDeviceRepo.deleteById(linkedDeviceId);
+            log.info("Linked device with ID: {} deleted successfully", linkedDeviceId);
+            return new ResponseDTO("Linked Device deleted");
+        } catch (Exception e) {
+            log.error("Error while deleting linked device with ID: {}", linkedDeviceId, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO updateLinkedDevice(Integer linkedDeviceId, LinkedDeviceDTO linkedDeviceDTO) {
-        Optional<LinkedDevice> linkedDeviceOpt = linkedDeviceRepo.findById(linkedDeviceId);
-        if (linkedDeviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
-        }
-        LinkedDevice linkedDevice = linkedDeviceOpt.get();
+        log.info("Updating linked device with ID: {}", linkedDeviceId);
+        try {
+            LinkedDevice linkedDevice = linkedDeviceRepo.findById(linkedDeviceId)
+                    .orElseThrow(() -> {
+                        log.warn("Linked Device with ID {} not found", linkedDeviceId);
+                        return new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
+                    });
 
-        updateDevice(linkedDevice, linkedDeviceDTO);
-        updateName(linkedDevice, linkedDeviceDTO);
-        updateManufacturer(linkedDevice, linkedDeviceDTO);
-        updateProductCode(linkedDevice, linkedDeviceDTO);
-        updateSerialNumber(linkedDevice, linkedDeviceDTO);
-        linkedDeviceRepo.save(linkedDevice);
-        return new ResponseDTO("Linked Device updated successfully");
+            updateDevice(linkedDevice, linkedDeviceDTO);
+            updateName(linkedDevice, linkedDeviceDTO);
+            updateManufacturer(linkedDevice, linkedDeviceDTO);
+            updateProductCode(linkedDevice, linkedDeviceDTO);
+            updateSerialNumber(linkedDevice, linkedDeviceDTO);
+
+            linkedDeviceRepo.save(linkedDevice);
+            log.info("Linked device with ID: {} updated successfully", linkedDeviceId);
+            return new ResponseDTO("Linked Device updated successfully");
+        } catch (Exception e) {
+            log.error("Error while updating linked device with ID: {}", linkedDeviceId, e);
+            throw e;
+        }
     }
 
     public void updateDevice(LinkedDevice linkedDevice, LinkedDeviceDTO linkedDeviceDTO) {
@@ -141,48 +165,75 @@ public class LinkedDeviceService {
     }
 
     public List<LinkedDeviceDTO> getNotUsedLinkedDevices() {
-        return linkedDeviceMapper.toDtoList(linkedDeviceRepo.findByDeviceId(null));
+        log.info("Fetching all linked devices not associated with any device");
+        List<LinkedDeviceDTO> devices = linkedDeviceMapper.toDtoList(linkedDeviceRepo.findByDeviceId(null));
+        log.info("Fetched {} linked devices not associated with any device", devices.size());
+        return devices;
     }
 
     public List<LinkedDeviceDTO> getAllLinkedDevices() {
-        return linkedDeviceMapper.toDtoList(linkedDeviceRepo.findAll());
+        log.info("Fetching all linked devices");
+        List<LinkedDeviceDTO> devices = linkedDeviceMapper.toDtoList(linkedDeviceRepo.findAll());
+        log.info("Fetched {} linked devices", devices.size());
+        return devices;
     }
 
     public List<LinkedDeviceDTO> getLinkedDevicesByDeviceId(Integer deviceId) {
-        return linkedDeviceMapper.toDtoList(linkedDeviceRepo.findByDeviceId(deviceId));
+        log.info("Fetching linked devices for device ID: {}", deviceId);
+        List<LinkedDeviceDTO> devices = linkedDeviceMapper.toDtoList(linkedDeviceRepo.findByDeviceId(deviceId));
+        log.info("Fetched {} linked devices for device ID: {}", devices.size(), deviceId);
+        return devices;
     }
 
     public List<LinkedDeviceDTO> getLinkedDeviceHistory(Integer linkedDeviceId) {
-        AuditReader auditReader = AuditReaderFactory.get(entityManager);
-        List<Number> revisions = auditReader.getRevisions(LinkedDevice.class, linkedDeviceId);
+        log.info("Fetching history for linked device ID: {}", linkedDeviceId);
+        try {
+            AuditReader auditReader = AuditReaderFactory.get(entityManager);
+            List<Number> revisions = auditReader.getRevisions(LinkedDevice.class, linkedDeviceId);
 
-        List<LinkedDevice> history = new ArrayList<>();
-        for (Number rev : revisions) {
-            LinkedDevice LinkedDeviceVersion = auditReader
-                    .find(LinkedDevice.class, linkedDeviceId, rev);
-            history.add(LinkedDeviceVersion);
+            List<LinkedDevice> history = new ArrayList<>();
+            for (Number rev : revisions) {
+                LinkedDevice version = auditReader.find(LinkedDevice.class, linkedDeviceId, rev);
+                history.add(version);
+            }
+
+            log.info("Fetched history with {} versions for linked device ID: {}", history.size(), linkedDeviceId);
+            return linkedDeviceMapper.toDtoList(history);
+        } catch (Exception e) {
+            log.error("Error while fetching history for linked device ID: {}", linkedDeviceId, e);
+            throw e;
         }
-        return linkedDeviceMapper.toDtoList(history);
     }
 
     public DeviceDTO getLinkedDeviceDevice(Integer linkedDeviceId) {
-        Optional<LinkedDevice> linkedDeviceOpt = linkedDeviceRepo.findById(linkedDeviceId);
-        if (linkedDeviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
-        }
-        LinkedDevice linkedDevice = linkedDeviceOpt.get();
-        return deviceMapper.toDto(linkedDevice.getDevice());
+        log.info("Fetching associated device for linked device ID: {}", linkedDeviceId);
+        LinkedDevice linkedDevice = linkedDeviceRepo.findById(linkedDeviceId)
+                .orElseThrow(() -> {
+                    log.warn("Linked Device with ID {} not found", linkedDeviceId);
+                    return new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
+                });
+        DeviceDTO device = deviceMapper.toDto(linkedDevice.getDevice());
+        log.info("Fetched associated device for linked device ID: {}", linkedDeviceId);
+        return device;
     }
 
     @Transactional
     public ResponseDTO removeDeviceFromLinkedDevice(Integer linkedDeviceId) {
-        Optional<LinkedDevice> linkedDeviceOpt = linkedDeviceRepo.findById(linkedDeviceId);
-        if (linkedDeviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
+        log.info("Removing device association from linked device ID: {}", linkedDeviceId);
+        try {
+            LinkedDevice linkedDevice = linkedDeviceRepo.findById(linkedDeviceId)
+                    .orElseThrow(() -> {
+                        log.warn("Linked Device with ID {} not found", linkedDeviceId);
+                        return new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
+                    });
+
+            linkedDevice.setDevice(null);
+            linkedDeviceRepo.save(linkedDevice);
+            log.info("Device association removed successfully from linked device ID: {}", linkedDeviceId);
+            return new ResponseDTO("Device removed from linked device successfully");
+        } catch (Exception e) {
+            log.error("Error while removing device association from linked device ID: {}", linkedDeviceId, e);
+            throw e;
         }
-        LinkedDevice linkedDevice = linkedDeviceOpt.get();
-        linkedDevice.setDevice(null);
-        linkedDeviceRepo.save(linkedDevice);
-        return new ResponseDTO("Device removed from linked device successfully");
     }
 }

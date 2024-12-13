@@ -21,12 +21,17 @@ public class WikiSpecificationService {
     private WikiMapper wikiMapper;
 
     public List<WikiDTO> searchWiki(String searchTerm) {
+        log.info("Searching for wiki entries with search term: '{}'", searchTerm);
         Specification<Wiki> combinedSpec = Specification.where(null);
 
         if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+            log.debug("Creating search specification for term: '{}'", searchTerm);
             Specification<Wiki> searchSpec = new WikiSpecification(searchTerm);
             combinedSpec = combinedSpec.and(searchSpec);
         }
-        return wikiMapper.toDtoList(wikiRepo.findAll(combinedSpec));
+
+        List<WikiDTO> wikis = wikiMapper.toDtoList(wikiRepo.findAll(combinedSpec));
+        log.info("Search completed. Found {} wiki entries matching the search term: '{}'", wikis.size(), searchTerm);
+        return wikis;
     }
 }

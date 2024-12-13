@@ -31,24 +31,37 @@ public class TicketFileUploadService {
 
     @Transactional
     public ResponseDTO uploadFilesToTicket(Integer ticketId, List<MultipartFile> files) throws IOException {
-        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+        log.info("Starting file upload to ticket with ID: {}", ticketId);
 
+        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         if (ticketOpt.isEmpty()) {
+            log.error("Ticket with ID: {} not found", ticketId);
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
+
         Ticket ticket = ticketOpt.get();
+        log.debug("Uploading {} files to ticket with ID: {}", files.size(), ticketId);
         Set<FileUpload> uploadedFiles = fileUploadService.uploadFiles(files);
+
         ticket.getFiles().addAll(uploadedFiles);
         ticketRepo.save(ticket);
+
+        log.info("Files uploaded successfully to ticket with ID: {}. Total files uploaded: {}", ticketId, uploadedFiles.size());
         return new ResponseDTO("Files uploaded successfully to ticket");
     }
 
     public List<FileUploadDTO> getTicketFiles(Integer ticketId) {
+        log.info("Fetching files for ticket with ID: {}", ticketId);
+
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         if (ticketOpt.isEmpty()) {
+            log.error("Ticket with ID: {} not found", ticketId);
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
+
         Ticket ticket = ticketOpt.get();
-        return fileUploadMapper.toDtoList(ticket.getFiles().stream().toList());
+        List<FileUploadDTO> files = fileUploadMapper.toDtoList(ticket.getFiles().stream().toList());
+        log.info("Found {} files for ticket with ID: {}", files.size(), ticketId);
+        return files;
     }
 }

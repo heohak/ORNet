@@ -23,39 +23,58 @@ public class ClientWorkerSpecificationService {
 
     public List<ClientWorkerDTO> searchAndFilterClientWorkers(String searchTerm, Integer roleId, Integer clientId,
                                                               Boolean favorite, Integer locationId, String country) {
-        Specification<ClientWorker> combinedSpec = Specification.where(null);
+        log.info("Starting search and filter for Client Workers with parameters - " +
+                        "searchTerm: {}, roleId: {}, clientId: {}, favorite: {}, locationId: {}, country: {}",
+                searchTerm, roleId, clientId, favorite, locationId, country);
 
-        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-            Specification<ClientWorker> searchSpec = new ClientWorkerSpecification(searchTerm);
-            combinedSpec = combinedSpec.and(searchSpec);
+        try {
+            Specification<ClientWorker> combinedSpec = Specification.where(null);
+
+            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+                log.debug("Adding search term filter: {}", searchTerm);
+                Specification<ClientWorker> searchSpec = new ClientWorkerSpecification(searchTerm);
+                combinedSpec = combinedSpec.and(searchSpec);
+            }
+
+            if (roleId != null) {
+                log.debug("Adding role filter with roleId: {}", roleId);
+                Specification<ClientWorker> roleSpec = ClientWorkerSpecification.hasRoleId(roleId);
+                combinedSpec = combinedSpec.and(roleSpec);
+            }
+
+            if (clientId != null) {
+                log.debug("Adding client filter with clientId: {}", clientId);
+                Specification<ClientWorker> clientSpec = ClientWorkerSpecification.hasClientId(clientId);
+                combinedSpec = combinedSpec.and(clientSpec);
+            }
+
+            if (favorite != null) {
+                log.debug("Adding favorite filter with value: {}", favorite);
+                Specification<ClientWorker> favoriteSpec = ClientWorkerSpecification.isFavorite();
+                combinedSpec = combinedSpec.and(favoriteSpec);
+            }
+
+            if (locationId != null) {
+                log.debug("Adding location filter with locationId: {}", locationId);
+                Specification<ClientWorker> locationSpec = ClientWorkerSpecification.hasLocationId(locationId);
+                combinedSpec = combinedSpec.and(locationSpec);
+            }
+
+            if (country != null) {
+                log.debug("Adding country filter: {}", country);
+                Specification<ClientWorker> countrySpec = ClientWorkerSpecification.hasLocationCountry(country);
+                combinedSpec = combinedSpec.and(countrySpec);
+            }
+
+            List<ClientWorkerDTO> result = clientWorkerMapper.toDtoList(
+                    clientWorkerRepo.findAll(combinedSpec, Sort.by(Sort.Direction.DESC, "favorite"))
+            );
+
+            log.info("Found {} Client Workers matching the criteria.", result.size());
+            return result;
+        } catch (Exception e) {
+            log.error("Error occurred while searching and filtering Client Workers.", e);
+            throw e;
         }
-
-        if (roleId != null) {
-            Specification<ClientWorker> roleSpec = ClientWorkerSpecification.hasRoleId(roleId);
-            combinedSpec = combinedSpec.and(roleSpec);
-        }
-
-        if (clientId != null) {
-            Specification<ClientWorker> clientSpec = ClientWorkerSpecification.hasClientId(clientId);
-            combinedSpec = combinedSpec.and(clientSpec);
-        }
-
-        if (favorite != null) {
-            Specification<ClientWorker> favoriteSpec = ClientWorkerSpecification.isFavorite();
-            combinedSpec = combinedSpec.and(favoriteSpec);
-        }
-
-        if (locationId != null) {
-            Specification<ClientWorker> locationSpec = ClientWorkerSpecification.hasLocationId(locationId);
-            combinedSpec = combinedSpec.and(locationSpec);
-        }
-
-        if (country != null) {
-            Specification<ClientWorker> countrySpec = ClientWorkerSpecification.hasLocationCountry(country);
-            combinedSpec = combinedSpec.and(countrySpec);
-        }
-
-        return clientWorkerMapper.toDtoList(clientWorkerRepo.findAll(combinedSpec,
-                Sort.by(Sort.Direction.DESC, "favorite")));
     }
 }

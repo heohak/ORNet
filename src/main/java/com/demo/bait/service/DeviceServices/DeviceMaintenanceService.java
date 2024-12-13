@@ -31,38 +31,67 @@ public class DeviceMaintenanceService {
 
     @Transactional
     public ResponseDTO addMaintenanceToDevice(Integer deviceId, Integer maintenanceId) {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
-        Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
+        log.info("Adding maintenance with ID: {} to device with ID: {}", maintenanceId, deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
 
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
-        }
-        if (maintenanceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found");
-        }
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
+            if (maintenanceOpt.isEmpty()) {
+                log.warn("Maintenance with ID {} not found.", maintenanceId);
+                throw new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found");
+            }
 
-        Device device = deviceOpt.get();
-        Maintenance maintenance = maintenanceOpt.get();
-        device.getMaintenances().add(maintenance);
-        deviceRepo.save(device);
-        return new ResponseDTO("Maintenance added successfully to device");
+            Device device = deviceOpt.get();
+            Maintenance maintenance = maintenanceOpt.get();
+            log.debug("Adding maintenance with ID: {} to device with ID: {}", maintenanceId, deviceId);
+            device.getMaintenances().add(maintenance);
+            deviceRepo.save(device);
+
+            log.info("Successfully added maintenance with ID: {} to device with ID: {}", maintenanceId, deviceId);
+            return new ResponseDTO("Maintenance added successfully to device");
+        } catch (Exception e) {
+            log.error("Error while adding maintenance with ID: {} to device with ID: {}", maintenanceId, deviceId, e);
+            throw e;
+        }
     }
 
     public List<MaintenanceDTO> getDeviceMaintenances(Integer deviceId) {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
-        }
+        log.info("Fetching maintenances for device with ID: {}", deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
 
-        Device device = deviceOpt.get();
-        return maintenanceMapper.toDtoList(device.getMaintenances().stream().toList());
+            Device device = deviceOpt.get();
+            List<MaintenanceDTO> maintenances = maintenanceMapper.toDtoList(device.getMaintenances().stream().toList());
+            log.info("Fetched {} maintenances for device with ID: {}", maintenances.size(), deviceId);
+            return maintenances;
+        } catch (Exception e) {
+            log.error("Error while fetching maintenances for device with ID: {}", deviceId, e);
+            throw e;
+        }
     }
 
     public void updateMaintenances(Device device, DeviceDTO deviceDTO) {
-        if (deviceDTO.maintenanceIds() != null) {
-            Set<Maintenance> maintenances = maintenanceService
-                    .maintenanceIdsToMaintenancesSet(deviceDTO.maintenanceIds());
-            device.setMaintenances(maintenances);
+        log.info("Updating maintenances for device with ID: {}", device.getId());
+        try {
+            if (deviceDTO.maintenanceIds() != null) {
+                log.debug("Updating maintenances with IDs: {} for device with ID: {}", deviceDTO.maintenanceIds(), device.getId());
+                Set<Maintenance> maintenances = maintenanceService.maintenanceIdsToMaintenancesSet(deviceDTO.maintenanceIds());
+                device.setMaintenances(maintenances);
+                log.info("Successfully updated maintenances for device with ID: {}", device.getId());
+            } else {
+                log.debug("No maintenances provided to update for device with ID: {}", device.getId());
+            }
+        } catch (Exception e) {
+            log.error("Error while updating maintenances for device with ID: {}", device.getId(), e);
+            throw e;
         }
     }
 }

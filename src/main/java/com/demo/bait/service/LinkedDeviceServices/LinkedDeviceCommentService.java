@@ -29,27 +29,52 @@ public class LinkedDeviceCommentService {
 
     @Transactional
     public ResponseDTO addCommentToLinkedDevice(Integer linkedDeviceId, String newComment) {
-        Optional<LinkedDevice> linkedDeviceOpt = linkedDeviceRepo.findById(linkedDeviceId);
-        if (linkedDeviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
+        log.info("Adding comment to linked device with ID: {}", linkedDeviceId);
+        try {
+            Optional<LinkedDevice> linkedDeviceOpt = linkedDeviceRepo.findById(linkedDeviceId);
+            if (linkedDeviceOpt.isEmpty()) {
+                log.warn("Linked Device with ID {} not found", linkedDeviceId);
+                throw new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
+            }
+
+            LinkedDevice linkedDevice = linkedDeviceOpt.get();
+            log.debug("Current comments for linked device ID {}: {}", linkedDeviceId, linkedDevice.getComments());
+
+            Comment comment = commentService.addComment(newComment);
+            linkedDevice.getComments().add(comment);
+            linkedDeviceRepo.save(linkedDevice);
+
+            log.info("Comment added successfully to linked device with ID: {}", linkedDeviceId);
+            return new ResponseDTO("Comment added successfully");
+        } catch (Exception e) {
+            log.error("Error while adding comment to linked device with ID: {}", linkedDeviceId, e);
+            throw e;
         }
-        LinkedDevice linkedDevice = linkedDeviceOpt.get();
-        Comment comment = commentService.addComment(newComment);
-        linkedDevice.getComments().add(comment);
-        linkedDeviceRepo.save(linkedDevice);
-        return new ResponseDTO("Comment added successfully");
     }
 
     public List<CommentDTO> getLinkedDeviceComments(Integer linkedDeviceId) {
-        Optional<LinkedDevice> linkedDeviceOpt = linkedDeviceRepo.findById(linkedDeviceId);
-        if (linkedDeviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
+        log.info("Fetching comments for linked device with ID: {}", linkedDeviceId);
+        try {
+            Optional<LinkedDevice> linkedDeviceOpt = linkedDeviceRepo.findById(linkedDeviceId);
+            if (linkedDeviceOpt.isEmpty()) {
+                log.warn("Linked Device with ID {} not found", linkedDeviceId);
+                throw new EntityNotFoundException("Linked Device with id " + linkedDeviceId + " not found");
+            }
+
+            LinkedDevice linkedDevice = linkedDeviceOpt.get();
+            log.debug("Fetched comments for linked device ID {}: {}", linkedDeviceId, linkedDevice.getComments());
+
+            List<CommentDTO> comments = commentMapper.toDtoList(
+                    linkedDevice.getComments()
+                            .stream()
+                            .sorted(Comparator.comparing(Comment::getTimestamp).reversed())
+                            .toList());
+
+            log.info("Successfully fetched {} comments for linked device ID: {}", comments.size(), linkedDeviceId);
+            return comments;
+        } catch (Exception e) {
+            log.error("Error while fetching comments for linked device with ID: {}", linkedDeviceId, e);
+            throw e;
         }
-        LinkedDevice linkedDevice = linkedDeviceOpt.get();
-        return commentMapper.toDtoList(
-                linkedDevice.getComments()
-                        .stream()
-                        .sorted(Comparator.comparing(Comment::getTimestamp).reversed())
-                        .toList());
     }
 }

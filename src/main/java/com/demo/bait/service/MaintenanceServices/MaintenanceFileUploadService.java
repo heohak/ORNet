@@ -30,23 +30,45 @@ public class MaintenanceFileUploadService {
 
     @Transactional
     public ResponseDTO uploadFilesToMaintenance(Integer maintenanceId, List<MultipartFile> files) throws IOException {
-        Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
-        if (maintenanceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found");
+        log.info("Uploading files to maintenance with ID: {}", maintenanceId);
+        try {
+            Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
+            if (maintenanceOpt.isEmpty()) {
+                log.warn("Maintenance with ID {} not found", maintenanceId);
+                throw new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found");
+            }
+
+            Maintenance maintenance = maintenanceOpt.get();
+            log.debug("Found maintenance with ID: {}", maintenanceId);
+
+            Set<FileUpload> uploadedFiles = fileUploadService.uploadFiles(files);
+            maintenance.getFiles().addAll(uploadedFiles);
+            maintenanceRepo.save(maintenance);
+
+            log.info("Successfully uploaded {} files to maintenance with ID: {}", uploadedFiles.size(), maintenanceId);
+            return new ResponseDTO("Files uploaded successfully to maintenance");
+        } catch (Exception e) {
+            log.error("Error while uploading files to maintenance with ID: {}", maintenanceId, e);
+            throw e;
         }
-        Maintenance maintenance = maintenanceOpt.get();
-        Set<FileUpload> uploadedFiles = fileUploadService.uploadFiles(files);
-        maintenance.getFiles().addAll(uploadedFiles);
-        maintenanceRepo.save(maintenance);
-        return new ResponseDTO("Files uploaded successfully to maintenance");
     }
 
     public List<FileUploadDTO> getMaintenanceFiles(Integer maintenanceId) {
-        Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
-        if (maintenanceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found");
+        log.info("Fetching files for maintenance with ID: {}", maintenanceId);
+        try {
+            Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
+            if (maintenanceOpt.isEmpty()) {
+                log.warn("Maintenance with ID {} not found", maintenanceId);
+                throw new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found");
+            }
+
+            Maintenance maintenance = maintenanceOpt.get();
+            List<FileUploadDTO> files = fileUploadMapper.toDtoList(maintenance.getFiles().stream().toList());
+            log.info("Fetched {} files for maintenance with ID: {}", files.size(), maintenanceId);
+            return files;
+        } catch (Exception e) {
+            log.error("Error while fetching files for maintenance with ID: {}", maintenanceId, e);
+            throw e;
         }
-        Maintenance maintenance = maintenanceOpt.get();
-        return fileUploadMapper.toDtoList(maintenance.getFiles().stream().toList());
     }
 }

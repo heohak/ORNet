@@ -26,17 +26,29 @@ public class ClientActivitySpecificationService {
     private ClientActivityRepo clientActivityRepo;
 
     public List<ClientActivityDTO> searchAndFilterClientActivities(Integer statusId, Integer clientId) {
-        Specification<ClientActivity> combinedSpec = Specification.where(null);
+        log.info("Searching and filtering Client Activities with parameters - statusId: {}, clientId: {}", statusId, clientId);
 
-        if (statusId != null) {
-            Specification<ClientActivity> statusSpec = ClientActivitySpecification.hasStatusId(statusId);
-            combinedSpec = combinedSpec.and(statusSpec);
-        }
+        try {
+            Specification<ClientActivity> combinedSpec = Specification.where(null);
 
-        if (clientId != null) {
-            Specification<ClientActivity> clientSpec = ClientActivitySpecification.hasClientId(clientId);
-            combinedSpec = combinedSpec.and(clientSpec);
+            if (statusId != null) {
+                log.debug("Adding filter for statusId: {}", statusId);
+                Specification<ClientActivity> statusSpec = ClientActivitySpecification.hasStatusId(statusId);
+                combinedSpec = combinedSpec.and(statusSpec);
+            }
+
+            if (clientId != null) {
+                log.debug("Adding filter for clientId: {}", clientId);
+                Specification<ClientActivity> clientSpec = ClientActivitySpecification.hasClientId(clientId);
+                combinedSpec = combinedSpec.and(clientSpec);
+            }
+
+            List<ClientActivityDTO> result = clientActivityMapper.toDtoList(clientActivityRepo.findAll(combinedSpec));
+            log.info("Found {} Client Activities matching the criteria", result.size());
+            return result;
+        } catch (Exception e) {
+            log.error("Error while searching and filtering Client Activities", e);
+            throw e;
         }
-        return clientActivityMapper.toDtoList(clientActivityRepo.findAll(combinedSpec));
     }
 }

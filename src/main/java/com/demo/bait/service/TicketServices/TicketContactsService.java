@@ -31,19 +31,28 @@ public class TicketContactsService {
 
     @Transactional
     public void addContactsToTicket(Ticket ticket, TicketDTO ticketDTO) {
+        log.info("Adding contacts to ticket with ID: {}", ticket.getId());
         if (ticketDTO.contactIds() != null) {
+            log.debug("Contact IDs provided: {}", ticketDTO.contactIds());
             Set<ClientWorker> contacts = clientWorkerService.contactIdsToClientWorkersSet(ticketDTO.contactIds());
             ticket.setContacts(contacts);
             ticketRepo.save(ticket);
+            log.info("Contacts successfully added to ticket with ID: {}", ticket.getId());
+        } else {
+            log.warn("No contact IDs provided for ticket with ID: {}", ticket.getId());
         }
     }
 
     public List<ClientWorkerDTO> getTicketContacts(Integer ticketId) {
+        log.info("Fetching contacts for ticket with ID: {}", ticketId);
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         if (ticketOpt.isEmpty()) {
+            log.error("Ticket with ID: {} not found", ticketId);
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
         Ticket ticket = ticketOpt.get();
-        return clientWorkerMapper.toDtoList(ticket.getContacts().stream().toList());
+        List<ClientWorkerDTO> contacts = clientWorkerMapper.toDtoList(ticket.getContacts().stream().toList());
+        log.info("Found {} contacts for ticket with ID: {}", contacts.size(), ticketId);
+        return contacts;
     }
 }

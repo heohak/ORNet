@@ -42,101 +42,160 @@ public class TicketStatusClassificatorService {
 
     @Transactional
     public ResponseDTO addTicketStatus(TicketStatusClassificatorDTO ticketStatusClassificatorDTO) {
-        TicketStatusClassificator ticketStatus = new TicketStatusClassificator();
-        ticketStatus.setStatus(ticketStatusClassificatorDTO.status());
-        ticketStatus.setColor(ticketStatusClassificatorDTO.color());
-        ticketStatusClassificatorRepo.save(ticketStatus);
-        return new ResponseDTO("Ticket status classificator added successfully");
+        log.info("Adding new Ticket Status Classificator: {}", ticketStatusClassificatorDTO);
+        try {
+            TicketStatusClassificator ticketStatus = new TicketStatusClassificator();
+            ticketStatus.setStatus(ticketStatusClassificatorDTO.status());
+            ticketStatus.setColor(ticketStatusClassificatorDTO.color());
+            ticketStatusClassificatorRepo.save(ticketStatus);
+            log.info("Successfully added Ticket Status Classificator: {}", ticketStatus);
+            return new ResponseDTO("Ticket status classificator added successfully");
+        } catch (Exception e) {
+            log.error("Error while adding Ticket Status Classificator: {}", ticketStatusClassificatorDTO, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO updateTicketStatus(Integer statusId, TicketStatusClassificatorDTO statusDTO) {
-        Optional<TicketStatusClassificator> ticketStatusOpt = ticketStatusClassificatorRepo.findById(statusId);
-        if (ticketStatusOpt.isEmpty()) {
-            throw new EntityNotFoundException("Ticket status classificator with id " + statusId + " not found");
+        log.info("Updating Ticket Status Classificator with ID: {}", statusId);
+        try {
+            Optional<TicketStatusClassificator> ticketStatusOpt = ticketStatusClassificatorRepo.findById(statusId);
+            if (ticketStatusOpt.isEmpty()) {
+                log.warn("Ticket Status Classificator with ID {} not found", statusId);
+                throw new EntityNotFoundException("Ticket status classificator with id " + statusId + " not found");
+            }
+            TicketStatusClassificator ticketStatus = ticketStatusOpt.get();
+            if (statusDTO.status() != null) {
+                ticketStatus.setStatus(statusDTO.status());
+            }
+            if (statusDTO.color() != null) {
+                ticketStatus.setColor(statusDTO.color());
+            }
+            ticketStatusClassificatorRepo.save(ticketStatus);
+            log.info("Successfully updated Ticket Status Classificator with ID: {}", statusId);
+            return new ResponseDTO("Ticket status classificator updated successfully");
+        } catch (Exception e) {
+            log.error("Error while updating Ticket Status Classificator with ID: {}", statusId, e);
+            throw e;
         }
-        TicketStatusClassificator ticketStatus = ticketStatusOpt.get();
-        if (statusDTO.status() != null) {
-            ticketStatus.setStatus(statusDTO.status());
-        }
-        if (statusDTO.color() != null) {
-            ticketStatus.setColor(statusDTO.color());
-        }
-        ticketStatusClassificatorRepo.save(ticketStatus);
-        return new ResponseDTO("Ticket status classificator updated successfully");
     }
 
     @Transactional
     public ResponseDTO deleteTicketStatus(Integer statusId) {
-        Optional<TicketStatusClassificator> ticketStatusOpt = ticketStatusClassificatorRepo.findById(statusId);
-        if (ticketStatusOpt.isEmpty()) {
-            throw new EntityNotFoundException("Ticket status classificator with id " + statusId + " not found");
-        }
-        TicketStatusClassificator ticketStatus = ticketStatusOpt.get();
+        log.info("Deleting Ticket Status Classificator with ID: {}", statusId);
+        try {
+            Optional<TicketStatusClassificator> ticketStatusOpt = ticketStatusClassificatorRepo.findById(statusId);
+            if (ticketStatusOpt.isEmpty()) {
+                log.warn("Ticket Status Classificator with ID {} not found", statusId);
+                throw new EntityNotFoundException("Ticket status classificator with id " + statusId + " not found");
+            }
+            TicketStatusClassificator ticketStatus = ticketStatusOpt.get();
 
-        List<Ticket> tickets = ticketRepo.findByStatus(ticketStatus);
-        for (Ticket ticket : tickets) {
-            ticket.setStatus(null);
-            ticketRepo.save(ticket);
-        }
+            log.debug("Unlinking associated Tickets for Status ID: {}", statusId);
+            List<Ticket> tickets = ticketRepo.findByStatus(ticketStatus);
+            for (Ticket ticket : tickets) {
+                ticket.setStatus(null);
+                ticketRepo.save(ticket);
+            }
 
-        List<ClientActivity> clientActivities = clientActivityRepo.findByStatus(ticketStatus);
-        for (ClientActivity clientActivity : clientActivities) {
-            clientActivity.setStatus(null);
-            clientActivityRepo.save(clientActivity);
-        }
+            log.debug("Unlinking associated Client Activities for Status ID: {}", statusId);
+            List<ClientActivity> clientActivities = clientActivityRepo.findByStatus(ticketStatus);
+            for (ClientActivity clientActivity : clientActivities) {
+                clientActivity.setStatus(null);
+                clientActivityRepo.save(clientActivity);
+            }
 
-        ticketStatusClassificatorRepo.delete(ticketStatus);
-        return new ResponseDTO("Ticket status classificator deleted successfully");
+            ticketStatusClassificatorRepo.delete(ticketStatus);
+            log.info("Successfully deleted Ticket Status Classificator with ID: {}", statusId);
+            return new ResponseDTO("Ticket status classificator deleted successfully");
+        } catch (Exception e) {
+            log.error("Error while deleting Ticket Status Classificator with ID: {}", statusId, e);
+            throw e;
+        }
     }
 
     public List<TicketStatusClassificatorDTO> getAllTicketStatusClassificators() {
-        return ticketStatusClassificatorMapper.toDtoList(ticketStatusClassificatorRepo.findAll());
+        log.info("Fetching all Ticket Status Classificators");
+        try {
+            List<TicketStatusClassificatorDTO> result = ticketStatusClassificatorMapper.toDtoList(ticketStatusClassificatorRepo.findAll());
+            log.debug("Fetched Ticket Status Classificators: {}", result);
+            return result;
+        } catch (Exception e) {
+            log.error("Error while fetching all Ticket Status Classificators", e);
+            throw e;
+        }
     }
 
     public TicketStatusClassificatorDTO getTicketStatusClassificatorById(Integer ticketStatusId) {
-        Optional<TicketStatusClassificator> ticketStatusOpt = ticketStatusClassificatorRepo.findById(ticketStatusId);
-        if (ticketStatusOpt.isEmpty()) {
-            throw new EntityNotFoundException("Ticket status classificator with id: " + ticketStatusId + " not found");
+        log.info("Fetching Ticket Status Classificator with ID: {}", ticketStatusId);
+        try {
+            Optional<TicketStatusClassificator> ticketStatusOpt = ticketStatusClassificatorRepo.findById(ticketStatusId);
+            if (ticketStatusOpt.isEmpty()) {
+                log.warn("Ticket Status Classificator with ID {} not found", ticketStatusId);
+                throw new EntityNotFoundException("Ticket status classificator with id: " + ticketStatusId + " not found");
+            }
+            TicketStatusClassificatorDTO result = ticketStatusClassificatorMapper.toDto(ticketStatusOpt.get());
+            log.debug("Fetched Ticket Status Classificator with ID {}: {}", ticketStatusId, result);
+            return result;
+        } catch (Exception e) {
+            log.error("Error while fetching Ticket Status Classificator with ID: {}", ticketStatusId, e);
+            throw e;
         }
-        return ticketStatusClassificatorMapper.toDto(ticketStatusOpt.get());
     }
 
     public List<TicketStatusClassificatorDTO> getTicketStatusHistory(Integer statusId) {
-        AuditReader auditReader = AuditReaderFactory.get(entityManager);
-        List<Number> revisions = auditReader.getRevisions(TicketStatusClassificator.class, statusId);
+        log.info("Fetching history for Ticket Status Classificator with ID: {}", statusId);
+        try {
+            AuditReader auditReader = AuditReaderFactory.get(entityManager);
+            List<Number> revisions = auditReader.getRevisions(TicketStatusClassificator.class, statusId);
 
-        List<TicketStatusClassificator> history = new ArrayList<>();
-        for (Number rev : revisions) {
-            TicketStatusClassificator status = auditReader.find(TicketStatusClassificator.class, statusId, rev);
-            history.add(status);
+            List<TicketStatusClassificator> history = new ArrayList<>();
+            for (Number rev : revisions) {
+                TicketStatusClassificator status = auditReader.find(TicketStatusClassificator.class, statusId, rev);
+                history.add(status);
+            }
+            List<TicketStatusClassificatorDTO> result = ticketStatusClassificatorMapper.toDtoList(history);
+            log.debug("Fetched history for Ticket Status Classificator with ID {}: {}", statusId, result);
+            return result;
+        } catch (Exception e) {
+            log.error("Error while fetching history for Ticket Status Classificator with ID: {}", statusId, e);
+            throw e;
         }
-        return ticketStatusClassificatorMapper.toDtoList(history);
     }
 
     public List<TicketStatusClassificatorDTO> getDeletedTicketStatuses() {
-        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+        log.info("Fetching deleted Ticket Status Classificators");
+        try {
+            AuditReader auditReader = AuditReaderFactory.get(entityManager);
 
-        AuditQuery query = auditReader.createQuery()
-                .forRevisionsOfEntity(TicketStatusClassificator.class, false, true)
-                .add(AuditEntity.revisionType().eq(RevisionType.DEL));
+            AuditQuery query = auditReader.createQuery()
+                    .forRevisionsOfEntity(TicketStatusClassificator.class, false, true)
+                    .add(AuditEntity.revisionType().eq(RevisionType.DEL));
 
-        List<Object[]> result = query.getResultList();
+            List<Object[]> result = query.getResultList();
 
-        List<TicketStatusClassificator> deletedEntities = result.stream()
-                .map(r -> {
-                    TicketStatusClassificator deletedEntity = (TicketStatusClassificator) r[0];
-                    DefaultRevisionEntity revisionEntity = (DefaultRevisionEntity) r[1];
+            List<TicketStatusClassificator> deletedEntities = result.stream()
+                    .map(r -> {
+                        TicketStatusClassificator deletedEntity = (TicketStatusClassificator) r[0];
+                        DefaultRevisionEntity revisionEntity = (DefaultRevisionEntity) r[1];
 
-                    TicketStatusClassificator lastStateBeforeDeletion = auditReader.find(
-                            TicketStatusClassificator.class,
-                            deletedEntity.getId(),
-                            revisionEntity.getId() - 1
-                    );
+                        TicketStatusClassificator lastStateBeforeDeletion = auditReader.find(
+                                TicketStatusClassificator.class,
+                                deletedEntity.getId(),
+                                revisionEntity.getId() - 1
+                        );
 
-                    return lastStateBeforeDeletion != null ? lastStateBeforeDeletion : deletedEntity;
-                })
-                .collect(Collectors.toList());
-        return ticketStatusClassificatorMapper.toDtoList(deletedEntities);
+                        return lastStateBeforeDeletion != null ? lastStateBeforeDeletion : deletedEntity;
+                    })
+                    .collect(Collectors.toList());
+
+            List<TicketStatusClassificatorDTO> deletedDTOs = ticketStatusClassificatorMapper.toDtoList(deletedEntities);
+            log.debug("Fetched deleted Ticket Status Classificators: {}", deletedDTOs);
+            return deletedDTOs;
+        } catch (Exception e) {
+            log.error("Error while fetching deleted Ticket Status Classificators", e);
+            throw e;
+        }
     }
 }

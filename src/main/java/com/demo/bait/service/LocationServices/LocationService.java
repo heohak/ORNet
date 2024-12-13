@@ -33,53 +33,77 @@ public class LocationService {
 
     @Transactional
     public LocationDTO addLocation(LocationDTO locationDTO) {
-        Location location = new Location();
-        location.setName(locationDTO.name());
-//        location.setAddress(locationDTO.address());
-        location.setCountry(locationDTO.country());
-        location.setCity(locationDTO.city());
-        location.setStreetAddress(locationDTO.streetAddress());
-        location.setPostalCode(locationDTO.postalCode());
-        location.setPhone(locationDTO.phone());
-        location.setEmail(locationDTO.email());
-        location.setLastMaintenance(locationDTO.lastMaintenance());
-        location.setNextMaintenance(locationDTO.nextMaintenance());
-        locationMaintenanceService.updateLocationMaintenance(location, locationDTO);
-        if (locationDTO.commentIds() != null) {
-            Set<Comment> comments = commentService.commentIdsToCommentsSet(locationDTO.commentIds());
-            location.setComments(comments);
+        log.info("Adding a new location with name: {}", locationDTO.name());
+        try {
+            Location location = new Location();
+            location.setName(locationDTO.name());
+            location.setCountry(locationDTO.country());
+            location.setCity(locationDTO.city());
+            location.setStreetAddress(locationDTO.streetAddress());
+            location.setPostalCode(locationDTO.postalCode());
+            location.setPhone(locationDTO.phone());
+            location.setEmail(locationDTO.email());
+            location.setLastMaintenance(locationDTO.lastMaintenance());
+            location.setNextMaintenance(locationDTO.nextMaintenance());
+
+            locationMaintenanceService.updateLocationMaintenance(location, locationDTO);
+
+            if (locationDTO.commentIds() != null) {
+                Set<Comment> comments = commentService.commentIdsToCommentsSet(locationDTO.commentIds());
+                location.setComments(comments);
+            }
+
+            locationRepo.save(location);
+            log.info("Location with name '{}' added successfully", locationDTO.name());
+            return locationMapper.toDto(location);
+        } catch (Exception e) {
+            log.error("Error while adding location: {}", locationDTO.name(), e);
+            throw e;
         }
-        locationRepo.save(location);
-        return locationMapper.toDto(location);
     }
 
     @Transactional
     public ResponseDTO deleteLocation(Integer locationId) {
-        locationRepo.deleteById(locationId);
-        return new ResponseDTO("Location deleted successfully");
+        log.info("Deleting location with ID: {}", locationId);
+        try {
+            locationRepo.deleteById(locationId);
+            log.info("Location with ID {} deleted successfully", locationId);
+            return new ResponseDTO("Location deleted successfully");
+        } catch (Exception e) {
+            log.error("Error while deleting location with ID: {}", locationId, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO updateLocation(Integer locationId, LocationDTO locationDTO) {
-        Optional<Location> locationOpt = locationRepo.findById(locationId);
-        if (locationOpt.isEmpty()) {
-            throw new EntityNotFoundException("Location with id " + locationId + " not found");
-        }
-        Location location = locationOpt.get();
+        log.info("Updating location with ID: {}", locationId);
+        try {
+            Optional<Location> locationOpt = locationRepo.findById(locationId);
+            if (locationOpt.isEmpty()) {
+                log.warn("Location with ID {} not found", locationId);
+                throw new EntityNotFoundException("Location with id " + locationId + " not found");
+            }
 
-        updateName(location, locationDTO);
-//        updateAddress(location, locationDTO);
-        updateCountry(location, locationDTO);
-        updateCity(location, locationDTO);
-        updateStreetAddress(location, locationDTO);
-        updatePostalCode(location, locationDTO);
-        updatePhone(location, locationDTO);
-        updateEmail(location, locationDTO);
-        updateLastMaintenance(location, locationDTO);
-        updateNextMaintenance(location, locationDTO);
-        locationMaintenanceService.updateLocationMaintenance(location, locationDTO);
-        locationRepo.save(location);
-        return new ResponseDTO("Location updated successfully");
+            Location location = locationOpt.get();
+            updateName(location, locationDTO);
+            updateCountry(location, locationDTO);
+            updateCity(location, locationDTO);
+            updateStreetAddress(location, locationDTO);
+            updatePostalCode(location, locationDTO);
+            updatePhone(location, locationDTO);
+            updateEmail(location, locationDTO);
+            updateLastMaintenance(location, locationDTO);
+            updateNextMaintenance(location, locationDTO);
+            locationMaintenanceService.updateLocationMaintenance(location, locationDTO);
+
+            locationRepo.save(location);
+            log.info("Location with ID {} updated successfully", locationId);
+            return new ResponseDTO("Location updated successfully");
+        } catch (Exception e) {
+            log.error("Error while updating location with ID: {}", locationId, e);
+            throw e;
+        }
     }
 
     public void updateName(Location location, LocationDTO locationDTO) {
@@ -87,12 +111,6 @@ public class LocationService {
             location.setName(locationDTO.name());
         }
     }
-
-//    public void updateAddress(Location location, LocationDTO locationDTO) {
-//        if (locationDTO.address() != null) {
-//            location.setAddress(locationDTO.address());
-//        }
-//    }
 
     public void updateCountry(Location location, LocationDTO locationDTO) {
         if (locationDTO.country() != null) {
@@ -143,53 +161,89 @@ public class LocationService {
     }
 
     public LocationDTO getLocationById(Integer locationId) {
-        Optional<Location> locationOpt = locationRepo.findById(locationId);
-        if (locationOpt.isEmpty()) {
-            throw new EntityNotFoundException("Location with id " + locationId + " not found");
+        log.info("Fetching location with ID: {}", locationId);
+        try {
+            Optional<Location> locationOpt = locationRepo.findById(locationId);
+            if (locationOpt.isEmpty()) {
+                log.warn("Location with ID {} not found", locationId);
+                throw new EntityNotFoundException("Location with id " + locationId + " not found");
+            }
+            log.info("Location with ID {} fetched successfully", locationId);
+            return locationMapper.toDto(locationOpt.get());
+        } catch (Exception e) {
+            log.error("Error while fetching location with ID: {}", locationId, e);
+            throw e;
         }
-        return locationMapper.toDto(locationOpt.get());
     }
 
     public List<LocationDTO> getAllLocations() {
-        List<LocationDTO> locations = locationMapper.toDtoList(locationRepo.findAll());
-        locations.sort(Comparator.comparing(LocationDTO::name, String::compareToIgnoreCase));
-        return locations;
+        log.info("Fetching all locations");
+        try {
+            List<LocationDTO> locations = locationMapper.toDtoList(locationRepo.findAll());
+            locations.sort(Comparator.comparing(LocationDTO::name, String::compareToIgnoreCase));
+            log.info("Fetched {} locations successfully", locations.size());
+            return locations;
+        } catch (Exception e) {
+            log.error("Error while fetching all locations", e);
+            throw e;
+        }
     }
 
     public Set<Location> locationIdsToLocationsSet(List<Integer> locationIds) {
-        Set<Location> locations = new HashSet<>();
-        for (Integer locationId : locationIds) {
-            Location location = locationRepo.findById(locationId)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid location ID: " + locationId));
-            locations.add(location);
+        log.info("Converting location IDs to location entities: {}", locationIds);
+        try {
+            Set<Location> locations = new HashSet<>();
+            for (Integer locationId : locationIds) {
+                Location location = locationRepo.findById(locationId)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid location ID: " + locationId));
+                locations.add(location);
+            }
+            log.info("Converted location IDs to entities successfully");
+            return locations;
+        } catch (Exception e) {
+            log.error("Error while converting location IDs to entities", e);
+            throw e;
         }
-        return locations;
     }
 
     public List<LocationDTO> getLocationHistory(Integer locationId) {
-        AuditReader auditReader = AuditReaderFactory.get(entityManager);
-        List<Number> revisions = auditReader.getRevisions(Location.class, locationId);
+        log.info("Fetching location history for ID: {}", locationId);
+        try {
+            AuditReader auditReader = AuditReaderFactory.get(entityManager);
+            List<Number> revisions = auditReader.getRevisions(Location.class, locationId);
 
-        List<Location> history = new ArrayList<>();
-        for (Number rev : revisions) {
-            Location LocationVersion = auditReader
-                    .find(Location.class, locationId, rev);
-            history.add(LocationVersion);
+            List<Location> history = new ArrayList<>();
+            for (Number rev : revisions) {
+                Location locationVersion = auditReader.find(Location.class, locationId, rev);
+                history.add(locationVersion);
+            }
+
+            log.info("Fetched history with {} revisions for location ID: {}", history.size(), locationId);
+            return locationMapper.toDtoList(history);
+        } catch (Exception e) {
+            log.error("Error while fetching location history for ID: {}", locationId, e);
+            throw e;
         }
-        return locationMapper.toDtoList(history);
     }
 
     public List<String> getAllLocationCountries() {
-        List<Location> locations = locationRepo.findAll();
-
-        return locations.stream()
-                .map(Location::getCountry)
-                .filter(country -> country != null && !country.isEmpty())
-                .map(country -> capitalize(country.toLowerCase()))
-                .collect(Collectors.toSet())
-                .stream()
-                .sorted()
-                .collect(Collectors.toList());
+        log.info("Fetching all location countries");
+        try {
+            List<Location> locations = locationRepo.findAll();
+            List<String> countries = locations.stream()
+                    .map(Location::getCountry)
+                    .filter(country -> country != null && !country.isEmpty())
+                    .map(country -> capitalize(country.toLowerCase()))
+                    .collect(Collectors.toSet())
+                    .stream()
+                    .sorted()
+                    .collect(Collectors.toList());
+            log.info("Fetched {} unique countries successfully", countries.size());
+            return countries;
+        } catch (Exception e) {
+            log.error("Error while fetching all location countries", e);
+            throw e;
+        }
     }
 
     private String capitalize(String country) {
