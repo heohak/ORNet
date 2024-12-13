@@ -5,16 +5,14 @@ import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.Activity;
 import com.demo.bait.entity.Ticket;
 import com.demo.bait.mapper.ActivityMapper;
-import com.demo.bait.mapper.CommentMapper;
 import com.demo.bait.repository.TicketRepo;
 import com.demo.bait.service.ActivityService.ActivityService;
-import com.demo.bait.service.CommentServices.CommentService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+//import org.springframework.security.core.Authentication;
+//import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -27,8 +25,6 @@ import java.util.Optional;
 public class TicketActivityService {
 
     private TicketRepo ticketRepo;
-    private CommentMapper commentMapper;
-    private CommentService commentService;
     private ActivityMapper activityMapper;
     private ActivityService activityService;
     private TicketService ticketService;
