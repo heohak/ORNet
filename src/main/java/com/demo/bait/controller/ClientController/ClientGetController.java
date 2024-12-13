@@ -50,7 +50,7 @@ public class ClientGetController {
     /**
      * Searches and filters tickets
      *
-     * @param clientType should be a string "pathology" or "surgery" or "editor"
+     * @param clientTypes should be a string "pathology" or "surgery" or "editor" or "other" or "prospect" of "agreement"
      */
     @GetMapping("/search")
     public List<ClientDTO> searchAndFilterClients(

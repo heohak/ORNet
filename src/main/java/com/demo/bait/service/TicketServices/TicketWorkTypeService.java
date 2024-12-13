@@ -31,20 +31,32 @@ public class TicketWorkTypeService {
 
     @Transactional
     public void addWorkTypeToTicket(Ticket ticket, TicketDTO ticketDTO) {
+        log.info("Adding work types to ticket with ID: {}", ticket.getId());
+
         if (ticketDTO.workTypeIds() != null) {
+            log.debug("Work type IDs provided: {}", ticketDTO.workTypeIds());
             Set<WorkTypeClassificator> workTypes = workTypeClassificatorService
                     .workTypeIdsToWorkTypesSet(ticketDTO.workTypeIds());
             ticket.setWorkTypes(workTypes);
             ticketRepo.save(ticket);
+            log.info("Work types successfully added to ticket with ID: {}", ticket.getId());
+        } else {
+            log.warn("No work type IDs provided for ticket with ID: {}", ticket.getId());
         }
     }
 
     public List<WorkTypeClassificatorDTO> getTicketWorkTypes(Integer ticketId) {
+        log.info("Fetching work types for ticket with ID: {}", ticketId);
+
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         if (ticketOpt.isEmpty()) {
+            log.error("Ticket with ID {} not found", ticketId);
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
+
         Ticket ticket = ticketOpt.get();
-        return workTypeClassificatorMapper.toDtoList(ticket.getWorkTypes().stream().toList());
+        List<WorkTypeClassificatorDTO> workTypes = workTypeClassificatorMapper.toDtoList(ticket.getWorkTypes().stream().toList());
+        log.info("Found {} work types for ticket with ID: {}", workTypes.size(), ticketId);
+        return workTypes;
     }
 }

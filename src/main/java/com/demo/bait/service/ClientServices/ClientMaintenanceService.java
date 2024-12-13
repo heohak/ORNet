@@ -31,37 +31,71 @@ public class ClientMaintenanceService {
 
     @Transactional
     public ResponseDTO addMaintenanceToClient(Integer clientId, Integer maintenanceId) {
-        Optional<Client> clientOpt = clientRepo.findById(clientId);
-        Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
+        log.info("Adding Maintenance with ID: {} to Client with ID: {}", maintenanceId, clientId);
+        try {
+            Optional<Client> clientOpt = clientRepo.findById(clientId);
+            Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
 
-        if (clientOpt.isEmpty()) {
-            throw new EntityNotFoundException("Client with id " + clientId + " not found");
-        }
-        if (maintenanceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found");
-        }
+            if (clientOpt.isEmpty()) {
+                log.warn("Client with ID {} not found", clientId);
+                throw new EntityNotFoundException("Client with id " + clientId + " not found");
+            }
+            if (maintenanceOpt.isEmpty()) {
+                log.warn("Maintenance with ID {} not found", maintenanceId);
+                throw new EntityNotFoundException("Maintenance with id " + maintenanceId + " not found");
+            }
 
-        Client client = clientOpt.get();
-        Maintenance maintenance = maintenanceOpt.get();
-        client.getMaintenances().add(maintenance);
-        clientRepo.save(client);
-        return new ResponseDTO("Maintenance added successfully");
+            Client client = clientOpt.get();
+            Maintenance maintenance = maintenanceOpt.get();
+
+            log.debug("Adding Maintenance with ID: {} to Client with ID: {}", maintenanceId, clientId);
+            client.getMaintenances().add(maintenance);
+            clientRepo.save(client);
+
+            log.info("Successfully added Maintenance with ID: {} to Client with ID: {}", maintenanceId, clientId);
+            return new ResponseDTO("Maintenance added successfully");
+        } catch (Exception e) {
+            log.error("Error while adding Maintenance with ID: {} to Client with ID: {}", maintenanceId, clientId, e);
+            throw e;
+        }
     }
 
     public List<MaintenanceDTO> getClientMaintenances(Integer clientId) {
-        Optional<Client> clientOpt = clientRepo.findById(clientId);
-        if (clientOpt.isEmpty()) {
-            throw new EntityNotFoundException("Client with id " + clientId + " not found");
-        }
+        log.info("Fetching maintenances for Client with ID: {}", clientId);
+        try {
+            Optional<Client> clientOpt = clientRepo.findById(clientId);
+            if (clientOpt.isEmpty()) {
+                log.warn("Client with ID {} not found", clientId);
+                throw new EntityNotFoundException("Client with id " + clientId + " not found");
+            }
 
-        Client client = clientOpt.get();
-        return maintenanceMapper.toDtoList(client.getMaintenances().stream().toList());
+            Client client = clientOpt.get();
+            List<MaintenanceDTO> maintenanceDTOs = maintenanceMapper
+                    .toDtoList(client.getMaintenances().stream().toList());
+
+            log.debug("Fetched {} maintenances for Client with ID: {}", maintenanceDTOs.size(), clientId);
+            return maintenanceDTOs;
+        } catch (Exception e) {
+            log.error("Error while fetching maintenances for Client with ID: {}", clientId, e);
+            throw e;
+        }
     }
 
     public void updateMaintenances(Client client, ClientDTO clientDTO) {
-        if (clientDTO.maintenanceIds() != null) {
-            Set<Maintenance> maintenances = maintenanceService.maintenanceIdsToMaintenancesSet(clientDTO.maintenanceIds());
-            client.setMaintenances(maintenances);
+        log.info("Updating maintenances for Client with ID: {}", client.getId());
+        try {
+            if (clientDTO.maintenanceIds() != null) {
+                log.debug("Updating maintenances with IDs: {} for Client with ID: {}", clientDTO.maintenanceIds(), client.getId());
+                Set<Maintenance> maintenances = maintenanceService
+                        .maintenanceIdsToMaintenancesSet(clientDTO.maintenanceIds());
+                client.setMaintenances(maintenances);
+                log.info("Successfully updated maintenances for Client with ID: {}", client.getId());
+            } else {
+                log.debug("No maintenances provided to update for Client with ID: {}", client.getId());
+            }
+        } catch (Exception e) {
+            log.error("Error while updating maintenances for Client with ID: {}", client.getId(), e);
+            throw e;
         }
     }
 }

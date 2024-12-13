@@ -29,12 +29,14 @@ public class SoftwareService {
 
     @Transactional
     public ResponseDTO addSoftware(SoftwareDTO softwareDTO) {
+        log.info("Starting to add new software with name: {}", softwareDTO.name());
         Software software = new Software();
 
         software.setName(softwareDTO.name());
         software.setDbVersion(softwareDTO.dbVersion());
 
         updateClient(software, softwareDTO);
+        log.debug("Client updated for software: {}", softwareDTO.clientId());
 
         HIS his = new HIS();
         his.setVendorName(softwareDTO.his().vendorName());
@@ -101,18 +103,22 @@ public class SoftwareService {
         software.setAiModule(aiModule);
 
         softwareRepo.save(software);
+        log.info("Software added successfully with ID: {}", software.getId());
         return new ResponseDTO(software.getId().toString());
     }
 
     @Transactional
     public ResponseDTO addClientToSoftware(Integer softwareId, Integer clientId) {
+        log.info("Adding client with ID {} to software with ID {}", clientId, softwareId);
         Optional<Software> softwareOpt = softwareRepo.findById(softwareId);
         Optional<Client> clientOpt = clientRepo.findById(clientId);
 
         if (softwareOpt.isEmpty()) {
+            log.error("Software with ID {} not found", softwareId);
             throw new EntityNotFoundException("Software with id " + softwareId + " not found");
         }
         if (clientOpt.isEmpty()) {
+            log.error("Client with ID {} not found", clientId);
             throw new EntityNotFoundException("Client with id " + clientId + " not found");
         }
 
@@ -120,19 +126,24 @@ public class SoftwareService {
         Client client = clientOpt.get();
         software.setClient(client);
         softwareRepo.save(software);
+        log.info("Client with ID {} added to software with ID {}", clientId, softwareId);
         return new ResponseDTO("Client added to software");
     }
 
     @Transactional
     public ResponseDTO deleteSoftware(Integer softwareId) {
+        log.info("Deleting software with ID {}", softwareId);
         softwareRepo.deleteById(softwareId);
+        log.info("Software with ID {} deleted successfully", softwareId);
         return new ResponseDTO("Software deleted");
     }
 
     @Transactional
     public ResponseDTO updateSoftware(Integer softwareId, SoftwareDTO softwareDTO) {
+        log.info("Updating software with ID {}", softwareId);
         Optional<Software> softwareOpt = softwareRepo.findById(softwareId);
         if (softwareOpt.isEmpty()) {
+            log.error("Software with ID {} not found", softwareId);
             throw new EntityNotFoundException("Software with id " + softwareId + " not found");
         }
         Software software = softwareOpt.get();
@@ -157,6 +168,7 @@ public class SoftwareService {
         updateAIModule(software, softwareDTO);
 
         softwareRepo.save(software);
+        log.info("Software with ID {} updated successfully", softwareId);
         return new ResponseDTO("Software updated successfully");
     }
 
@@ -347,30 +359,45 @@ public class SoftwareService {
     }
 
     public List<SoftwareDTO> getSoftwareByClientId(Integer clientId) {
-        return softwareMapper.toDtoList(softwareRepo.findByClientId(clientId));
+        log.info("Fetching software list for client with ID {}", clientId);
+        List<SoftwareDTO> softwareList = softwareMapper.toDtoList(softwareRepo.findByClientId(clientId));
+        log.info("Found {} software items for client with ID {}", softwareList.size(), clientId);
+        return softwareList;
     }
 
     public List<SoftwareDTO> getNotUsedSoftware() {
-        return softwareMapper.toDtoList(softwareRepo.findByClientIsNull());
+        log.info("Fetching software not associated with any client");
+        List<SoftwareDTO> notUsedSoftwareList = softwareMapper.toDtoList(softwareRepo.findByClientIsNull());
+        log.info("Found {} software items not associated with any client", notUsedSoftwareList.size());
+        return notUsedSoftwareList;
     }
 
     public SoftwareDTO getSoftwareById(Integer softwareId) {
-        return softwareMapper.toDto(softwareRepo.getReferenceById(softwareId));
+        log.info("Fetching software details for ID {}", softwareId);
+        SoftwareDTO software = softwareMapper.toDto(softwareRepo.getReferenceById(softwareId));
+        log.info("Successfully fetched software details for ID {}", softwareId);
+        return software;
     }
 
     public List<SoftwareDTO> getAllSoftwareVariations() {
-        return softwareMapper.toDtoList(softwareRepo.findAll());
+        log.info("Fetching all software variations");
+        List<SoftwareDTO> allSoftware = softwareMapper.toDtoList(softwareRepo.findAll());
+        log.info("Found {} software variations", allSoftware.size());
+        return allSoftware;
     }
 
     @Transactional
     public ResponseDTO removeClientFromSoftware(Integer softwareId) {
+        log.info("Removing client association from software with ID {}", softwareId);
         Optional<Software> softwareOpt = softwareRepo.findById(softwareId);
         if (softwareOpt.isEmpty()) {
+            log.error("Software with ID {} not found", softwareId);
             throw new EntityNotFoundException("Software with id " + softwareId + " not found");
         }
         Software software = softwareOpt.get();
         software.setClient(null);
         softwareRepo.save(software);
+        log.info("Successfully removed client association from software with ID {}", softwareId);
         return new ResponseDTO("Software removed from client");
     }
 }

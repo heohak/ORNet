@@ -29,36 +29,55 @@ public class ActivityService {
 
     @Transactional
     public ResponseDTO updateActivity(Integer activityId, ActivityDTO activityDTO) {
+        log.info("Attempting to update activity with ID: {}", activityId);
+
         Optional<Activity> activityOpt = activityRepo.findById(activityId);
         if (activityOpt.isEmpty()) {
+            log.error("Activity with ID {} not found", activityId);
             throw new EntityNotFoundException("Activity with id " + activityId + " not found");
         }
         Activity activity = activityOpt.get();
+
+        log.debug("Updating activity with ID: {} | New Activity: {}", activityId, activityDTO.activity());
         activity.setActivity(activityDTO.activity());
         activityRepo.save(activity);
+
+        log.info("Activity with ID: {} updated successfully", activityId);
         return new ResponseDTO("Activity updated successfully");
     }
 
     @Transactional
     public ResponseDTO deleteActivity(Integer activityId) {
+        log.info("Attempting to delete activity with ID: {}", activityId);
+
         Optional<Activity> activityOpt = activityRepo.findById(activityId);
         if (activityOpt.isEmpty()) {
+            log.error("Activity with ID {} not found", activityId);
             throw new EntityNotFoundException("Activity with id " + activityId + " not found");
         }
         Activity activity = activityOpt.get();
-        Ticket ticket = ticketRepo.findByActivitiesContaining(activity);
 
+        log.debug("Removing activity with ID: {} from associated ticket", activityId);
+        Ticket ticket = ticketRepo.findByActivitiesContaining(activity);
         ticket.getActivities().remove(activity);
         ticketRepo.save(ticket);
+
+        log.debug("Deleting activity with ID: {}", activityId);
         activityRepo.delete(activity);
+
+        log.info("Activity with ID: {} deleted successfully", activityId);
         return new ResponseDTO("Activity deleted successfully");
     }
 
     @Transactional
-    public Activity addActivity(String newActivity, Integer hours, Integer minutes, Boolean paid) {
+    public Activity addActivity(String newActivity, Integer hours, Integer minutes, Boolean paid, String username) {
+        log.info("Attempting to add a new activity: '{}' | Hours: {}, Minutes: {}, Paid: {}, Username: {}",
+                newActivity, hours, minutes, paid, username);
+
         Activity activity = new Activity();
         activity.setActivity(newActivity);
         activity.setTimestamp(LocalDateTime.now().withNano(0));
+
         if (hours != null && minutes != null) {
             activity.setTimeSpent(Duration.ofHours(hours).plusMinutes(minutes));
         } else if (hours != null) {
@@ -69,7 +88,10 @@ public class ActivityService {
             activity.setTimeSpent(Duration.ZERO);
         }
         activity.setPaid(paid);
+        activity.setUsername(username);
+
         activityRepo.save(activity);
+        log.info("New activity added successfully: '{}' | ID: {}", newActivity, activity.getId());
         return activity;
     }
 }

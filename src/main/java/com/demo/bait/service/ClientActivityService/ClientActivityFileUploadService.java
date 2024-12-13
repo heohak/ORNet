@@ -31,23 +31,49 @@ public class ClientActivityFileUploadService {
     @Transactional
     public ResponseDTO uploadFilesToClientActivity(Integer clientActivityId, List<MultipartFile> files)
             throws IOException {
-        Optional<ClientActivity> clientActivityOpt = clientActivityRepo.findById(clientActivityId);
-        if (clientActivityOpt.isEmpty()) {
-            throw new EntityNotFoundException("Client Activity with id " + clientActivityId + " not found");
+        log.info("Uploading files to Client Activity with ID: {}", clientActivityId);
+        try {
+            Optional<ClientActivity> clientActivityOpt = clientActivityRepo.findById(clientActivityId);
+            if (clientActivityOpt.isEmpty()) {
+                log.warn("Client Activity with ID {} not found", clientActivityId);
+                throw new EntityNotFoundException("Client Activity with id " + clientActivityId + " not found");
+            }
+            ClientActivity clientActivity = clientActivityOpt.get();
+
+            log.debug("Uploading {} files for Client Activity with ID: {}", files.size(), clientActivityId);
+            Set<FileUpload> uploadedFiles = fileUploadService.uploadFiles(files);
+
+            log.debug("Adding uploaded files to Client Activity with ID: {}", clientActivityId);
+            clientActivity.getFiles().addAll(uploadedFiles);
+
+            clientActivityRepo.save(clientActivity);
+            log.info("Successfully uploaded {} files to Client Activity with ID: {}", files.size(), clientActivityId);
+            return new ResponseDTO("Files uploaded to client activity successfully.");
+        } catch (IOException e) {
+            log.error("Error while uploading files to Client Activity with ID: {}", clientActivityId, e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error while uploading files to Client Activity with ID: {}", clientActivityId, e);
+            throw e;
         }
-        ClientActivity clientActivity = clientActivityOpt.get();
-        Set<FileUpload> uploadedFiles = fileUploadService.uploadFiles(files);
-        clientActivity.getFiles().addAll(uploadedFiles);
-        clientActivityRepo.save(clientActivity);
-        return new ResponseDTO("Files uploaded to client activity successfully.");
     }
 
     public List<FileUploadDTO> getClientActivityFiles(Integer clientActivityId) {
-        Optional<ClientActivity> clientActivityOpt = clientActivityRepo.findById(clientActivityId);
-        if (clientActivityOpt.isEmpty()) {
-            throw new EntityNotFoundException("Client Activity with id " + clientActivityId + " not found");
+        log.info("Fetching files for Client Activity with ID: {}", clientActivityId);
+        try {
+            Optional<ClientActivity> clientActivityOpt = clientActivityRepo.findById(clientActivityId);
+            if (clientActivityOpt.isEmpty()) {
+                log.warn("Client Activity with ID {} not found", clientActivityId);
+                throw new EntityNotFoundException("Client Activity with id " + clientActivityId + " not found");
+            }
+            ClientActivity clientActivity = clientActivityOpt.get();
+
+            List<FileUploadDTO> fileDtos = fileUploadMapper.toDtoList(clientActivity.getFiles().stream().toList());
+            log.debug("Fetched {} files for Client Activity with ID: {}", fileDtos.size(), clientActivityId);
+            return fileDtos;
+        } catch (Exception e) {
+            log.error("Error while fetching files for Client Activity with ID: {}", clientActivityId, e);
+            throw e;
         }
-        ClientActivity clientActivity = clientActivityOpt.get();
-        return fileUploadMapper.toDtoList(clientActivity.getFiles().stream().toList());
     }
 }

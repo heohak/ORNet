@@ -31,54 +31,79 @@ public class BaitWorkerService {
 
     @Transactional
     public ResponseDTO addWorker(BaitWorkerDTO workerDTO) {
-        BaitWorker worker = new BaitWorker();
-        worker.setFirstName(workerDTO.firstName());
-        worker.setLastName(workerDTO.lastName());
-        worker.setEmail(workerDTO.email());
-        worker.setPhoneNumber(workerDTO.phoneNumber());
-        worker.setTitle(workerDTO.title());
-        baitWorkerRepo.save(worker);
-        return new ResponseDTO("Bait Worker added successfully");
+        log.info("Adding new Bait Worker: {}", workerDTO);
+        try {
+            BaitWorker worker = new BaitWorker();
+            worker.setFirstName(workerDTO.firstName());
+            worker.setLastName(workerDTO.lastName());
+            worker.setEmail(workerDTO.email());
+            worker.setPhoneNumber(workerDTO.phoneNumber());
+            worker.setTitle(workerDTO.title());
+            baitWorkerRepo.save(worker);
+            log.info("Bait Worker successfully added: {}", worker);
+            return new ResponseDTO("Bait Worker added successfully");
+        } catch (Exception e) {
+            log.error("Error occurred while adding Bait Worker: {}", workerDTO, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO deleteBaitWorker(Integer baitWorkerId) {
-        Optional<BaitWorker> baitWorkerOpt = baitWorkerRepo.findById(baitWorkerId);
-        if (baitWorkerOpt.isEmpty()) {
-            throw new EntityNotFoundException("Bait Worker with id " + baitWorkerId + " not found");
-        }
-        BaitWorker baitWorker = baitWorkerOpt.get();
+        log.info("Deleting Bait Worker with ID: {}", baitWorkerId);
+        try {
+            Optional<BaitWorker> baitWorkerOpt = baitWorkerRepo.findById(baitWorkerId);
+            if (baitWorkerOpt.isEmpty()) {
+                log.warn("Bait Worker with ID {} not found", baitWorkerId);
+                throw new EntityNotFoundException("Bait Worker with id " + baitWorkerId + " not found");
+            }
+            BaitWorker baitWorker = baitWorkerOpt.get();
 
-        List<Ticket> tickets = ticketRepo.findByBaitWorker(baitWorker);
-        for (Ticket ticket : tickets) {
-            ticket.setBaitWorker(null);
-            ticketRepo.save(ticket);
-        }
+            log.debug("Unlinking tickets for Bait Worker ID: {}", baitWorkerId);
+            List<Ticket> tickets = ticketRepo.findByBaitWorker(baitWorker);
+            for (Ticket ticket : tickets) {
+                ticket.setBaitWorker(null);
+                ticketRepo.save(ticket);
+            }
 
-        List<ClientActivity> clientActivities = clientActivityRepo.findByBaitWorker(baitWorker);
-        for (ClientActivity clientActivity : clientActivities) {
-            clientActivity.setBaitWorker(null);
-            clientActivityRepo.save(clientActivity);
-        }
+            log.debug("Unlinking client activities for Bait Worker ID: {}", baitWorkerId);
+            List<ClientActivity> clientActivities = clientActivityRepo.findByBaitWorker(baitWorker);
+            for (ClientActivity clientActivity : clientActivities) {
+                clientActivity.setBaitWorker(null);
+                clientActivityRepo.save(clientActivity);
+            }
 
-        baitWorkerRepo.delete(baitWorker);
-        return new ResponseDTO("Bait Worker deleted successfully");
+            baitWorkerRepo.delete(baitWorker);
+            log.info("Bait Worker with ID {} successfully deleted", baitWorkerId);
+            return new ResponseDTO("Bait Worker deleted successfully");
+        } catch (Exception e) {
+            log.error("Error occurred while deleting Bait Worker with ID: {}", baitWorkerId, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO updateBaitWorker(Integer baitWorkerId, BaitWorkerDTO baitWorkerDTO) {
-        Optional<BaitWorker> baitWorkerOpt = baitWorkerRepo.findById(baitWorkerId);
-        if (baitWorkerOpt.isEmpty()) {
-            throw new EntityNotFoundException("Bait worker with id " + baitWorkerId + " not found");
+        log.info("Updating Bait Worker with ID: {}", baitWorkerId);
+        try {
+            Optional<BaitWorker> baitWorkerOpt = baitWorkerRepo.findById(baitWorkerId);
+            if (baitWorkerOpt.isEmpty()) {
+                log.warn("Bait Worker with ID {} not found", baitWorkerId);
+                throw new EntityNotFoundException("Bait Worker with id " + baitWorkerId + " not found");
+            }
+            BaitWorker worker = baitWorkerOpt.get();
+            updateFirstName(worker, baitWorkerDTO);
+            updateLastName(worker, baitWorkerDTO);
+            updateEmail(worker, baitWorkerDTO);
+            updatePhoneNumber(worker, baitWorkerDTO);
+            updateTitle(worker, baitWorkerDTO);
+            baitWorkerRepo.save(worker);
+            log.info("Bait Worker with ID {} successfully updated", baitWorkerId);
+            return new ResponseDTO("Bait Worker updated successfully");
+        } catch (Exception e) {
+            log.error("Error occurred while updating Bait Worker with ID: {}", baitWorkerId, e);
+            throw e;
         }
-        BaitWorker worker = baitWorkerOpt.get();
-        updateFirstName(worker, baitWorkerDTO);
-        updateLastName(worker, baitWorkerDTO);
-        updateEmail(worker, baitWorkerDTO);
-        updatePhoneNumber(worker, baitWorkerDTO);
-        updateTitle(worker, baitWorkerDTO);
-        baitWorkerRepo.save(worker);
-        return new ResponseDTO("Bait Worker updated successfully");
     }
 
     public void updateFirstName(BaitWorker worker, BaitWorkerDTO baitWorkerDTO) {
@@ -112,14 +137,21 @@ public class BaitWorkerService {
     }
 
     public List<BaitWorkerDTO> getAllWorkers() {
-        return baitWorkerMapper.toDtoList(baitWorkerRepo.findAll());
+        log.info("Fetching all Bait Workers");
+        List<BaitWorkerDTO> workers = baitWorkerMapper.toDtoList(baitWorkerRepo.findAll());
+        log.debug("Fetched Bait Workers: {}", workers);
+        return workers;
     }
 
     public BaitWorkerDTO getBaitWorkerById(Integer workerId) {
+        log.info("Fetching Bait Worker with ID: {}", workerId);
         Optional<BaitWorker> baitWorkerOpt = baitWorkerRepo.findById(workerId);
         if (baitWorkerOpt.isEmpty()) {
-            throw new EntityNotFoundException("Bait worker with id " + workerId + " not found");
+            log.warn("Bait Worker with ID {} not found", workerId);
+            throw new EntityNotFoundException("Bait Worker with id " + workerId + " not found");
         }
-        return baitWorkerMapper.toDto(baitWorkerOpt.get());
+        BaitWorkerDTO workerDTO = baitWorkerMapper.toDto(baitWorkerOpt.get());
+        log.debug("Fetched Bait Worker: {}", workerDTO);
+        return workerDTO;
     }
 }
