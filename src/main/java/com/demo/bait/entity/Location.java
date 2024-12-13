@@ -29,9 +29,9 @@ public class Location {
     private String city;
     private String streetAddress;
     private String postalCode;
-    @Pattern(regexp = "^\\+?[0-9 ]{1,15}$", message = "Invalid phone number format")
+//    @Pattern(regexp = "^\\+?[0-9 ]{1,15}$", message = "Invalid phone number format")
     private String phone;
-    @Email
+//    @Email
     private String email;
     private LocalDate lastMaintenance;
     private LocalDate nextMaintenance;
