@@ -49,86 +49,137 @@ public class ClientWorkerService {
 
     @Transactional
     public ResponseDTO addWorker(ClientWorkerDTO workerDTO) {
-        ClientWorker worker = new ClientWorker();
-        worker.setFirstName(workerDTO.firstName());
-        worker.setLastName(workerDTO.lastName());
-        worker.setEmail(workerDTO.email());
-        worker.setPhoneNumber(workerDTO.phoneNumber());
-        worker.setTitle(workerDTO.title());
+        log.info("Adding a new Client Worker: {}", workerDTO);
+        try {
+            ClientWorker worker = new ClientWorker();
+            worker.setFirstName(workerDTO.firstName());
+            worker.setLastName(workerDTO.lastName());
+            worker.setEmail(workerDTO.email());
+            worker.setPhoneNumber(workerDTO.phoneNumber());
+            worker.setTitle(workerDTO.title());
 
-        updateClient(worker, workerDTO);
-        updateLocation(worker, workerDTO);
-        updateRoles(worker, workerDTO);
+            updateClient(worker, workerDTO);
+            updateLocation(worker, workerDTO);
+            updateRoles(worker, workerDTO);
 
-        worker.setFavorite(workerDTO.favorite() != null ? workerDTO.favorite() : false);
+            worker.setFavorite(workerDTO.favorite() != null ? workerDTO.favorite() : false);
+            worker.setComment(workerDTO.comment());
 
-        clientWorkerRepo.save(worker);
-        return new ResponseDTO(worker.getId().toString());
+            clientWorkerRepo.save(worker);
+            log.info("Successfully added Client Worker with ID: {}", worker.getId());
+            return new ResponseDTO(worker.getId().toString());
+        } catch (Exception e) {
+            log.error("Error while adding Client Worker: {}", workerDTO, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO addEmployer(Integer workerId, Integer clientId) {
-        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
-        Optional<Client> clientOpt = clientRepo.findById(clientId);
+        log.info("Adding employer with ID: {} to worker with ID: {}", clientId, workerId);
+        try {
+            Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+            Optional<Client> clientOpt = clientRepo.findById(clientId);
 
-        if (workerOpt.isEmpty()) {
-            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
-        }
-        if (clientOpt.isEmpty()) {
-            throw new EntityNotFoundException("Client with id " + clientId + " not found");
-        }
+            if (workerOpt.isEmpty()) {
+                log.warn("Worker with ID {} not found", workerId);
+                throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+            }
+            if (clientOpt.isEmpty()) {
+                log.warn("Client with ID {} not found", clientId);
+                throw new EntityNotFoundException("Client with id " + clientId + " not found");
+            }
 
-        ClientWorker worker = workerOpt.get();
-        Client client = clientOpt.get();
-        worker.setClient(client);
-        clientWorkerRepo.save(worker);
-        return new ResponseDTO("Employer added successfully");
+            ClientWorker worker = workerOpt.get();
+            Client client = clientOpt.get();
+            worker.setClient(client);
+            clientWorkerRepo.save(worker);
+
+            log.info("Successfully added employer with ID: {} to worker with ID: {}", clientId, workerId);
+            return new ResponseDTO("Employer added successfully");
+        } catch (Exception e) {
+            log.error("Error while adding employer with ID: {} to worker with ID: {}", clientId, workerId, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO addLocationToEmployee(Integer workerId, Integer locationId) {
-        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
-        Optional<Location> locationOpt = locationRepo.findById(locationId);
+        log.info("Adding location with ID: {} to worker with ID: {}", locationId, workerId);
+        try {
+            Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+            Optional<Location> locationOpt = locationRepo.findById(locationId);
 
-        if (workerOpt.isEmpty()) {
-            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
-        }
-        if (locationOpt.isEmpty()) {
-            throw new EntityNotFoundException("Location with id " + locationId + " not found");
-        }
+            if (workerOpt.isEmpty()) {
+                log.warn("Worker with ID {} not found", workerId);
+                throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+            }
+            if (locationOpt.isEmpty()) {
+                log.warn("Location with ID {} not found", locationId);
+                throw new EntityNotFoundException("Location with id " + locationId + " not found");
+            }
 
-        ClientWorker worker = workerOpt.get();
-        Location location = locationOpt.get();
-        worker.setLocation(location);
-        clientWorkerRepo.save(worker);
-        return new ResponseDTO("Location to worker added successfully");
+            ClientWorker worker = workerOpt.get();
+            Location location = locationOpt.get();
+            worker.setLocation(location);
+            clientWorkerRepo.save(worker);
+
+            log.info("Successfully added location with ID: {} to worker with ID: {}", locationId, workerId);
+            return new ResponseDTO("Location to worker added successfully");
+        } catch (Exception e) {
+            log.error("Error while adding location with ID: {} to worker with ID: {}", locationId, workerId, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO deleteWorker(Integer workerId) {
-        clientWorkerRepo.deleteById(workerId);
-        return new ResponseDTO("Worker deleted successfully");
+        log.info("Deleting worker with ID: {}", workerId);
+        try {
+            clientWorkerRepo.deleteById(workerId);
+            log.info("Successfully deleted worker with ID: {}", workerId);
+            return new ResponseDTO("Worker deleted successfully");
+        } catch (Exception e) {
+            log.error("Error while deleting worker with ID: {}", workerId, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO updateClientWorker(Integer workerId, ClientWorkerDTO clientWorkerDTO) {
-        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
-        if (workerOpt.isEmpty()) {
-            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
-        }
-        ClientWorker worker = workerOpt.get();
+        log.info("Updating Client Worker with ID: {}", workerId);
+        try {
+            Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+            if (workerOpt.isEmpty()) {
+                log.warn("Worker with ID {} not found", workerId);
+                throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+            }
+            ClientWorker worker = workerOpt.get();
 
-        updateFirstName(worker, clientWorkerDTO);
-        updateLastName(worker, clientWorkerDTO);
-        updateEmail(worker, clientWorkerDTO);
-        updatePhoneNumber(worker, clientWorkerDTO);
-        updateTitle(worker, clientWorkerDTO);
-        updateClient(worker, clientWorkerDTO);
-        updateLocation(worker, clientWorkerDTO);
-        updateRoles(worker, clientWorkerDTO);
-        updateFavorite(worker, clientWorkerDTO);
-        clientWorkerRepo.save(worker);
-        return new ResponseDTO("Client worker updated successfully");
+            updateFirstName(worker, clientWorkerDTO);
+            updateLastName(worker, clientWorkerDTO);
+            updateEmail(worker, clientWorkerDTO);
+            updatePhoneNumber(worker, clientWorkerDTO);
+            updateTitle(worker, clientWorkerDTO);
+            updateClient(worker, clientWorkerDTO);
+            updateLocation(worker, clientWorkerDTO);
+            updateRoles(worker, clientWorkerDTO);
+            updateFavorite(worker, clientWorkerDTO);
+            updateComment(worker, clientWorkerDTO);
+
+            clientWorkerRepo.save(worker);
+            log.info("Successfully updated Client Worker with ID: {}", workerId);
+            return new ResponseDTO("Client worker updated successfully");
+        } catch (Exception e) {
+            log.error("Error while updating Client Worker with ID: {}", workerId, e);
+            throw e;
+        }
+    }
+
+    public void updateComment(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
+        if (clientWorkerDTO.comment() != null) {
+            worker.setComment(clientWorkerDTO.comment());
+        }
     }
 
     public void updateFirstName(ClientWorker worker, ClientWorkerDTO clientWorkerDTO) {
@@ -190,70 +241,143 @@ public class ClientWorkerService {
     }
 
     public List<ClientWorkerDTO> getAllWorkers() {
-        return clientWorkerMapper.toDtoList(clientWorkerRepo.findByOrderByFavoriteDesc());
+        log.info("Fetching all workers, ordered by favorite status.");
+        try {
+            List<ClientWorkerDTO> workers = clientWorkerMapper.toDtoList(clientWorkerRepo.findByOrderByFavoriteDesc());
+            log.info("Fetched {} workers.", workers.size());
+            return workers;
+        } catch (Exception e) {
+            log.error("Error while fetching all workers.", e);
+            throw e;
+        }
     }
 
     public List<ClientWorkerDTO> getWorkersByClientId(Integer clientId) {
-        return clientWorkerMapper.toDtoList(clientWorkerRepo.findByClientIdOrderByFavoriteDesc(clientId));
+        log.info("Fetching workers for client with ID: {}, ordered by favorite status.", clientId);
+        try {
+            List<ClientWorkerDTO> workers = clientWorkerMapper.toDtoList(clientWorkerRepo
+                    .findByClientIdOrderByFavoriteDesc(clientId));
+            log.info("Fetched {} workers for client with ID: {}", workers.size(), clientId);
+            return workers;
+        } catch (Exception e) {
+            log.error("Error while fetching workers for client with ID: {}", clientId, e);
+            throw e;
+        }
     }
 
     public LocationDTO getWorkerLocation(Integer workerId) {
-        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
-        if (workerOpt.isEmpty()) {
-            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        log.info("Fetching location for worker with ID: {}", workerId);
+        try {
+            Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+            if (workerOpt.isEmpty()) {
+                log.warn("Worker with ID {} not found.", workerId);
+                throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+            }
+
+            ClientWorker worker = workerOpt.get();
+            Location location = worker.getLocation();
+            LocationDTO locationDTO = locationMapper.toDto(location);
+            log.info("Fetched location for worker with ID: {}", workerId);
+            return locationDTO;
+        } catch (Exception e) {
+            log.error("Error while fetching location for worker with ID: {}", workerId, e);
+            throw e;
         }
-        ClientWorker worker = workerOpt.get();
-        Location location = worker.getLocation();
-        return locationMapper.toDto(location);
     }
 
     public ClientDTO getWorkerEmployer(Integer workerId) {
-        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
-        if (workerOpt.isEmpty()) {
-            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        log.info("Fetching employer for worker with ID: {}", workerId);
+        try {
+            Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+            if (workerOpt.isEmpty()) {
+                log.warn("Worker with ID {} not found.", workerId);
+                throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+            }
+
+            ClientWorker worker = workerOpt.get();
+            Client client = worker.getClient();
+            ClientDTO clientDTO = clientMapper.toDto(client);
+            log.info("Fetched employer for worker with ID: {}", workerId);
+            return clientDTO;
+        } catch (Exception e) {
+            log.error("Error while fetching employer for worker with ID: {}", workerId, e);
+            throw e;
         }
-        ClientWorker worker = workerOpt.get();
-        Client client = worker.getClient();
-        return clientMapper.toDto(client);
     }
 
     public Set<ClientWorker> contactIdsToClientWorkersSet(List<Integer> contactIds) {
-        Set<ClientWorker> contacts = new HashSet<>();
-        for (Integer id : contactIds) {
-            ClientWorker contact = clientWorkerRepo.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid worker ID: " + id));
-            contacts.add(contact);
+        log.info("Converting contact IDs to ClientWorker set: {}", contactIds);
+        try {
+            Set<ClientWorker> contacts = new HashSet<>();
+            for (Integer id : contactIds) {
+                ClientWorker contact = clientWorkerRepo.findById(id)
+                        .orElseThrow(() -> {
+                            log.warn("Invalid worker ID: {}", id);
+                            return new IllegalArgumentException("Invalid worker ID: " + id);
+                        });
+                contacts.add(contact);
+            }
+            log.info("Converted {} contact IDs to ClientWorker set.", contacts.size());
+            return contacts;
+        } catch (Exception e) {
+            log.error("Error while converting contact IDs to ClientWorker set: {}", contactIds, e);
+            throw e;
         }
-        return contacts;
     }
 
     @Transactional
     public ResponseDTO toggleFavorite(Integer workerId) {
-        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
-        if (workerOpt.isEmpty()) {
-            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        log.info("Toggling favorite status for worker with ID: {}", workerId);
+        try {
+            Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+            if (workerOpt.isEmpty()) {
+                log.warn("Worker with ID {} not found.", workerId);
+                throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+            }
+
+            ClientWorker worker = workerOpt.get();
+            if (worker.getFavorite() == null) {
+                worker.setFavorite(false);
+            }
+            worker.setFavorite(!worker.getFavorite());
+            clientWorkerRepo.save(worker);
+            log.info("Favorite status toggled for worker with ID: {}. New status: {}", workerId, worker.getFavorite());
+            return new ResponseDTO("Worker favorite changed");
+        } catch (Exception e) {
+            log.error("Error while toggling favorite status for worker with ID: {}", workerId, e);
+            throw e;
         }
-        ClientWorker worker = workerOpt.get();
-        if (worker.getFavorite() == null) {
-            worker.setFavorite(false);
-        }
-        worker.setFavorite(!worker.getFavorite());
-        clientWorkerRepo.save(worker);
-        return new ResponseDTO("Worker favorite changed");
     }
 
     public ResponseDTO removeClientFromWorker(Integer workerId) {
-        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
-        if (workerOpt.isEmpty()) {
-            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        log.info("Removing client association for worker with ID: {}", workerId);
+        try {
+            Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+            if (workerOpt.isEmpty()) {
+                log.warn("Worker with ID {} not found.", workerId);
+                throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+            }
+
+            ClientWorker worker = workerOpt.get();
+            worker.setClient(null);
+            clientWorkerRepo.save(worker);
+            log.info("Successfully removed client association for worker with ID: {}", workerId);
+            return new ResponseDTO("Worker removed from client");
+        } catch (Exception e) {
+            log.error("Error while removing client association for worker with ID: {}", workerId, e);
+            throw e;
         }
-        ClientWorker worker = workerOpt.get();
-        worker.setClient(null);
-        clientWorkerRepo.save(worker);
-        return new ResponseDTO("Worker removed from client");
     }
 
     public List<ClientWorkerDTO> getNotUsedContacts() {
-        return clientWorkerMapper.toDtoList(clientWorkerRepo.findByClientIsNull());
+        log.info("Fetching all workers not associated with any client.");
+        try {
+            List<ClientWorkerDTO> workers = clientWorkerMapper.toDtoList(clientWorkerRepo.findByClientIsNull());
+            log.info("Fetched {} workers not associated with any client.", workers.size());
+            return workers;
+        } catch (Exception e) {
+            log.error("Error while fetching workers not associated with any client.", e);
+            throw e;
+        }
     }
 }

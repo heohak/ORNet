@@ -28,29 +28,50 @@ public class DeviceCommentService {
 
     @Transactional
     public ResponseDTO addCommentToDevice(Integer deviceId, String newComment) {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+        log.info("Adding comment to device with ID: {}", deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
+
+            Device device = deviceOpt.get();
+            log.debug("Adding new comment: '{}' to device with ID: {}", newComment, deviceId);
+            Comment comment = commentService.addComment(newComment);
+            device.getComments().add(comment);
+            deviceRepo.save(device);
+
+            log.info("Successfully added comment to device with ID: {}", deviceId);
+            return new ResponseDTO("Comment added successfully");
+        } catch (Exception e) {
+            log.error("Error while adding comment to device with ID: {}", deviceId, e);
+            throw e;
         }
-        Device device = deviceOpt.get();
-        Comment comment = commentService.addComment(newComment);
-        device.getComments().add(comment);
-        deviceRepo.save(device);
-        return new ResponseDTO("Comment added successfully");
     }
 
     public List<CommentDTO> getDeviceComments(Integer deviceId) {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
-        }
+        log.info("Fetching comments for device with ID: {}", deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
 
-        Device device = deviceOpt.get();
-        return commentMapper.toDtoList(
-                device.getComments()
-                        .stream()
-                        .sorted(Comparator.comparing(Comment::getTimestamp).reversed())
-                        .toList()
-        );
+            Device device = deviceOpt.get();
+            List<CommentDTO> comments = commentMapper.toDtoList(
+                    device.getComments()
+                            .stream()
+                            .sorted(Comparator.comparing(Comment::getTimestamp).reversed())
+                            .toList()
+            );
+
+            log.info("Fetched {} comments for device with ID: {}", comments.size(), deviceId);
+            return comments;
+        } catch (Exception e) {
+            log.error("Error while fetching comments for device with ID: {}", deviceId, e);
+            throw e;
+        }
     }
 }

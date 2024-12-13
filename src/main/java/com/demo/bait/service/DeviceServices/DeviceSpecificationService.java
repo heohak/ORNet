@@ -22,33 +22,49 @@ public class DeviceSpecificationService {
 
     public List<DeviceDTO> searchAndFilterDevices(String searchTerm, Integer classificatorId, Integer clientId,
                                                   Integer locationId, Boolean writtenOff) {
-        Specification<Device> combinedSpec = Specification.where(null);
+        log.info("Searching and filtering devices with parameters - " +
+                        "searchTerm: {}, classificatorId: {}, clientId: {}, locationId: {}, writtenOff: {}",
+                searchTerm, classificatorId, clientId, locationId, writtenOff);
 
-        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-            Specification<Device> searchSpec = new DeviceSpecification(searchTerm);
-            combinedSpec = combinedSpec.and(searchSpec);
+        try {
+            Specification<Device> combinedSpec = Specification.where(null);
+
+            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+                log.debug("Adding search term filter: {}", searchTerm);
+                Specification<Device> searchSpec = new DeviceSpecification(searchTerm);
+                combinedSpec = combinedSpec.and(searchSpec);
+            }
+
+            if (classificatorId != null) {
+                log.debug("Adding classificator filter with ID: {}", classificatorId);
+                Specification<Device> classificatorSpec = DeviceSpecification.hasClassificatorId(classificatorId);
+                combinedSpec = combinedSpec.and(classificatorSpec);
+            }
+
+            if (clientId != null) {
+                log.debug("Adding client filter with ID: {}", clientId);
+                Specification<Device> clientSpec = DeviceSpecification.hasClientId(clientId);
+                combinedSpec = combinedSpec.and(clientSpec);
+            }
+
+            if (locationId != null) {
+                log.debug("Adding location filter with ID: {}", locationId);
+                Specification<Device> locationSpec = DeviceSpecification.hasLocationId(locationId);
+                combinedSpec = combinedSpec.and(locationSpec);
+            }
+
+            if (writtenOff != null) {
+                log.debug("Adding written-off filter with value: {}", writtenOff);
+                Specification<Device> writtenOffSpec = DeviceSpecification.isWrittenOff(writtenOff);
+                combinedSpec = combinedSpec.and(writtenOffSpec);
+            }
+
+            List<DeviceDTO> devices = deviceMapper.toDtoList(deviceRepo.findAll(combinedSpec));
+            log.info("Found {} devices matching the criteria.", devices.size());
+            return devices;
+        } catch (Exception e) {
+            log.error("Error while searching and filtering devices.", e);
+            throw e;
         }
-
-        if (classificatorId != null) {
-            Specification<Device> classificatorSpec = DeviceSpecification.hasClassificatorId(classificatorId);
-            combinedSpec = combinedSpec.and(classificatorSpec);
-        }
-
-        if (clientId != null) {
-            Specification<Device> clientSpec = DeviceSpecification.hasClientId(clientId);
-            combinedSpec = combinedSpec.and(clientSpec);
-        }
-
-        if (locationId != null) {
-            Specification<Device> locationSpec = DeviceSpecification.hasLocationId(locationId);
-            combinedSpec = combinedSpec.and(locationSpec);
-        }
-
-        if (writtenOff != null) {
-            Specification<Device> writtenOffSpec = DeviceSpecification.isWrittenOff(writtenOff);
-            combinedSpec = combinedSpec.and(writtenOffSpec);
-        }
-
-        return deviceMapper.toDtoList(deviceRepo.findAll(combinedSpec));
     }
 }

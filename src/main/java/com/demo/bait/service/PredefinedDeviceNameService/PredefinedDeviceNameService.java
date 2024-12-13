@@ -23,19 +23,41 @@ public class PredefinedDeviceNameService {
 
     @Transactional
     public ResponseDTO addPredefinedDeviceName(String deviceName) {
-        PredefinedDeviceName predefinedDeviceName = new PredefinedDeviceName();
-        predefinedDeviceName.setName(deviceName);
-        predefinedDeviceNameRepo.save(predefinedDeviceName);
-        return new ResponseDTO("New predefined device name added");
+        log.info("Adding a new predefined device name: '{}'", deviceName);
+        try {
+            PredefinedDeviceName predefinedDeviceName = new PredefinedDeviceName();
+            predefinedDeviceName.setName(deviceName);
+            predefinedDeviceNameRepo.save(predefinedDeviceName);
+            log.info("Predefined device name '{}' added successfully", deviceName);
+            return new ResponseDTO("New predefined device name added");
+        } catch (Exception e) {
+            log.error("Error while adding predefined device name: '{}'", deviceName, e);
+            throw e;
+        }
     }
 
     public List<PredefinedDeviceNameDTO> getPredefinedDeviceNames() {
-        return predefinedDeviceNameMapper.toDtoList(predefinedDeviceNameRepo.findAll());
+        log.info("Fetching all predefined device names");
+        try {
+            List<PredefinedDeviceNameDTO> predefinedDeviceNames = predefinedDeviceNameMapper.toDtoList(predefinedDeviceNameRepo.findAll());
+            log.info("Fetched {} predefined device names", predefinedDeviceNames.size());
+            return predefinedDeviceNames;
+        } catch (Exception e) {
+            log.error("Error while fetching predefined device names", e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO removePredefinedDeviceName(Integer nameId) {
-        predefinedDeviceNameRepo.deleteById(nameId);
-        return new ResponseDTO("Predefined device name deleted");
+        log.info("Removing predefined device name with ID: {}", nameId);
+        try {
+            predefinedDeviceNameRepo.deleteById(nameId);
+            log.info("Predefined device name with ID {} removed successfully", nameId);
+            return new ResponseDTO("Predefined device name deleted");
+        } catch (Exception e) {
+            log.error("Error while removing predefined device name with ID: {}", nameId, e);
+            throw e;
+        }
     }
 }

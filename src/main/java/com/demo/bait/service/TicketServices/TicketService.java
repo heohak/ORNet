@@ -44,26 +44,26 @@ public class TicketService {
 
     @Transactional
     public ResponseDTO addTicket(TicketDTO ticketDTO) {
+        log.info("Adding new ticket for client ID: {}", ticketDTO.clientId());
         Optional<Client> clientOpt = clientRepo.findById(ticketDTO.clientId());
-
         if (clientOpt.isEmpty()) {
+            log.error("Client with ID: {} not found", ticketDTO.clientId());
             throw new EntityNotFoundException("Client with id " + ticketDTO.clientId() + " not found");
         }
 
         Ticket ticket = new Ticket();
         ticket.setTitle(ticketDTO.title());
         ticket.setClient(clientOpt.get());
-//        ticket.setBaitNumeration(ticketDTO.baitNumeration());
         setTicketBaitNumeration(ticket);
         ticket.setClientNumeration(ticketDTO.clientNumeration());
         ticket.setDescription(ticketDTO.description());
-
         ticket.setStartDateTime(LocalDateTime.now().withNano(0));
 
         if (ticketDTO.locationId() != null && locationRepo.findById(ticketDTO.locationId()).isPresent()) {
             ticket.setLocation(locationRepo.getReferenceById(ticketDTO.locationId()));
         }
 
+        log.debug("Setting ticket contacts, work types, and crisis flag");
         if (ticketDTO.contactIds() != null) {
             Set<ClientWorker> contacts = clientWorkerService.contactIdsToClientWorkersSet(ticketDTO.contactIds());
             ticket.setContacts(contacts);
@@ -75,17 +75,7 @@ public class TicketService {
             ticket.setWorkTypes(workTypes);
         }
 
-//        if (ticketDTO.remote() == null) {
-//            ticket.setRemote(false);
-//        } else {
-//            ticket.setRemote(ticketDTO.remote());
-//        }
-
-        if (ticketDTO.crisis() == null) {
-            ticket.setCrisis(false);
-        } else {
-            ticket.setCrisis(ticketDTO.crisis());
-        }
+        ticket.setCrisis(ticketDTO.crisis() != null ? ticketDTO.crisis() : false);
 
         if (ticketDTO.statusId() != null && ticketStatusRepo.findById(ticketDTO.statusId()).isPresent()) {
             ticket.setStatus(ticketStatusRepo.getReferenceById(ticketDTO.statusId()));
@@ -95,19 +85,22 @@ public class TicketService {
             ticket.setBaitWorker(baitWorkerRepo.getReferenceById(ticketDTO.baitWorkerId()));
         }
 
+        log.debug("Setting ticket response, end date, root cause, files, and devices");
         ticket.setResponseDateTime(ticketDTO.responseDateTime());
-//        ticket.setResponse(ticketDTO.response());
         ticket.setInsideInfo(ticketDTO.insideInfo());
         ticket.setEndDateTime(ticketDTO.endDateTime());
         ticket.setRootCause(ticketDTO.rootCause());
+
         if (ticketDTO.fileIds() != null) {
             Set<FileUpload> files = fileUploadService.fileIdsToFilesSet(ticketDTO.fileIds());
             ticket.setFiles(files);
         }
+
         if (ticketDTO.deviceIds() != null) {
             Set<Device> devices = deviceService.deviceIdsToDevicesSet(ticketDTO.deviceIds());
             ticket.setDevices(devices);
         }
+
         ticket.setTimeSpent(Duration.ZERO);
         ticket.setPaidTime(Duration.ZERO);
         ticket.setPaid(Boolean.FALSE);
@@ -115,17 +108,21 @@ public class TicketService {
 
         ticketRepo.save(ticket);
         setTicketUpdateTime(ticket);
+        log.info("Ticket successfully added with ID: {}", ticket.getId());
         return new ResponseDTO(ticket.getId().toString());
     }
 
     @Transactional
     public ResponseDTO deleteTicket(Integer ticketId) {
+        log.info("Deleting ticket with ID: {}", ticketId);
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         if (ticketOpt.isEmpty()) {
+            log.error("Ticket with ID: {} not found", ticketId);
             throw new EntityNotFoundException("Ticket with ID " + ticketId + " not found");
         }
-        Ticket ticket = ticketOpt.get();
 
+        Ticket ticket = ticketOpt.get();
+        log.debug("Clearing all associations for ticket ID: {}", ticketId);
         ticket.setClient(null);
         ticket.setLocation(null);
         ticket.getContacts().clear();
@@ -135,19 +132,22 @@ public class TicketService {
         ticket.getDevices().clear();
 
         ticketRepo.delete(ticket);
+        log.info("Ticket with ID: {} successfully deleted", ticketId);
         return new ResponseDTO("Ticket deleted successfully");
     }
 
     @Transactional
     public void addResponsibleBaitWorkerToTicket(Ticket ticket, Integer baitWorkerId) {
+        log.info("Adding responsible bait worker ID: {} to ticket ID: {}", baitWorkerId, ticket.getId());
         if (baitWorkerId != null) {
             Optional<BaitWorker> baitWorkerOpt = baitWorkerRepo.findById(baitWorkerId);
             if (baitWorkerOpt.isEmpty()) {
+                log.error("Bait worker with ID: {} not found", baitWorkerId);
                 throw new EntityNotFoundException("Bait worker with id " + baitWorkerId + " not found");
             }
-            BaitWorker baitWorker = baitWorkerOpt.get();
-            ticket.setBaitWorker(baitWorker);
+            ticket.setBaitWorker(baitWorkerOpt.get());
             ticketRepo.save(ticket);
+            log.info("Responsible bait worker successfully added to ticket ID: {}", ticket.getId());
         }
     }
 
@@ -209,14 +209,6 @@ public class TicketService {
         }
     }
 
-//    @Transactional
-//    public void updateTicketResponse(Ticket ticket, TicketDTO ticketDTO) {
-//        if (ticketDTO.response() != null) {
-//            ticket.setResponse(ticketDTO.response());
-//            ticketRepo.save(ticket);
-//        }
-//    }
-
     @Transactional
     public void updateTicketInsideInfo(Ticket ticket, TicketDTO ticketDTO) {
         if (ticketDTO.insideInfo() != null) {
@@ -265,22 +257,6 @@ public class TicketService {
         }
     }
 
-//    @Transactional
-//    public void updateRemoteInTicket(Ticket ticket, TicketDTO ticketDTO) {
-//        if (ticketDTO.remote() != null) {
-//            ticket.setRemote(ticketDTO.remote());
-//            ticketRepo.save(ticket);
-//        }
-//    }
-
-//    @Transactional
-//    public void updateTicketNumeration(Ticket ticket, TicketDTO ticketDTO) {
-//        if (ticketDTO.baitNumeration() != null) {
-//            ticket.setBaitNumeration(ticketDTO.baitNumeration());
-//            ticketRepo.save(ticket);
-//        }
-//    }
-
     @Transactional
     public void updateTicketClientNumeration(Ticket ticket, TicketDTO ticketDTO) {
         if (ticketDTO.clientNumeration() != null) {
@@ -297,18 +273,18 @@ public class TicketService {
 
     @Transactional
     public ResponseDTO updateWholeTicket(Integer ticketId, TicketDTO ticketDTO) {
+        log.info("Updating whole ticket with ID: {}", ticketId);
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         if (ticketOpt.isEmpty()) {
+            log.error("Ticket with ID: {} not found", ticketId);
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
-        Ticket ticket = ticketOpt.get();
 
+        Ticket ticket = ticketOpt.get();
         addResponseDateToTicket(ticket, ticketDTO);
         addEndDateToTicket(ticket, ticketDTO);
-//        updateTicketNumeration(ticket, ticketDTO);
         updateTicketClientNumeration(ticket, ticketDTO);
         updateCrisisInTicket(ticket, ticketDTO);
-//        updateRemoteInTicket(ticket, ticketDTO);
         ticketWorkTypeService.addWorkTypeToTicket(ticket, ticketDTO);
         addResponsibleBaitWorkerToTicket(ticket, ticketDTO.baitWorkerId());
         addClientToTicket(ticket, ticketDTO.clientId());
@@ -316,11 +292,12 @@ public class TicketService {
         addStatusToTicket(ticket, ticketDTO.statusId());
         addRootCauseToTicket(ticket, ticketDTO);
         updateTicketDescription(ticket, ticketDTO);
-//        updateTicketResponse(ticket, ticketDTO);
         updateTicketInsideInfo(ticket, ticketDTO);
         ticketContactsService.addContactsToTicket(ticket, ticketDTO);
         ticketDeviceService.addDevicesToTicket(ticket, ticketDTO);
         setTicketUpdateTime(ticket);
+
+        log.info("Whole ticket updated successfully with ID: {}", ticketId);
         return new ResponseDTO("Whole ticket updated successfully");
     }
 
@@ -329,8 +306,6 @@ public class TicketService {
         ticketRepo.save(ticket);
         LocalDate now = LocalDate.now();
         String yy = String.valueOf(now.getYear()).substring(2);
-//        String mm = String.format("%02d", now.getMonthValue());
-//        String dd = String.format("%02d", now.getDayOfMonth());
         String nn;
         if (ticket.getId() < 10) {
             nn = String.format("00%d", ticket.getId());
@@ -371,19 +346,28 @@ public class TicketService {
     }
 
     public TicketDTO getTicketById(Integer ticketId) {
+        log.info("Retrieving ticket with ID: {}", ticketId);
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         if (ticketOpt.isEmpty()) {
+            log.error("Ticket with ID: {} not found", ticketId);
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
-        Ticket ticket = ticketOpt.get();
-        return ticketMapper.toDto(ticket);
+
+        log.info("Successfully retrieved ticket with ID: {}", ticketId);
+        return ticketMapper.toDto(ticketOpt.get());
     }
 
     public List<TicketDTO> getTicketsByClientId(Integer clientId) {
-        return ticketMapper.toDtoList(ticketRepo.findByClientId(clientId));
+        log.info("Retrieving tickets for client ID: {}", clientId);
+        List<TicketDTO> tickets = ticketMapper.toDtoList(ticketRepo.findByClientId(clientId));
+        log.info("Retrieved {} tickets for client ID: {}", tickets.size(), clientId);
+        return tickets;
     }
 
     public List<TicketDTO> getAllTickets() {
-        return ticketMapper.toDtoList(ticketRepo.findAll());
+        log.info("Retrieving all tickets");
+        List<TicketDTO> tickets = ticketMapper.toDtoList(ticketRepo.findAll());
+        log.info("Successfully retrieved {} tickets", tickets.size());
+        return tickets;
     }
 }

@@ -34,31 +34,50 @@ public class MaintenanceService {
 
     @Transactional
     public ResponseDTO addMaintenance(MaintenanceDTO maintenanceDTO) {
-        Maintenance maintenance = new Maintenance();
-        maintenance.setMaintenanceName(maintenanceDTO.maintenanceName());
-        maintenance.setMaintenanceDate(maintenanceDTO.maintenanceDate());
-        maintenance.setComment(maintenanceDTO.comment());
+        log.info("Adding a new maintenance record with name: '{}'", maintenanceDTO.maintenanceName());
+        try {
+            Maintenance maintenance = new Maintenance();
+            maintenance.setMaintenanceName(maintenanceDTO.maintenanceName());
+            maintenance.setMaintenanceDate(maintenanceDTO.maintenanceDate());
+            maintenance.setComment(maintenanceDTO.comment());
 
-        if (maintenanceDTO.fileIds() != null) {
-            Set<FileUpload> files = fileUploadService.fileIdsToFilesSet(maintenanceDTO.fileIds());
-            maintenance.setFiles(files);
+            if (maintenanceDTO.fileIds() != null) {
+                log.debug("Attaching {} files to maintenance record", maintenanceDTO.fileIds().size());
+                Set<FileUpload> files = fileUploadService.fileIdsToFilesSet(maintenanceDTO.fileIds());
+                maintenance.setFiles(files);
+            }
+
+            maintenanceRepo.save(maintenance);
+            log.info("Maintenance record added successfully with ID: {}", maintenance.getId());
+            return new ResponseDTO(maintenance.getId().toString());
+        } catch (Exception e) {
+            log.error("Error while adding maintenance record", e);
+            throw e;
         }
-        maintenanceRepo.save(maintenance);
-        return new ResponseDTO(maintenance.getId().toString());
     }
 
     @Transactional
     public ResponseDTO updateMaintenance(Integer maintenanceId, MaintenanceDTO maintenanceDTO) {
-        Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
-        if (maintenanceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Maintenance with " + maintenanceId + " not found");
+        log.info("Updating maintenance record with ID: {}", maintenanceId);
+        try {
+            Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
+            if (maintenanceOpt.isEmpty()) {
+                log.warn("Maintenance record with ID {} not found", maintenanceId);
+                throw new EntityNotFoundException("Maintenance with " + maintenanceId + " not found");
+            }
+
+            Maintenance maintenance = maintenanceOpt.get();
+            updateMaintenanceName(maintenance, maintenanceDTO);
+            updateMaintenanceDate(maintenance, maintenanceDTO);
+            updateMaintenanceComment(maintenance, maintenanceDTO);
+            maintenanceRepo.save(maintenance);
+
+            log.info("Maintenance record updated successfully with ID: {}", maintenanceId);
+            return new ResponseDTO("Maintenance updated successfully");
+        } catch (Exception e) {
+            log.error("Error while updating maintenance record with ID: {}", maintenanceId, e);
+            throw e;
         }
-        Maintenance maintenance = maintenanceOpt.get();
-        updateMaintenanceName(maintenance, maintenanceDTO);
-        updateMaintenanceDate(maintenance, maintenanceDTO);
-        updateMaintenanceComment(maintenance, maintenanceDTO);
-        maintenanceRepo.save(maintenance);
-        return new ResponseDTO("Maintenance updated successfully");
     }
 
     public void updateMaintenanceName(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
@@ -80,25 +99,49 @@ public class MaintenanceService {
     }
 
     public List<MaintenanceDTO> getAllMaintenances() {
-        return maintenanceMapper.toDtoList(maintenanceRepo.findAll());
+        log.info("Fetching all maintenance records");
+        try {
+            List<MaintenanceDTO> maintenances = maintenanceMapper.toDtoList(maintenanceRepo.findAll());
+            log.info("Fetched {} maintenance records", maintenances.size());
+            return maintenances;
+        } catch (Exception e) {
+            log.error("Error while fetching all maintenance records", e);
+            throw e;
+        }
     }
 
     public Set<Maintenance> maintenanceIdsToMaintenancesSet(List<Integer> maintenanceIds) {
-        Set<Maintenance> maintenances = new HashSet<>();
-        for (Integer id : maintenanceIds) {
-            Maintenance maintenance = maintenanceRepo.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid maintenance ID: " + id));
-            maintenances.add(maintenance);
+        log.info("Fetching maintenance records for IDs: {}", maintenanceIds);
+        try {
+            Set<Maintenance> maintenances = new HashSet<>();
+            for (Integer id : maintenanceIds) {
+                Maintenance maintenance = maintenanceRepo.findById(id)
+                        .orElseThrow(() -> new IllegalArgumentException("Invalid maintenance ID: " + id));
+                maintenances.add(maintenance);
+            }
+            log.info("Fetched {} maintenance records for provided IDs", maintenances.size());
+            return maintenances;
+        } catch (Exception e) {
+            log.error("Error while fetching maintenance records for IDs: {}", maintenanceIds, e);
+            throw e;
         }
-        return maintenances;
     }
 
     public MaintenanceDTO getMaintenanceById(Integer id) {
-        Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(id);
-        if (maintenanceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Maintenance with " + id + " not found");
+        log.info("Fetching maintenance record with ID: {}", id);
+        try {
+            Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(id);
+            if (maintenanceOpt.isEmpty()) {
+                log.warn("Maintenance record with ID {} not found", id);
+                throw new EntityNotFoundException("Maintenance with " + id + " not found");
+            }
+
+            Maintenance maintenance = maintenanceOpt.get();
+            log.info("Maintenance record with ID {} fetched successfully", id);
+            return maintenanceMapper.toDto(maintenance);
+        } catch (Exception e) {
+            log.error("Error while fetching maintenance record with ID: {}", id, e);
+            throw e;
         }
-        Maintenance maintenance = maintenanceOpt.get();
-        return maintenanceMapper.toDto(maintenance);
     }
 }

@@ -31,38 +31,69 @@ public class ClientThirdPartyITService {
 
     @Transactional
     public ResponseDTO addThirdPartyIT(Integer clientId, Integer thirdPartyITId) {
-        Optional<Client> clientOpt = clientRepo.findById(clientId);
-        Optional<ThirdPartyIT> thirdPartyITOpt = thirdPartyITRepo.findById(thirdPartyITId);
+        log.info("Adding Third Party IT with ID: {} to Client with ID: {}", thirdPartyITId, clientId);
+        try {
+            Optional<Client> clientOpt = clientRepo.findById(clientId);
+            Optional<ThirdPartyIT> thirdPartyITOpt = thirdPartyITRepo.findById(thirdPartyITId);
 
-        if (clientOpt.isEmpty()) {
-            throw new EntityNotFoundException("Client with id " + clientId + " not found");
-        }
-        if (thirdPartyITOpt.isEmpty()) {
-            throw new EntityNotFoundException("Third party with id " + thirdPartyITId + " not found");
-        }
+            if (clientOpt.isEmpty()) {
+                log.warn("Client with ID {} not found", clientId);
+                throw new EntityNotFoundException("Client with id " + clientId + " not found");
+            }
+            if (thirdPartyITOpt.isEmpty()) {
+                log.warn("Third Party IT with ID {} not found", thirdPartyITId);
+                throw new EntityNotFoundException("Third party with id " + thirdPartyITId + " not found");
+            }
 
-        Client client = clientOpt.get();
-        ThirdPartyIT thirdPartyIT = thirdPartyITOpt.get();
-        client.getThirdPartyITs().add(thirdPartyIT);
-        clientRepo.save(client);
-        return new ResponseDTO("Third party added successfully");
+            Client client = clientOpt.get();
+            ThirdPartyIT thirdPartyIT = thirdPartyITOpt.get();
+
+            log.debug("Adding Third Party IT with ID: {} to Client with ID: {}", thirdPartyITId, clientId);
+            client.getThirdPartyITs().add(thirdPartyIT);
+            clientRepo.save(client);
+
+            log.info("Successfully added Third Party IT with ID: {} to Client with ID: {}", thirdPartyITId, clientId);
+            return new ResponseDTO("Third party added successfully");
+        } catch (Exception e) {
+            log.error("Error while adding Third Party IT with ID: {} to Client with ID: {}", thirdPartyITId, clientId, e);
+            throw e;
+        }
     }
 
     public List<ThirdPartyITDTO> getClientThirdPartyITs(Integer clientId) {
-        Optional<Client> clientOpt = clientRepo.findById(clientId);
-        if (clientOpt.isEmpty()) {
-            throw new EntityNotFoundException("Client with id " + clientId + " not found");
-        }
+        log.info("Fetching Third Party ITs for Client with ID: {}", clientId);
+        try {
+            Optional<Client> clientOpt = clientRepo.findById(clientId);
+            if (clientOpt.isEmpty()) {
+                log.warn("Client with ID {} not found", clientId);
+                throw new EntityNotFoundException("Client with id " + clientId + " not found");
+            }
 
-        Client client = clientOpt.get();
-        return thirdPartyITMapper.toDtoList(client.getThirdPartyITs().stream().toList());
+            Client client = clientOpt.get();
+            List<ThirdPartyITDTO> thirdPartyITDTOs = thirdPartyITMapper.toDtoList(client.getThirdPartyITs().stream().toList());
+
+            log.debug("Fetched {} Third Party ITs for Client with ID: {}", thirdPartyITDTOs.size(), clientId);
+            return thirdPartyITDTOs;
+        } catch (Exception e) {
+            log.error("Error while fetching Third Party ITs for Client with ID: {}", clientId, e);
+            throw e;
+        }
     }
 
     public void updateThirdPartyITs(Client client, ClientDTO clientDTO) {
-        if (clientDTO.thirdPartyIds() != null) {
-            Set<ThirdPartyIT> thirdPartyITs = thirdPartyITService
-                    .thirdPartyITIdsToThirdPartyITsSet(clientDTO.thirdPartyIds());
-            client.setThirdPartyITs(thirdPartyITs);
+        log.info("Updating Third Party ITs for Client with ID: {}", client.getId());
+        try {
+            if (clientDTO.thirdPartyIds() != null) {
+                log.debug("Updating Third Party ITs with IDs: {} for Client with ID: {}", clientDTO.thirdPartyIds(), client.getId());
+                Set<ThirdPartyIT> thirdPartyITs = thirdPartyITService.thirdPartyITIdsToThirdPartyITsSet(clientDTO.thirdPartyIds());
+                client.setThirdPartyITs(thirdPartyITs);
+                log.info("Successfully updated Third Party ITs for Client with ID: {}", client.getId());
+            } else {
+                log.debug("No Third Party ITs provided to update for Client with ID: {}", client.getId());
+            }
+        } catch (Exception e) {
+            log.error("Error while updating Third Party ITs for Client with ID: {}", client.getId(), e);
+            throw e;
         }
     }
 }

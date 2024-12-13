@@ -30,26 +30,48 @@ public class DeviceFileUploadService {
 
     @Transactional
     public ResponseDTO uploadFilesToDevice(Integer deviceId, List<MultipartFile> files) throws IOException {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
-        }
-        Device device = deviceOpt.get();
+        log.info("Uploading files to device with ID: {}", deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
 
-        Set<FileUpload> uploadedFiles = fileUploadService.uploadFiles(files);
-        device.getFiles().addAll(uploadedFiles);
-        deviceRepo.save(device);
-        return new ResponseDTO("Files uploaded successfully to device");
+            Device device = deviceOpt.get();
+            log.debug("Uploading {} files to device with ID: {}", files.size(), deviceId);
+            Set<FileUpload> uploadedFiles = fileUploadService.uploadFiles(files);
+            device.getFiles().addAll(uploadedFiles);
+            deviceRepo.save(device);
+
+            log.info("Successfully uploaded {} files to device with ID: {}", uploadedFiles.size(), deviceId);
+            return new ResponseDTO("Files uploaded successfully to device");
+        } catch (IOException e) {
+            log.error("IO Exception occurred while uploading files to device with ID: {}", deviceId, e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error occurred while uploading files to device with ID: {}", deviceId, e);
+            throw e;
+        }
     }
 
     public List<FileUploadDTO> getDeviceFiles(Integer deviceId) {
-        Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+        log.info("Fetching files for device with ID: {}", deviceId);
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
 
-        if (deviceOpt.isEmpty()) {
-            throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            Device device = deviceOpt.get();
+            List<FileUploadDTO> files = fileUploadMapper.toDtoList(device.getFiles().stream().toList());
+
+            log.info("Fetched {} files for device with ID: {}", files.size(), deviceId);
+            return files;
+        } catch (Exception e) {
+            log.error("Error while fetching files for device with ID: {}", deviceId, e);
+            throw e;
         }
-
-        Device device = deviceOpt.get();
-        return fileUploadMapper.toDtoList(device.getFiles().stream().toList());
     }
 }

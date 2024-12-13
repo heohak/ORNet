@@ -24,14 +24,23 @@ public class LocationSpecificationService {
     private LocationMapper locationMapper;
 
     public List<LocationDTO> searchLocations(String searchTerm) {
-        Specification<Location> combinedSpec = Specification.where(null);
+        log.info("Searching for locations with search term: '{}'", searchTerm);
+        try {
+            Specification<Location> combinedSpec = Specification.where(null);
 
-        if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-            Specification<Location> searchSpec = new LocationSpecification(searchTerm);
-            combinedSpec = combinedSpec.and(searchSpec);
+            if (searchTerm != null && !searchTerm.trim().isEmpty()) {
+                log.debug("Adding search specification for term: '{}'", searchTerm);
+                Specification<Location> searchSpec = new LocationSpecification(searchTerm);
+                combinedSpec = combinedSpec.and(searchSpec);
+            }
+
+            List<LocationDTO> locations = locationMapper.toDtoList(locationRepo.findAll(combinedSpec));
+            locations.sort(Comparator.comparing(LocationDTO::name, String::compareToIgnoreCase));
+            log.info("Found {} locations matching search term: '{}'", locations.size(), searchTerm);
+            return locations;
+        } catch (Exception e) {
+            log.error("Error while searching for locations with search term: '{}'", searchTerm, e);
+            throw e;
         }
-        List<LocationDTO> locations = locationMapper.toDtoList(locationRepo.findAll(combinedSpec));
-        locations.sort(Comparator.comparing(LocationDTO::name, String::compareToIgnoreCase));
-        return locations;
     }
 }

@@ -23,30 +23,71 @@ public class DeviceAttributeService {
 
     @Transactional
     public void addAttributeToAllDevices(String attributeName, Object attributeValue) {
-        List<Device> devices = deviceRepo.findAll();
-        for (Device device : devices) {
-            device.getAttributes().put(attributeName, attributeValue);
+        log.info("Adding attribute '{}' with value '{}' to all devices.", attributeName, attributeValue);
+        try {
+            List<Device> devices = deviceRepo.findAll();
+            log.debug("Found {} devices to update.", devices.size());
+
+            for (Device device : devices) {
+                log.debug("Adding attribute '{}' to device with ID: {}", attributeName, device.getId());
+                device.getAttributes().put(attributeName, attributeValue);
+            }
+
+            deviceRepo.saveAll(devices);
+            log.info("Successfully added attribute '{}' to all devices.", attributeName);
+        } catch (Exception e) {
+            log.error("Error while adding attribute '{}' to all devices.", attributeName, e);
+            throw e;
         }
-        deviceRepo.saveAll(devices);
     }
 
     @Transactional
     public DeviceDTO updateDeviceAttributes(Integer deviceId, Map<String, Object> newAttributes) {
-        Device device = deviceRepo.findById(deviceId)
-                .orElseThrow(() -> new EntityNotFoundException("Device not found"));
-        if (newAttributes != null) {
-            device.getAttributes().putAll(newAttributes);
+        log.info("Updating attributes for device with ID: {}", deviceId);
+        try {
+            Device device = deviceRepo.findById(deviceId)
+                    .orElseThrow(() -> {
+                        log.warn("Device with ID {} not found.", deviceId);
+                        return new EntityNotFoundException("Device not found");
+                    });
+
+            if (newAttributes != null) {
+                log.debug("Adding new attributes: {} to device with ID: {}", newAttributes, deviceId);
+                device.getAttributes().putAll(newAttributes);
+            }
+
+            Device updatedDevice = deviceRepo.save(device);
+            log.info("Successfully updated attributes for device with ID: {}", deviceId);
+            return deviceMapper.toDto(updatedDevice);
+        } catch (Exception e) {
+            log.error("Error while updating attributes for device with ID: {}", deviceId, e);
+            throw e;
         }
-        Device updatedDevice = deviceRepo.save(device);
-        return deviceMapper.toDto(updatedDevice);
     }
 
     @Transactional
     public DeviceDTO removeDeviceAttribute(Integer deviceId, String attributeName) {
-        Device device = deviceRepo.findById(deviceId)
-                .orElseThrow(() -> new EntityNotFoundException("Device not found"));
-        device.getAttributes().remove(attributeName);
-        Device updatedDevice = deviceRepo.save(device);
-        return deviceMapper.toDto(updatedDevice);
+        log.info("Removing attribute '{}' from device with ID: {}", attributeName, deviceId);
+        try {
+            Device device = deviceRepo.findById(deviceId)
+                    .orElseThrow(() -> {
+                        log.warn("Device with ID {} not found.", deviceId);
+                        return new EntityNotFoundException("Device not found");
+                    });
+
+            if (device.getAttributes().containsKey(attributeName)) {
+                log.debug("Removing attribute '{}' from device with ID: {}", attributeName, deviceId);
+                device.getAttributes().remove(attributeName);
+            } else {
+                log.warn("Attribute '{}' not found in device with ID: {}", attributeName, deviceId);
+            }
+
+            Device updatedDevice = deviceRepo.save(device);
+            log.info("Successfully removed attribute '{}' from device with ID: {}", attributeName, deviceId);
+            return deviceMapper.toDto(updatedDevice);
+        } catch (Exception e) {
+            log.error("Error while removing attribute '{}' from device with ID: {}", attributeName, deviceId, e);
+            throw e;
+        }
     }
 }

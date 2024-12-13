@@ -28,19 +28,28 @@ public class TicketDeviceService {
 
     @Transactional
     public void addDevicesToTicket(Ticket ticket, TicketDTO ticketDTO) {
+        log.info("Adding devices to ticket with ID: {}", ticket.getId());
         if (ticketDTO.deviceIds() != null) {
+            log.debug("Device IDs provided: {}", ticketDTO.deviceIds());
             Set<Device> devices = deviceService.deviceIdsToDevicesSet(ticketDTO.deviceIds());
             ticket.setDevices(devices);
             ticketRepo.save(ticket);
+            log.info("Devices successfully added to ticket with ID: {}", ticket.getId());
+        } else {
+            log.warn("No device IDs provided for ticket with ID: {}", ticket.getId());
         }
     }
 
     public List<DeviceDTO> getTicketDevices(Integer ticketId) {
+        log.info("Fetching devices for ticket with ID: {}", ticketId);
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         if (ticketOpt.isEmpty()) {
+            log.error("Ticket with ID: {} not found", ticketId);
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
         Ticket ticket = ticketOpt.get();
-        return deviceMapper.toDtoList(ticket.getDevices().stream().toList());
+        List<DeviceDTO> devices = deviceMapper.toDtoList(ticket.getDevices().stream().toList());
+        log.info("Found {} devices for ticket with ID: {}", devices.size(), ticketId);
+        return devices;
     }
 }

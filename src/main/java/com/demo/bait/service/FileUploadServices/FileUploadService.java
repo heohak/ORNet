@@ -45,46 +45,62 @@ public class FileUploadService {
 
     @Transactional
     public Set<FileUpload> uploadFiles(List<MultipartFile> files) throws IOException {
-        Set<FileUpload> uploadedFiles = new HashSet<>();
-        File uploadDir = new File(UPLOAD_DIR);
+        log.info("Uploading {} files", files.size());
+        try {
+            Set<FileUpload> uploadedFiles = new HashSet<>();
+            File uploadDir = new File(UPLOAD_DIR);
 
-        if (!uploadDir.exists()) {
-            uploadDir.mkdirs();
+            if (!uploadDir.exists()) {
+                log.debug("Creating upload directory: {}", UPLOAD_DIR);
+                uploadDir.mkdirs();
+            }
+
+            for (MultipartFile file : files) {
+                log.debug("Processing file: {}", file.getOriginalFilename());
+                String uniqueFileName = UUID.randomUUID().toString();
+                String fileExtension = getFileExtension(file.getOriginalFilename());
+                String storedFileName = uniqueFileName + fileExtension;
+
+                Path filePath = Paths.get(UPLOAD_DIR, storedFileName);
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                byte[] thumbnail = generateThumbnail(file);
+
+                FileUpload fileUpload = new FileUpload();
+                fileUpload.setFileName(file.getOriginalFilename());
+                fileUpload.setStoredFileName(storedFileName);
+                fileUpload.setFilePath(filePath.toString());
+                fileUpload.setFileSize(file.getSize());
+                fileUpload.setFileType(file.getContentType());
+                fileUpload.setThumbnail(thumbnail);
+
+                fileUploadRepo.save(fileUpload);
+                uploadedFiles.add(fileUpload);
+
+                log.info("File {} uploaded successfully as {}", file.getOriginalFilename(), storedFileName);
+            }
+
+            log.info("{} files uploaded successfully", uploadedFiles.size());
+            return uploadedFiles;
+        } catch (IOException e) {
+            log.error("Error during file upload", e);
+            throw e;
         }
-
-        for (MultipartFile file : files) {
-            String uniqueFileName = UUID.randomUUID().toString();
-            String fileExtension = getFileExtension(file.getOriginalFilename());
-            String storedFileName = uniqueFileName + fileExtension;
-
-            Path filePath = Paths.get(UPLOAD_DIR, storedFileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            byte[] thumbnail = generateThumbnail(file);
-
-            FileUpload fileUpload = new FileUpload();
-            fileUpload.setFileName(file.getOriginalFilename());
-            fileUpload.setStoredFileName(storedFileName);
-            fileUpload.setFilePath(filePath.toString());
-            fileUpload.setFileSize(file.getSize());
-            fileUpload.setFileType(file.getContentType());
-            fileUpload.setThumbnail(thumbnail);
-
-            fileUploadRepo.save(fileUpload);
-            uploadedFiles.add(fileUpload);
-        }
-        return uploadedFiles;
     }
 
     private String getFileExtension(String fileName) {
         if (fileName == null || !fileName.contains(".")) {
+            log.debug("No file extension found for file: {}", fileName);
             return "";
         }
-        return fileName.substring(fileName.lastIndexOf('.'));
+        String extension = fileName.substring(fileName.lastIndexOf('.'));
+        log.debug("Extracted file extension: {}", extension);
+        return extension;
     }
 
     private byte[] generateThumbnail(MultipartFile file) {
         try {
+            log.debug("Generating thumbnail for file: {}", file.getOriginalFilename());
             String contentType = file.getContentType();
             if (contentType != null && contentType.startsWith("image/")) {
                 ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
@@ -94,6 +110,7 @@ public class FileUploadService {
                         .toOutputStream(thumbnailOutputStream);
                 return thumbnailOutputStream.toByteArray();
             } else {
+                log.debug("File {} is not an image. Generating placeholder.", file.getOriginalFilename());
                 return generatePlaceholderImage(file.getOriginalFilename());
             }
         } catch (IOException e) {
@@ -104,6 +121,7 @@ public class FileUploadService {
 
     private byte[] generatePlaceholderImage(String fileName) {
         try {
+            log.debug("Generating placeholder image for file: {}", fileName);
             BufferedImage placeholder = new BufferedImage(150, 150, BufferedImage.TYPE_INT_RGB);
             Graphics2D g2d = placeholder.createGraphics();
             g2d.setColor(Color.GRAY);
@@ -126,34 +144,50 @@ public class FileUploadService {
     }
 
     public ResponseEntity<byte[]> getThumbnail(Integer fileId) {
-        FileUpload fileUpload = fileUploadRepo.findById(fileId).orElseThrow(() -> new RuntimeException("File not found"));
+        log.info("Fetching thumbnail for file ID: {}", fileId);
+        FileUpload fileUpload = fileUploadRepo.findById(fileId)
+                .orElseThrow(() -> {
+                    log.warn("File with ID {} not found", fileId);
+                    return new RuntimeException("File not found");
+                });
         byte[] thumbnail = fileUpload.getThumbnail();
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.CONTENT_TYPE, "image/jpeg");
 
+        log.info("Thumbnail fetched successfully for file ID: {}", fileId);
         return new ResponseEntity<>(thumbnail, headers, HttpStatus.OK);
     }
 
     public List<FileUploadDTO> getAllFiles() {
-        return fileUploadMapper.toDtoList(fileUploadRepo.findAll());
+        log.info("Fetching all uploaded files");
+        List<FileUploadDTO> files = fileUploadMapper.toDtoList(fileUploadRepo.findAll());
+        log.info("Fetched {} files", files.size());
+        return files;
     }
 
     public ResponseEntity<Resource> downloadFile(Integer fileId) {
+        log.info("Preparing download for file ID: {}", fileId);
         return prepareFileResponse(fileId, "attachment");
     }
 
     public ResponseEntity<Resource> openFileInBrowser(Integer fileId) {
+        log.info("Preparing to open file in browser for file ID: {}", fileId);
         return prepareFileResponse(fileId, "inline");
     }
 
     private ResponseEntity<Resource> prepareFileResponse(Integer fileId, String dispositionType) {
+        log.debug("Preparing file response for file ID: {} with disposition: {}", fileId, dispositionType);
         FileUpload fileUpload = fileUploadRepo.findById(fileId)
-                .orElseThrow(() -> new RuntimeException("File not found"));
+                .orElseThrow(() -> {
+                    log.warn("File with ID {} not found", fileId);
+                    return new RuntimeException("File not found");
+                });
 
         Path path = Paths.get(fileUpload.getFilePath());
         Resource resource = loadResource(path);
         HttpHeaders headers = createHeaders(fileUpload.getFileName(), dispositionType);
 
+        log.info("File response prepared for file ID: {}", fileId);
         return ResponseEntity.ok()
                 .headers(headers)
                 .contentLength(fileUpload.getFileSize())
@@ -163,38 +197,50 @@ public class FileUploadService {
 
     public static Resource loadResource(Path path) {
         try {
+            log.debug("Loading resource from path: {}", path);
             Resource resource = new UrlResource(path.toUri());
             if (!resource.exists() || !resource.isReadable()) {
+                log.error("File at path {} not found or not readable", path);
                 throw new RuntimeException("File not found or not readable");
             }
             return resource;
         } catch (MalformedURLException e) {
+            log.error("Error loading file at path: {}", path, e);
             throw new RuntimeException("Error loading file", e);
         }
     }
 
     public static HttpHeaders createHeaders(String fileName, String dispositionType) {
+        log.debug("Creating headers for file: {} with disposition: {}", fileName, dispositionType);
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, dispositionType + "; filename=\"" + fileName + "\"");
         return headers;
     }
 
     public Set<FileUpload> fileIdsToFilesSet(List<Integer> fileIds) {
+        log.info("Fetching files for IDs: {}", fileIds);
         Set<FileUpload> files = new HashSet<>();
         for (Integer fileId : fileIds) {
             FileUpload file = fileUploadRepo.findById(fileId)
-                    .orElseThrow(() -> new IllegalArgumentException("Invalid file ID: " + fileId));
+                    .orElseThrow(() -> {
+                        log.warn("Invalid file ID: {}", fileId);
+                        return new IllegalArgumentException("Invalid file ID: " + fileId);
+                    });
             files.add(file);
         }
+        log.info("Fetched {} files for given IDs", files.size());
         return files;
     }
 
     public FileUploadDTO getFileById(Integer id) {
+        log.info("Fetching file with ID: {}", id);
         Optional<FileUpload> fileOpt = fileUploadRepo.findById(id);
         if (fileOpt.isEmpty()) {
+            log.warn("File with ID {} not found", id);
             throw new EntityNotFoundException("File with ID " + id + " not found");
         }
         FileUpload file = fileOpt.get();
+        log.info("File with ID {} fetched successfully", id);
         return fileUploadMapper.toDto(file);
     }
 }

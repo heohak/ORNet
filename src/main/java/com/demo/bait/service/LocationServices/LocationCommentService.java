@@ -28,28 +28,52 @@ public class LocationCommentService {
 
     @Transactional
     public ResponseDTO addCommentToLocation(Integer locationId, String newComment) {
-        Optional<Location> locationOpt = locationRepo.findById(locationId);
-        if (locationOpt.isEmpty()) {
-            throw new EntityNotFoundException("Location with id " + locationId + " not found");
+        log.info("Adding comment to location with ID: {}", locationId);
+        try {
+            Optional<Location> locationOpt = locationRepo.findById(locationId);
+            if (locationOpt.isEmpty()) {
+                log.warn("Location with ID {} not found", locationId);
+                throw new EntityNotFoundException("Location with id " + locationId + " not found");
+            }
+
+            Location location = locationOpt.get();
+            log.debug("Current comments for location ID {}: {}", locationId, location.getComments());
+
+            Comment comment = commentService.addComment(newComment);
+            location.getComments().add(comment);
+            locationRepo.save(location);
+
+            log.info("Comment added successfully to location with ID: {}", locationId);
+            return new ResponseDTO("Comment added successfully");
+        } catch (Exception e) {
+            log.error("Error while adding comment to location with ID: {}", locationId, e);
+            throw e;
         }
-        Location location = locationOpt.get();
-        Comment comment = commentService.addComment(newComment);
-        location.getComments().add(comment);
-        locationRepo.save(location);
-        return new ResponseDTO("Comment added successfully");
     }
 
     public List<CommentDTO> getLocationComments(Integer locationId) {
-        Optional<Location> locationOpt = locationRepo.findById(locationId);
-        if (locationOpt.isEmpty()) {
-            throw new EntityNotFoundException("Location with id " + locationId + " not found");
+        log.info("Fetching comments for location with ID: {}", locationId);
+        try {
+            Optional<Location> locationOpt = locationRepo.findById(locationId);
+            if (locationOpt.isEmpty()) {
+                log.warn("Location with ID {} not found", locationId);
+                throw new EntityNotFoundException("Location with id " + locationId + " not found");
+            }
+
+            Location location = locationOpt.get();
+            log.debug("Fetched comments for location ID {}: {}", locationId, location.getComments());
+
+            List<CommentDTO> comments = commentMapper.toDtoList(
+                    location.getComments()
+                            .stream()
+                            .sorted(Comparator.comparing(Comment::getTimestamp).reversed())
+                            .toList());
+
+            log.info("Successfully fetched {} comments for location ID: {}", comments.size(), locationId);
+            return comments;
+        } catch (Exception e) {
+            log.error("Error while fetching comments for location with ID: {}", locationId, e);
+            throw e;
         }
-        Location location = locationOpt.get();
-        return commentMapper.toDtoList(
-                location.getComments()
-                        .stream()
-                        .sorted(Comparator.comparing(Comment::getTimestamp).reversed())
-                        .toList()
-        );
     }
 }

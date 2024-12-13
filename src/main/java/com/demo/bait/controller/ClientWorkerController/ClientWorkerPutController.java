@@ -38,7 +38,7 @@ public class ClientWorkerPutController {
 
     @PutMapping("/update/{workerId}")
     public ResponseDTO updateClientWorker(@PathVariable Integer workerId,
-                                          @Valid @RequestBody ClientWorkerDTO clientWorkerDTO) {
+                                          @RequestBody ClientWorkerDTO clientWorkerDTO) {
         return clientWorkerService.updateClientWorker(workerId, clientWorkerDTO);
     }
 

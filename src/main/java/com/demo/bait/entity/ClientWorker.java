@@ -24,9 +24,9 @@ public class ClientWorker {
     private Integer id;
     private String firstName;
     private String lastName;
-    @Email
+//    @Email
     private String email;
-    @Pattern(regexp = "^\\+?[0-9 ]{1,15}$", message = "Invalid phone number format")
+//    @Pattern(regexp = "^\\+?[0-9 ]{1,15}$", message = "Invalid phone number format")
     private String phoneNumber;
     private String title;
 //    private Integer clientId;
@@ -46,4 +46,6 @@ public class ClientWorker {
     )
     private Set<ClientWorkerRoleClassificator> roles = new HashSet<>();
     private Boolean favorite;
+    @Column(columnDefinition = "TEXT")
+    private String comment;
 }

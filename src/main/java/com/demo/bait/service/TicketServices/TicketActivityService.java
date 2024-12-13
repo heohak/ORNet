@@ -1,20 +1,18 @@
 package com.demo.bait.service.TicketServices;
 
 import com.demo.bait.dto.ActivityDTO;
-import com.demo.bait.dto.CommentDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.Activity;
-import com.demo.bait.entity.Comment;
 import com.demo.bait.entity.Ticket;
 import com.demo.bait.mapper.ActivityMapper;
-import com.demo.bait.mapper.CommentMapper;
 import com.demo.bait.repository.TicketRepo;
 import com.demo.bait.service.ActivityService.ActivityService;
-import com.demo.bait.service.CommentServices.CommentService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+//import org.springframework.security.core.Authentication;
+//import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -27,39 +25,62 @@ import java.util.Optional;
 public class TicketActivityService {
 
     private TicketRepo ticketRepo;
-    private CommentMapper commentMapper;
-    private CommentService commentService;
     private ActivityMapper activityMapper;
     private ActivityService activityService;
     private TicketService ticketService;
 
     @Transactional
     public ResponseDTO addActivityToTicket(Integer ticketId, String newActivity, Integer hours, Integer minutes,
-                                          Boolean paid) {
+                                           Boolean paid) {
+        log.info("Attempting to add activity to ticket with ID: {}", ticketId);
+
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         if (ticketOpt.isEmpty()) {
+            log.error("Ticket with ID {} not found", ticketId);
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
         Ticket ticket = ticketOpt.get();
+
+        log.debug("Adding time spent to ticket with ID: {} | Hours: {}, Minutes: {}, Paid: {}",
+                ticketId, hours, minutes, paid);
         ticketService.addTimeSpent(ticket, hours, minutes, paid);
-        Activity activity = activityService.addActivity(newActivity, hours, minutes, paid);
+
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication == null || !authentication.isAuthenticated()
+//                || "anonymousUser".equals(authentication.getName())) {
+//            log.error("Unauthenticated user attempted to add activity to ticket ID: {}", ticketId);
+//            throw new SecurityException("User is not authenticated");
+//        }
+//        String username = authentication.getName();
+//        log.debug("Authenticated user: {}", username);
+//
+//        log.debug("Adding activity: '{}' to ticket with ID: {}", newActivity, ticketId);
+//        Activity activity = activityService.addActivity(newActivity, hours, minutes, paid, username);
+
+        Activity activity = activityService.addActivity(newActivity, hours, minutes, paid, null);
         ticket.getActivities().add(activity);
-//        Comment comment = commentService.addComment(newComment, hours, minutes);
-//        ticket.getComments().add(comment);
+
         ticketRepo.save(ticket);
+        log.info("Activity added successfully to ticket with ID: {}", ticketId);
         return new ResponseDTO("Activity added successfully");
     }
 
     public List<ActivityDTO> getTicketActivities(Integer ticketId) {
+        log.info("Fetching activities for ticket with ID: {}", ticketId);
+
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         if (ticketOpt.isEmpty()) {
+            log.error("Ticket with ID {} not found", ticketId);
             throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
         }
         Ticket ticket = ticketOpt.get();
-        return activityMapper.toDtoList(
+
+        List<ActivityDTO> activities = activityMapper.toDtoList(
                 ticket.getActivities()
                         .stream()
                         .sorted(Comparator.comparing(Activity::getTimestamp))
                         .toList());
+        log.info("Retrieved {} activities for ticket with ID: {}", activities.size(), ticketId);
+        return activities;
     }
 }

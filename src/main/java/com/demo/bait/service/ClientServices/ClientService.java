@@ -39,64 +39,85 @@ public class ClientService {
 
     @Transactional
     public ResponseDTO addClient(ClientDTO clientDTO) {
-        Client client = new Client();
-        client.setFullName(clientDTO.fullName());
-        client.setShortName(clientDTO.shortName());
-        client.setCountry(clientDTO.country());
+        log.info("Adding a new Client: {}", clientDTO);
+        try {
+            Client client = new Client();
+            client.setFullName(clientDTO.fullName());
+            client.setShortName(clientDTO.shortName());
+            client.setCountry(clientDTO.country());
 
-        clientLocationService.updateLocations(client, clientDTO);
+            clientLocationService.updateLocations(client, clientDTO);
+            clientThirdPartyITService.updateThirdPartyITs(client, clientDTO);
 
-        clientThirdPartyITService.updateThirdPartyITs(client, clientDTO);
+            client.setPathologyClient(Boolean.TRUE.equals(clientDTO.pathologyClient()));
+            client.setSurgeryClient(Boolean.TRUE.equals(clientDTO.surgeryClient()));
+            client.setEditorClient(Boolean.TRUE.equals(clientDTO.editorClient()));
+            client.setOtherMedicalDevices(Boolean.TRUE.equals(clientDTO.otherMedicalDevices()));
+            client.setProspect(Boolean.TRUE.equals(clientDTO.prospect()));
+            client.setAgreement(Boolean.TRUE.equals(clientDTO.agreement()));
+            client.setActiveCustomer(Boolean.TRUE.equals(clientDTO.activeCustomer()));
 
-        client.setPathologyClient(Boolean.TRUE.equals(clientDTO.pathologyClient()));
-        client.setSurgeryClient(Boolean.TRUE.equals(clientDTO.surgeryClient()));
-        client.setEditorClient(Boolean.TRUE.equals(clientDTO.editorClient()));
-        client.setOtherMedicalDevices(Boolean.TRUE.equals(clientDTO.otherMedicalDevices()));
-        client.setProspect(Boolean.TRUE.equals(clientDTO.prospect()));
-        client.setAgreement(Boolean.TRUE.equals(clientDTO.agreement()));
-        client.setActiveCustomer(Boolean.TRUE.equals(clientDTO.activeCustomer()));
+            client.setLastMaintenance(clientDTO.lastMaintenance());
+            client.setNextMaintenance(clientDTO.nextMaintenance());
 
-        client.setLastMaintenance(clientDTO.lastMaintenance());
-        client.setNextMaintenance(clientDTO.nextMaintenance());
+            clientMaintenanceService.updateMaintenances(client, clientDTO);
 
-        clientMaintenanceService.updateMaintenances(client, clientDTO);
-
-        clientRepo.save(client);
-        return new ResponseDTO(client.getId().toString());
+            clientRepo.save(client);
+            log.info("Successfully added Client with ID: {}", client.getId());
+            return new ResponseDTO(client.getId().toString());
+        } catch (Exception e) {
+            log.error("Error while adding Client: {}", clientDTO, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO deleteClient(Integer id) {
-        clientRepo.deleteById(id); // see ei tohiks tootada prq
-        return new ResponseDTO("Client deleted successfully");
+        log.info("Deleting Client with ID: {}", id);
+        try {
+            clientRepo.deleteById(id);
+            log.info("Successfully deleted Client with ID: {}", id);
+            return new ResponseDTO("Client deleted successfully");
+        } catch (Exception e) {
+            log.error("Error while deleting Client with ID: {}", id, e);
+            throw e;
+        }
     }
 
     @Transactional
     public ResponseDTO updateClient(Integer clientId, ClientDTO clientDTO) {
-        Optional<Client> clientOpt = clientRepo.findById(clientId);
-        if (clientOpt.isEmpty()) {
-            throw new EntityNotFoundException("Client with id " + clientId + " not found");
+        log.info("Updating Client with ID: {}", clientId);
+        try {
+            Optional<Client> clientOpt = clientRepo.findById(clientId);
+            if (clientOpt.isEmpty()) {
+                log.warn("Client with ID {} not found", clientId);
+                throw new EntityNotFoundException("Client with id " + clientId + " not found");
+            }
+            Client client = clientOpt.get();
+
+            updateFullName(client, clientDTO);
+            updateShortName(client, clientDTO);
+            updateCountry(client, clientDTO);
+            clientLocationService.updateLocations(client, clientDTO);
+            clientThirdPartyITService.updateThirdPartyITs(client, clientDTO);
+            updatePathologyClient(client, clientDTO);
+            updateSurgeryClient(client, clientDTO);
+            updateEditorClient(client, clientDTO);
+            updateOtherMedicalDevices(client, clientDTO);
+            updateProspect(client, clientDTO);
+            updateAgreement(client, clientDTO);
+            updateActiveCustomer(client, clientDTO);
+            updateLastMaintenance(client, clientDTO);
+            updateNextMaintenance(client, clientDTO);
+            clientMaintenanceService.updateMaintenances(client, clientDTO);
+
+            clientRepo.save(client);
+            log.info("Successfully updated Client with ID: {}", clientId);
+            return new ResponseDTO("Client updated successfully");
+        } catch (Exception e) {
+            log.error("Error while updating Client with ID: {}", clientId, e);
+            throw e;
         }
-        Client client = clientOpt.get();
-
-        updateFullName(client, clientDTO);
-        updateShortName(client, clientDTO);
-        updateCountry(client, clientDTO);
-        clientLocationService.updateLocations(client, clientDTO);
-        clientThirdPartyITService.updateThirdPartyITs(client, clientDTO);
-        updatePathologyClient(client, clientDTO);
-        updateSurgeryClient(client, clientDTO);
-        updateEditorClient(client, clientDTO);
-        updateOtherMedicalDevices(client, clientDTO);
-        updateProspect(client, clientDTO);
-        updateAgreement(client, clientDTO);
-        updateActiveCustomer(client, clientDTO);
-        updateLastMaintenance(client, clientDTO);
-        updateNextMaintenance(client, clientDTO);
-        clientMaintenanceService.updateMaintenances(client, clientDTO);
-
-        clientRepo.save(client);
-        return new ResponseDTO("Client updated successfully");
     }
 
     public void updateFullName(Client client, ClientDTO clientDTO) {
@@ -172,90 +193,137 @@ public class ClientService {
     }
 
     public List<ClientDTO> getAllClients() {
-        return clientMapper.toDtoList(clientRepo.findAll());
+        log.info("Fetching all Clients");
+        try {
+            List<ClientDTO> clients = clientMapper.toDtoList(clientRepo.findAll());
+            log.info("Fetched {} Clients", clients.size());
+            return clients;
+        } catch (Exception e) {
+            log.error("Error while fetching all Clients", e);
+            throw e;
+        }
     }
 
     public ClientDTO getClientById(Integer clientId) {
-        Optional<Client> clientOpt = clientRepo.findById(clientId);
-        if (clientOpt.isEmpty()) {
-            throw new EntityNotFoundException("Client with id " + clientId + " not found");
+        log.info("Fetching Client with ID: {}", clientId);
+        try {
+            Optional<Client> clientOpt = clientRepo.findById(clientId);
+            if (clientOpt.isEmpty()) {
+                log.warn("Client with ID {} not found", clientId);
+                throw new EntityNotFoundException("Client with id " + clientId + " not found");
+            }
+            ClientDTO clientDTO = clientMapper.toDto(clientOpt.get());
+            log.info("Fetched Client: {}", clientDTO);
+            return clientDTO;
+        } catch (Exception e) {
+            log.error("Error while fetching Client with ID: {}", clientId, e);
+            throw e;
         }
-        return clientMapper.toDto(clientOpt.get());
     }
 
     public List<ClientDTO> getClientHistory(Integer clientId) {
-        AuditReader auditReader = AuditReaderFactory.get(entityManager);
-        List<Number> revisions = auditReader.getRevisions(Client.class, clientId);
+        log.info("Fetching history for Client with ID: {}", clientId);
+        try {
+            AuditReader auditReader = AuditReaderFactory.get(entityManager);
+            List<Number> revisions = auditReader.getRevisions(Client.class, clientId);
 
-        List<Client> history = new ArrayList<>();
-        for (Number rev : revisions) {
-            Client clientVersion = auditReader
-                    .find(Client.class, clientId, rev);
-            history.add(clientVersion);
+            List<Client> history = new ArrayList<>();
+            for (Number rev : revisions) {
+                Client clientVersion = auditReader.find(Client.class, clientId, rev);
+                history.add(clientVersion);
+            }
+            List<ClientDTO> clientHistory = clientMapper.toDtoList(history);
+            log.debug("Fetched history for Client with ID {}: {}", clientId, clientHistory);
+            return clientHistory;
+        } catch (Exception e) {
+            log.error("Error while fetching history for Client with ID: {}", clientId, e);
+            throw e;
         }
-        return clientMapper.toDtoList(history);
     }
 
     public List<ClientActivityDTO> getClientActivitiesForClient(Integer clientId) {
-        return clientActivityMapper.toDtoList(clientActivityRepo.findByClientId(clientId));
+        log.info("Fetching Client Activities for Client with ID: {}", clientId);
+        try {
+            List<ClientActivityDTO> activities = clientActivityMapper.toDtoList(clientActivityRepo.findByClientId(clientId));
+            log.info("Fetched {} Client Activities for Client with ID: {}", activities.size(), clientId);
+            return activities;
+        } catch (Exception e) {
+            log.error("Error while fetching Client Activities for Client with ID: {}", clientId, e);
+            throw e;
+        }
     }
 
     public List<String> getAllClientCountries() {
-        return clientRepo.findAll().stream()
-                .map(Client::getCountry)
-                .filter(country -> country != null && !country.isEmpty())
-                .map(country -> country.substring(0, 1).toUpperCase() + country.substring(1).toLowerCase())
-                .distinct()
-                .sorted()
-                .collect(Collectors.toList());
+        log.info("Fetching all unique Client countries");
+        try {
+            List<String> countries = clientRepo.findAll().stream()
+                    .map(Client::getCountry)
+                    .filter(country -> country != null && !country.isEmpty())
+                    .map(country -> country.substring(0, 1).toUpperCase() + country.substring(1).toLowerCase())
+                    .distinct()
+                    .sorted()
+                    .collect(Collectors.toList());
+            log.info("Fetched {} unique Client countries", countries.size());
+            return countries;
+        } catch (Exception e) {
+            log.error("Error while fetching all Client countries", e);
+            throw e;
+        }
     }
 
     public Map<Integer, Map<String, LocalDateTime>> getClientsActivityDates() {
-        Map<Integer, Map<String, LocalDateTime>> clientActivityDates = new HashMap<>();
-        LocalDateTime today = LocalDateTime.now();
+        log.info("Fetching Client Activity dates");
+        try {
+            Map<Integer, Map<String, LocalDateTime>> clientActivityDates = new HashMap<>();
+            LocalDateTime today = LocalDateTime.now();
 
-        List<ClientActivity> activities = clientActivityRepo.findAll();
+            List<ClientActivity> activities = clientActivityRepo.findAll();
 
-        Map<Integer, List<ClientActivity>> activitiesByClient = activities.stream()
-                .filter(activity -> activity.getClient() != null)
-                .collect(Collectors.groupingBy(activity -> activity.getClient().getId()));
+            Map<Integer, List<ClientActivity>> activitiesByClient = activities.stream()
+                    .filter(activity -> activity.getClient() != null)
+                    .collect(Collectors.groupingBy(activity -> activity.getClient().getId()));
 
-        for (Map.Entry<Integer, List<ClientActivity>> entry : activitiesByClient.entrySet()) {
-            Integer clientId = entry.getKey();
-            List<ClientActivity> clientActivities = entry.getValue();
+            for (Map.Entry<Integer, List<ClientActivity>> entry : activitiesByClient.entrySet()) {
+                Integer clientId = entry.getKey();
+                List<ClientActivity> clientActivities = entry.getValue();
 
-            LocalDateTime endDateTime = clientActivities.stream()
-                    .map(ClientActivity::getEndDateTime)
-                    .filter(Objects::nonNull)
-                    .reduce((closest, current) -> {
-                        if (closest == null) {
-                            return current;
-                        }
-                        if (current.isBefore(today) && closest.isBefore(today)) {
-                            return current.isBefore(closest) ? current : closest;
-                        } else if (current.isBefore(today)) {
-                            return current;
-                        } else if (closest.isBefore(today)) {
-                            return closest;
-                        } else {
-                            return current.isBefore(closest) ? current : closest;
-                        }
-                    })
-                    .orElse(null);
+                LocalDateTime endDateTime = clientActivities.stream()
+                        .map(ClientActivity::getEndDateTime)
+                        .filter(Objects::nonNull)
+                        .reduce((closest, current) -> {
+                            if (closest == null) {
+                                return current;
+                            }
+                            if (current.isBefore(today) && closest.isBefore(today)) {
+                                return current.isBefore(closest) ? current : closest;
+                            } else if (current.isBefore(today)) {
+                                return current;
+                            } else if (closest.isBefore(today)) {
+                                return closest;
+                            } else {
+                                return current.isBefore(closest) ? current : closest;
+                            }
+                        })
+                        .orElse(null);
 
-            LocalDateTime updateDateTime = clientActivities.stream()
-                    .map(ClientActivity::getUpdateDateTime)
-                    .filter(Objects::nonNull)
-                    .max(LocalDateTime::compareTo)
-                    .orElse(null);
+                LocalDateTime updateDateTime = clientActivities.stream()
+                        .map(ClientActivity::getUpdateDateTime)
+                        .filter(Objects::nonNull)
+                        .max(LocalDateTime::compareTo)
+                        .orElse(null);
 
-            Map<String, LocalDateTime> dateMap = new HashMap<>();
-            dateMap.put("endDateTime", endDateTime);
-            dateMap.put("updateDateTime", updateDateTime);
+                Map<String, LocalDateTime> dateMap = new HashMap<>();
+                dateMap.put("endDateTime", endDateTime);
+                dateMap.put("updateDateTime", updateDateTime);
 
-            clientActivityDates.put(clientId, dateMap);
+                clientActivityDates.put(clientId, dateMap);
+            }
+
+            log.info("Fetched activity dates for {} Clients", clientActivityDates.size());
+            return clientActivityDates;
+        } catch (Exception e) {
+            log.error("Error while fetching Client Activity dates", e);
+            throw e;
         }
-
-        return clientActivityDates;
     }
 }
