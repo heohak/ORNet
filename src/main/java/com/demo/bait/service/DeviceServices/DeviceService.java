@@ -21,6 +21,7 @@ import org.hibernate.envers.AuditReaderFactory;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Slf4j
@@ -187,7 +188,7 @@ public class DeviceService {
     }
 
     @Transactional
-    public ResponseDTO addWrittenOffDate(Integer deviceId, DeviceDTO deviceDTO, String comment) {
+    public ResponseDTO addWrittenOffDate(Integer deviceId, LocalDate writtenOffDate, String comment) {
         log.info("Adding written-off date to device with ID: {}", deviceId);
         try {
             Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
@@ -198,7 +199,7 @@ public class DeviceService {
             }
 
             Device device = deviceOpt.get();
-            device.setWrittenOffDate(deviceDTO.writtenOffDate());
+            device.setWrittenOffDate(writtenOffDate);
             String commentText = (comment != null ? comment : "") + " (DEVICE WRITTEN-OFF)";
             log.debug("Adding comment: '{}' to device with ID: {}", commentText, deviceId);
             deviceCommentService.addCommentToDevice(deviceId, commentText);
