@@ -32,7 +32,7 @@ public class LinkedDevicePutController {
 
     @PutMapping("/comment/{linkedDeviceId}")
     public ResponseDTO addCommentToLinkedDevice(@PathVariable Integer linkedDeviceId,
-                                                @RequestParam("comment") String comment) {
+                                                @RequestBody String comment) {
         return linkedDeviceCommentService.addCommentToLinkedDevice(linkedDeviceId, comment);
     }
 
