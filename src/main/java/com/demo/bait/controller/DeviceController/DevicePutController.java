@@ -61,12 +61,12 @@ public class DevicePutController {
 
     @PutMapping("/reactivate/{deviceId}")
     public ResponseDTO reactivateDevice(@PathVariable Integer deviceId,
-                                        @RequestParam(value = "comment", required = false) String comment) {
+                                        @RequestBody(required = false) String comment) {
         return deviceService.reactivateDevice(deviceId, comment);
     }
 
     @PutMapping("/comment/{deviceId}")
-    public ResponseDTO addCommentToDevice(@PathVariable Integer deviceId, @RequestParam("comment") String comment) {
+    public ResponseDTO addCommentToDevice(@PathVariable Integer deviceId, @RequestBody String comment) {
         return deviceCommentService.addCommentToDevice(deviceId, comment);
     }
 
