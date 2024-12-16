@@ -15,7 +15,7 @@ public class WebConfig implements WebMvcConfigurer {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
                         .allowedOrigins("http://192.168.1.49:3000") // Allow React app's origin
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
                         .allowCredentials(true);
             }
         };
