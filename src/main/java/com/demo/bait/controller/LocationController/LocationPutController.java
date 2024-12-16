@@ -20,7 +20,7 @@ public class LocationPutController {
     public final LocationMaintenanceService locationMaintenanceService;
 
     @PutMapping("/update/{locationId}")
-    public ResponseDTO updateLocation(@PathVariable Integer locationId,@Valid @RequestBody LocationDTO locationDTO) {
+    public ResponseDTO updateLocation(@PathVariable Integer locationId, @RequestBody LocationDTO locationDTO) {
         return locationService.updateLocation(locationId, locationDTO);
     }
 
@@ -31,7 +31,7 @@ public class LocationPutController {
     }
 
     @PutMapping("/comment/{locationId}")
-    public ResponseDTO commentLocation(@PathVariable Integer locationId, @RequestParam("comment") String comment) {
+    public ResponseDTO commentLocation(@PathVariable Integer locationId, @RequestBody String comment) {
         return locationCommentService.addCommentToLocation(locationId, comment);
     }
 }

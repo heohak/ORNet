@@ -33,7 +33,7 @@ public class TicketPutController {
 
     @PutMapping("/activity/{ticketId}")
     public ResponseDTO addActivityToTicket(@PathVariable Integer ticketId,
-                                          @RequestParam("activity") String activity,
+                                          @RequestBody String activity,
                                           @RequestParam(value = "hours", required = false) Integer hours,
                                           @RequestParam(value = "minutes", required = false) Integer minutes,
                                           @RequestParam(value = "paid", required = false) Boolean paid) {

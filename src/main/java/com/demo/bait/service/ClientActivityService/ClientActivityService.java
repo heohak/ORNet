@@ -124,9 +124,17 @@ public class ClientActivityService {
             clientRepo.findById(clientActivityDTO.clientId()).ifPresent(clientActivity::setClient);
         }
 
-        clientActivity.setTitle(clientActivityDTO.title());
-        clientActivity.setClientNumeration(clientActivityDTO.clientNumeration());
-        clientActivity.setDescription(clientActivityDTO.description());
+        if (clientActivityDTO.title() != null) {
+            clientActivity.setTitle(clientActivityDTO.title());
+        }
+
+        if (clientActivityDTO.clientNumeration() != null) {
+            clientActivity.setClientNumeration(clientActivityDTO.clientNumeration());
+        }
+
+        if (clientActivityDTO.description() != null) {
+            clientActivity.setDescription(clientActivityDTO.description());
+        }
 
         if (clientActivityDTO.locationId() != null) {
             locationRepo.findById(clientActivityDTO.locationId()).ifPresent(clientActivity::setLocation);
@@ -152,7 +160,9 @@ public class ClientActivityService {
             baitWorkerRepo.findById(clientActivityDTO.baitWorkerId()).ifPresent(clientActivity::setBaitWorker);
         }
 
-        clientActivity.setEndDateTime(clientActivityDTO.endDateTime());
+        if (clientActivityDTO.endDateTime() != null) {
+            clientActivity.setEndDateTime(clientActivityDTO.endDateTime());
+        }
 
         if (clientActivityDTO.fileIds() != null) {
             Set<FileUpload> files = fileUploadService.fileIdsToFilesSet(clientActivityDTO.fileIds());
