@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -33,11 +34,11 @@ public class TicketPutController {
 
     @PutMapping("/activity/{ticketId}")
     public ResponseDTO addActivityToTicket(@PathVariable Integer ticketId,
-                                          @RequestBody String activity,
+                                          @RequestBody Map<String, String> activity,
                                           @RequestParam(value = "hours", required = false) Integer hours,
                                           @RequestParam(value = "minutes", required = false) Integer minutes,
                                           @RequestParam(value = "paid", required = false) Boolean paid) {
-        return ticketCommentService.addActivityToTicket(ticketId, activity, hours, minutes, paid);
+        return ticketCommentService.addActivityToTicket(ticketId, activity.get(activity), hours, minutes, paid);
     }
 
     @PutMapping("/update/whole/{ticketId}")
