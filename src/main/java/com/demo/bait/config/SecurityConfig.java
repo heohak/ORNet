@@ -36,10 +36,10 @@ public class SecurityConfig {
     @Bean
     public DefaultSpringSecurityContextSource contextSource() {
         // Configure the LDAP server URL and base DN
-        return new DefaultSpringSecurityContextSource(
-                List.of("ldap://localhost:10389"), "dc=example,dc=com");
 //        return new DefaultSpringSecurityContextSource(
-//                List.of("ldap://bait-dc.bait.local:389"), "DC=bait,DC=local");
+//                List.of("ldap://localhost:10389"), "dc=example,dc=com");
+        return new DefaultSpringSecurityContextSource(
+                List.of("ldap://bait-dc.bait.local:389"), "DC=bait,DC=local");
     }
 
     @Bean
@@ -55,10 +55,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMINISTRATORS")
-                        .requestMatchers("/api/**").hasAnyRole("USERS", "ADMINISTRATORS")
-//                        .requestMatchers("/api/admin/**").hasRole("CRMADMINS")
-//                        .requestMatchers("/api/**").hasAnyRole("CRMUSERS", "CRMADMINS")
+//                        .requestMatchers("/api/admin/**").hasRole("ADMINISTRATORS")
+//                        .requestMatchers("/api/**").hasAnyRole("USERS", "ADMINISTRATORS")
+                        .requestMatchers("/api/admin/**").hasRole("CRMADMINS")
+                        .requestMatchers("/api/**").hasAnyRole("CRMUSERS", "CRMADMINS")
                         .anyRequest().authenticated()
 //                        .anyRequest().permitAll()
                 )
@@ -84,16 +84,16 @@ public class SecurityConfig {
 
         // Define an LdapAuthoritiesPopulator
         DefaultLdapAuthoritiesPopulator authoritiesPopulator = new DefaultLdapAuthoritiesPopulator(contextSource, "ou=groups");
-        authoritiesPopulator.setGroupSearchFilter("(member={0})"); // Matches groups by membership
-        authoritiesPopulator.setGroupRoleAttribute("cn"); // Use the group's 'cn' as the role name
-//        authoritiesPopulator.setGroupSearchFilter("(cn={0})");
-//        authoritiesPopulator.setGroupRoleAttribute("cn");
+//        authoritiesPopulator.setGroupSearchFilter("(member={0})"); // Matches groups by membership
+//        authoritiesPopulator.setGroupRoleAttribute("cn"); // Use the group's 'cn' as the role name
+        authoritiesPopulator.setGroupSearchFilter("(cn={0})");
+        authoritiesPopulator.setGroupRoleAttribute("cn");
         authoritiesPopulator.setConvertToUpperCase(true); // Roles will be in uppercase (e.g., ROLE_ADMINISTRATORS)
 
         // Configure the PasswordComparisonAuthenticator
         PasswordComparisonAuthenticator authenticator = new PasswordComparisonAuthenticator(contextSource);
-        authenticator.setUserDnPatterns(new String[]{"uid={0},ou=users"}); // User DN pattern
-//        authenticator.setUserDnPatterns(new String[]{"CN={0},CN=Users,DC=bait,DC=local"});
+//        authenticator.setUserDnPatterns(new String[]{"uid={0},ou=users"}); // User DN pattern
+        authenticator.setUserDnPatterns(new String[]{"CN={0},CN=Users,DC=bait,DC=local"});
         authenticator.setPasswordEncoder(passwordEncoder());
         authenticator.setPasswordAttributeName("userPassword");
 
@@ -109,8 +109,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-//        configuration.setAllowedOrigins(List.of("http://192.168.1.49:3000"));
+//        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of("http://192.168.1.49:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(List.of("*"));
