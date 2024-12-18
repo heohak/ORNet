@@ -11,10 +11,7 @@ import com.demo.bait.mapper.ClientMapper;
 import com.demo.bait.mapper.ClientWorkerMapper;
 import com.demo.bait.mapper.LocationMapper;
 import com.demo.bait.mapper.classificator.ClientWorkerRoleClassificatorMapper;
-import com.demo.bait.repository.ClientRepo;
-import com.demo.bait.repository.ClientWorkerRepo;
-import com.demo.bait.repository.LocationRepo;
-import com.demo.bait.repository.TicketRepo;
+import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.ClientWorkerRoleClassificatorRepo;
 import com.demo.bait.service.classificator.ClientWorkerRoleClassificatorService;
 import com.demo.bait.specification.ClientSpecification;
@@ -45,6 +42,7 @@ public class ClientWorkerService {
     private ClientWorkerRoleClassificatorService clientWorkerRoleClassificatorService;
     private ClientMapper clientMapper;
     private TicketRepo ticketRepo;
+    private ClientActivityRepo clientActivityRepo;
 
     @Transactional
     public ResponseDTO addWorker(ClientWorkerDTO workerDTO) {
@@ -147,6 +145,11 @@ public class ClientWorkerService {
             for (Ticket ticket : tickets) {
                 ticket.getContacts().remove(worker);
                 ticketRepo.save(ticket);
+            }
+            List<ClientActivity> activities = clientActivityRepo.findAllByContactsContaining(worker);
+            for (ClientActivity activity : activities) {
+                activity.getContacts().remove(worker);
+                clientActivityRepo.save(activity);
             }
             worker.getRoles().clear();
             worker.setClient(null);
