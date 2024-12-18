@@ -1,5 +1,6 @@
 package com.demo.bait.repository;
 
+import com.demo.bait.entity.Client;
 import com.demo.bait.entity.ClientWorker;
 import com.demo.bait.entity.classificator.ClientWorkerRoleClassificator;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +17,6 @@ public interface ClientWorkerRepo extends JpaRepository<ClientWorker, Integer>, 
 
     List<ClientWorker> findByRolesContaining(ClientWorkerRoleClassificator role);
     List<ClientWorker> findByClientIsNull();
+    List<ClientWorker> findAllByClient(Client client);
+
 }

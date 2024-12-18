@@ -133,7 +133,15 @@ public class SoftwareService {
     @Transactional
     public ResponseDTO deleteSoftware(Integer softwareId) {
         log.info("Deleting software with ID {}", softwareId);
-        softwareRepo.deleteById(softwareId);
+        Optional<Software> softwareOpt = softwareRepo.findById(softwareId);
+        if (softwareOpt.isEmpty()) {
+            log.error("Software with ID {} not found", softwareId);
+            throw new EntityNotFoundException("Software with id " + softwareId + " not found");
+        }
+        Software software = softwareOpt.get();
+        software.setClient(null);
+        softwareRepo.save(software);
+        softwareRepo.delete(software);
         log.info("Software with ID {} deleted successfully", softwareId);
         return new ResponseDTO("Software deleted");
     }

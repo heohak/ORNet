@@ -5,18 +5,13 @@ import com.demo.bait.dto.ClientWorkerDTO;
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.ClientWorkerRoleClassificatorDTO;
-import com.demo.bait.entity.Client;
-import com.demo.bait.entity.ClientWorker;
-import com.demo.bait.entity.Device;
-import com.demo.bait.entity.Location;
+import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.ClientWorkerRoleClassificator;
 import com.demo.bait.mapper.ClientMapper;
 import com.demo.bait.mapper.ClientWorkerMapper;
 import com.demo.bait.mapper.LocationMapper;
 import com.demo.bait.mapper.classificator.ClientWorkerRoleClassificatorMapper;
-import com.demo.bait.repository.ClientRepo;
-import com.demo.bait.repository.ClientWorkerRepo;
-import com.demo.bait.repository.LocationRepo;
+import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.ClientWorkerRoleClassificatorRepo;
 import com.demo.bait.service.classificator.ClientWorkerRoleClassificatorService;
 import com.demo.bait.specification.ClientSpecification;
@@ -46,6 +41,8 @@ public class ClientWorkerService {
     private LocationMapper locationMapper;
     private ClientWorkerRoleClassificatorService clientWorkerRoleClassificatorService;
     private ClientMapper clientMapper;
+    private TicketRepo ticketRepo;
+    private ClientActivityRepo clientActivityRepo;
 
     @Transactional
     public ResponseDTO addWorker(ClientWorkerDTO workerDTO) {
@@ -135,8 +132,31 @@ public class ClientWorkerService {
     @Transactional
     public ResponseDTO deleteWorker(Integer workerId) {
         log.info("Deleting worker with ID: {}", workerId);
+
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        if (workerOpt.isEmpty()) {
+            log.error("Worker with ID {} not found", workerId);
+            throw new EntityNotFoundException("Worker with ID " + workerId + " not found");
+        }
+        ClientWorker worker = workerOpt.get();
+
         try {
-            clientWorkerRepo.deleteById(workerId);
+            List<Ticket> tickets = ticketRepo.findAllByContactsContaining(worker);
+            for (Ticket ticket : tickets) {
+                ticket.getContacts().remove(worker);
+                ticketRepo.save(ticket);
+            }
+            List<ClientActivity> activities = clientActivityRepo.findAllByContactsContaining(worker);
+            for (ClientActivity activity : activities) {
+                activity.getContacts().remove(worker);
+                clientActivityRepo.save(activity);
+            }
+            worker.getRoles().clear();
+            worker.setClient(null);
+            worker.setLocation(null);
+            clientWorkerRepo.save(worker);
+
+            clientWorkerRepo.delete(worker);
             log.info("Successfully deleted worker with ID: {}", workerId);
             return new ResponseDTO("Worker deleted successfully");
         } catch (Exception e) {

@@ -1,9 +1,6 @@
 package com.demo.bait.repository;
 
-import com.demo.bait.entity.Activity;
-import com.demo.bait.entity.BaitWorker;
-import com.demo.bait.entity.Device;
-import com.demo.bait.entity.Ticket;
+import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.TicketStatusClassificator;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,5 +26,8 @@ public interface TicketRepo extends JpaRepository<Ticket, Integer>, JpaSpecifica
     List<Ticket> findByBaitWorker(BaitWorker baitWorker);
     List<Ticket> findByStatus(TicketStatusClassificator status);
     List<Ticket> findByWorkTypesContaining(WorkTypeClassificator workType);
+    List<Ticket> findAllByContactsContaining(ClientWorker worker);
+    List<Ticket> findAllByClient(Client client);
+
 
 }
