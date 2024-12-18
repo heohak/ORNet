@@ -14,8 +14,8 @@ import com.demo.bait.repository.LocationRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-//import org.springframework.security.core.Authentication;
-//import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,8 +50,8 @@ public class CommentService {
         comment.setComment(commentDTO.comment());
         comment.setTimestamp(LocalDateTime.now().withNano(0));
 
-//        String username = getUsername();
-//        comment.setUsername(username);
+        String username = getUsername();
+        comment.setUsername(username);
 
         commentRepo.save(comment);
         log.info("Comment added successfully: {}", commentDTO.comment());
@@ -71,25 +71,25 @@ public class CommentService {
         comment.setComment(newComment);
         comment.setTimestamp(LocalDateTime.now().withNano(0));
 
-//        String username = getUsername();
-//        comment.setUsername(username);
+        String username = getUsername();
+        comment.setUsername(username);
 
         commentRepo.save(comment);
         log.info("Comment added successfully: {}", newComment);
         return comment;
     }
 
-//    public String getUsername() {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication == null || !authentication.isAuthenticated()
-//                || authentication.getName().equals("anonymousUser")) {
-//            log.error("User is not authenticated");
-//            throw new SecurityException("User is not authenticated");
-//        }
-//        String username = authentication.getName();
-//        log.debug("Authenticated username: {}", username);
-//        return username;
-//    }
+    public String getUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication.getName().equals("anonymousUser")) {
+            log.error("User is not authenticated");
+            throw new SecurityException("User is not authenticated");
+        }
+        String username = authentication.getName();
+        log.debug("Authenticated username: {}", username);
+        return username;
+    }
 
     public List<CommentDTO> getAllComments() {
         log.info("Fetching all comments");

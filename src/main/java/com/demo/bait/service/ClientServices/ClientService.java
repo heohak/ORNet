@@ -36,6 +36,10 @@ public class ClientService {
     private EntityManager entityManager;
     private ClientActivityRepo clientActivityRepo;
     private ClientActivityMapper clientActivityMapper;
+    private ClientWorkerRepo clientWorkerRepo;
+    private TicketRepo ticketRepo;
+    private DeviceRepo deviceRepo;
+    private SoftwareRepo softwareRepo;
 
     @Transactional
     public ResponseDTO addClient(ClientDTO clientDTO) {
@@ -74,8 +78,60 @@ public class ClientService {
     @Transactional
     public ResponseDTO deleteClient(Integer id) {
         log.info("Deleting Client with ID: {}", id);
+
+        Optional<Client> clientOpt = clientRepo.findById(id);
+        if (clientOpt.isEmpty()) {
+            log.error("Client with ID {} not found", id);
+            throw new EntityNotFoundException("Client with ID " + id + " not found");
+        }
+        Client client = clientOpt.get();
+
         try {
-            clientRepo.deleteById(id);
+            List<ClientWorker> clientWorkers = clientWorkerRepo.findAllByClient(client);
+            for (ClientWorker worker : clientWorkers) {
+                worker.setClient(null);
+                worker.setLocation(null);
+                worker.getRoles().clear();
+                clientWorkerRepo.save(worker);
+            }
+
+            List<Ticket> tickets = ticketRepo.findAllByClient(client);
+            for (Ticket ticket : tickets) {
+                ticket.setClient(null);
+                ticketRepo.save(ticket);
+            }
+
+            List<Device> devices = deviceRepo.findAllByClient(client);
+            for (Device device : devices) {
+                device.setClient(null);
+                device.setLocation(null);
+                deviceRepo.save(device);
+            }
+
+            List<Software> softwareList = softwareRepo.findAllByClient(client);
+            for (Software software : softwareList) {
+                software.setClient(null);
+                softwareRepo.save(software);
+            }
+
+            List<ClientActivity> clientActivities = clientActivityRepo.findAllByClient(client);
+            for (ClientActivity activity : clientActivities) {
+                activity.setClient(null);
+                activity.setLocation(null);
+                activity.getContacts().clear();
+                activity.getWorkTypes().clear();
+                activity.getFiles().clear();
+                activity.getDevices().clear();
+                clientActivityRepo.delete(activity);
+            }
+
+            client.getLocations().clear();
+            client.getThirdPartyITs().clear();
+            client.getMaintenances().clear();
+
+            clientRepo.save(client);
+
+            clientRepo.delete(client);
             log.info("Successfully deleted Client with ID: {}", id);
             return new ResponseDTO("Client deleted successfully");
         } catch (Exception e) {

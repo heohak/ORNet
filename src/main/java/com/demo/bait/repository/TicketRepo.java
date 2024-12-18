@@ -27,5 +27,7 @@ public interface TicketRepo extends JpaRepository<Ticket, Integer>, JpaSpecifica
     List<Ticket> findByStatus(TicketStatusClassificator status);
     List<Ticket> findByWorkTypesContaining(WorkTypeClassificator workType);
     List<Ticket> findAllByContactsContaining(ClientWorker worker);
+    List<Ticket> findAllByClient(Client client);
+
 
 }

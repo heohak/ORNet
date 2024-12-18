@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/ticket")
+@RequestMapping("/api/admin/ticket")
 public class TicketDeleteController {
 
     public final TicketService ticketService;
