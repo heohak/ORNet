@@ -11,8 +11,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-//import org.springframework.security.core.Authentication;
-//import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -45,19 +45,19 @@ public class TicketActivityService {
                 ticketId, hours, minutes, paid);
         ticketService.addTimeSpent(ticket, hours, minutes, paid);
 
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication == null || !authentication.isAuthenticated()
-//                || "anonymousUser".equals(authentication.getName())) {
-//            log.error("Unauthenticated user attempted to add activity to ticket ID: {}", ticketId);
-//            throw new SecurityException("User is not authenticated");
-//        }
-//        String username = authentication.getName();
-//        log.debug("Authenticated user: {}", username);
-//
-//        log.debug("Adding activity: '{}' to ticket with ID: {}", newActivity, ticketId);
-//        Activity activity = activityService.addActivity(newActivity, hours, minutes, paid, username);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+            log.error("Unauthenticated user attempted to add activity to ticket ID: {}", ticketId);
+            throw new SecurityException("User is not authenticated");
+        }
+        String username = authentication.getName();
+        log.debug("Authenticated user: {}", username);
 
-        Activity activity = activityService.addActivity(newActivity, hours, minutes, paid, null);
+        log.debug("Adding activity: '{}' to ticket with ID: {}", newActivity, ticketId);
+        Activity activity = activityService.addActivity(newActivity, hours, minutes, paid, username);
+
+//        Activity activity = activityService.addActivity(newActivity, hours, minutes, paid, null);
         ticket.getActivities().add(activity);
 
         ticketRepo.save(ticket);

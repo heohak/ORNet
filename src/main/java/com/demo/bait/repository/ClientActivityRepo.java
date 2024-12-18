@@ -1,6 +1,7 @@
 package com.demo.bait.repository;
 
 import com.demo.bait.entity.BaitWorker;
+import com.demo.bait.entity.Client;
 import com.demo.bait.entity.ClientActivity;
 import com.demo.bait.entity.classificator.TicketStatusClassificator;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
@@ -17,5 +18,7 @@ public interface ClientActivityRepo extends JpaRepository<ClientActivity, Intege
     List<ClientActivity> findByBaitWorker(BaitWorker baitWorker);
     List<ClientActivity> findByStatus(TicketStatusClassificator status);
     List<ClientActivity> findByWorkTypesContaining(WorkTypeClassificator workType);
+    List<ClientActivity> findAllByClient(Client client);
+
 
 }
