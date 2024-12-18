@@ -38,7 +38,7 @@ public class HelloController {
         return ResponseEntity.ok("Welcome to the Admin Dashboard, " + username + "!");
     }
 
-    @GetMapping("/api/user/profile")
+    @GetMapping("/api/profile")
     public ResponseEntity<?> getUserProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -51,7 +51,7 @@ public class HelloController {
         return ResponseEntity.ok("Here is your profile, " + username + "!");
     }
 
-    @GetMapping("/api/user/details")
+    @GetMapping("/api/details")
     public UserDetails getUserDetails() {
         // Get the logged-in username
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

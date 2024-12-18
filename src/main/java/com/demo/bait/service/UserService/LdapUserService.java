@@ -20,6 +20,7 @@ public class LdapUserService {
     public UserDetails getUserDetails(String username) {
         LdapQuery query = query()
                 .base("ou=users")
+//                .base("CN=Users,DC=bait,DC=local")
                 .filter("(uid=" + username + ")");
 
         return ldapTemplate.findOne(query, UserDetails.class);

@@ -16,6 +16,7 @@ import javax.naming.directory.Attributes;
 @Getter
 @Setter
 @Entry(
+//        base = "CN=Users,DC=bait,DC=local",
         base = "ou=users,dc=example,dc=com", // Base DN where the user entries are located
         objectClasses = {"person", "organizationalPerson", "inetOrgPerson"} // LDAP object classes
 )
