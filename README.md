@@ -67,5 +67,5 @@ For endpoint testing you can download Postman here [Postman](https://postman.com
     - `resources/`: Contains application properties and database config files.
   
 ## Database Diagram
-![Bait_Partner_Project_Diagram_1](https://github.com/user-attachments/assets/1dc0792a-85bd-4dde-b08c-6d90679024c4)
+![CRM_diagram](https://github.com/user-attachments/assets/7e25ee53-00f7-4af0-af1f-b7a38c122820)
 
