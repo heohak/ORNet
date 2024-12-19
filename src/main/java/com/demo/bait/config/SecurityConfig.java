@@ -83,22 +83,29 @@ public class SecurityConfig {
         });
 
         // Define an LdapAuthoritiesPopulator
-        DefaultLdapAuthoritiesPopulator authoritiesPopulator = new DefaultLdapAuthoritiesPopulator(contextSource, "ou=groups");
+//        DefaultLdapAuthoritiesPopulator authoritiesPopulator =
+//                new DefaultLdapAuthoritiesPopulator(contextSource, "");
+        DefaultLdapAuthoritiesPopulator authoritiesPopulator =
+                new DefaultLdapAuthoritiesPopulator(contextSource, "CN=Users");
 //        authoritiesPopulator.setGroupSearchFilter("(member={0})"); // Matches groups by membership
 //        authoritiesPopulator.setGroupRoleAttribute("cn"); // Use the group's 'cn' as the role name
-        authoritiesPopulator.setGroupSearchFilter("(cn={0})");
+        authoritiesPopulator.setGroupSearchFilter("(member={0})");
         authoritiesPopulator.setGroupRoleAttribute("cn");
         authoritiesPopulator.setConvertToUpperCase(true); // Roles will be in uppercase (e.g., ROLE_ADMINISTRATORS)
 
         // Configure the PasswordComparisonAuthenticator
         PasswordComparisonAuthenticator authenticator = new PasswordComparisonAuthenticator(contextSource);
 //        authenticator.setUserDnPatterns(new String[]{"uid={0},ou=users"}); // User DN pattern
-        authenticator.setUserDnPatterns(new String[]{"CN={0},CN=Users,DC=bait,DC=local"});
+//        authenticator.setUserDnPatterns(new String[]{"CN={0},CN=Users,DC=bait,DC=local"});
+        authenticator.setUserDnPatterns(new String[]{
+                "CN={0},OU=SBSUsers,OU=Users,OU=MyBusiness,DC=bait,DC=local"
+        });
         authenticator.setPasswordEncoder(passwordEncoder());
         authenticator.setPasswordAttributeName("userPassword");
 
         // Create the LdapAuthenticationProvider
-        LdapAuthenticationProvider ldapAuthenticationProvider = new LdapAuthenticationProvider(authenticator, authoritiesPopulator);
+        LdapAuthenticationProvider ldapAuthenticationProvider =
+                new LdapAuthenticationProvider(authenticator, authoritiesPopulator);
 
         // Add the custom LDAP AuthenticationProvider
         authBuilder.authenticationProvider(ldapAuthenticationProvider);
