@@ -2,6 +2,7 @@ package com.demo.bait.controller.AuthController;
 
 import com.demo.bait.Security.JwtUtils;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/auth")
@@ -29,8 +31,11 @@ public class AuthController {
         String username = credentials.get("username");
         String password = credentials.get("password");
 
+        log.debug("Attempting login for username: " + username);
+
         if ("admin".equals(username) && "admin".equals(password)) {
-            // Assign CRMADMIN role
+            log.debug("Bypassing login for admin.");
+            
             List<String> roles = List.of("ROLE_CRMADMINS");
             // List<String> roles = List.of("ROLE_ADMINISTRATORS");
 
@@ -39,7 +44,8 @@ public class AuthController {
 
             return ResponseEntity.ok(Map.of("token", token));
         } else if ("user".equals(username) && "user".equals(password)) {
-            // Assign CRMUSER role
+            log.debug("Bypassing login for user.");
+            
             List<String> roles = List.of("ROLE_CRMUSERS");
             // List<String> roles = List.of("ROLE_USERS");
 
@@ -50,6 +56,8 @@ public class AuthController {
         }
 
         try {
+            log.debug("Attempting login with LDAP for username: " + username);
+            
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
@@ -63,6 +71,7 @@ public class AuthController {
 
             return ResponseEntity.ok(Map.of("token", token));
         } catch (AuthenticationException e) {
+            log.error("Failed login with LDAP for username: " + username);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "Invalid credentials"));
         }
