@@ -29,6 +29,26 @@ public class AuthController {
         String username = credentials.get("username");
         String password = credentials.get("password");
 
+        if ("admin".equals(username) && "admin".equals(password)) {
+            // Assign CRMADMIN role
+//            List<String> roles = List.of("ROLE_CRMADMIN");
+            List<String> roles = List.of("ROLE_ADMINISTRATORS");
+
+            // Generate a JWT token for the test admin user
+            String token = jwtUtils.generateToken(username, roles);
+
+            return ResponseEntity.ok(Map.of("token", token));
+        } else if ("user".equals(username) && "user".equals(password)) {
+            // Assign CRMUSER role
+//            List<String> roles = List.of("ROLE_CRMUSER");
+            List<String> roles = List.of("ROLE_USERS");
+
+            // Generate a JWT token for the test user
+            String token = jwtUtils.generateToken(username, roles);
+
+            return ResponseEntity.ok(Map.of("token", token));
+        }
+
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
