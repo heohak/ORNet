@@ -3,10 +3,14 @@ package com.demo.bait.service.ThirdPartyITServices;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.ThirdPartyITDTO;
 import com.demo.bait.entity.Client;
+import com.demo.bait.entity.ClientWorker;
+import com.demo.bait.entity.FileUpload;
 import com.demo.bait.entity.ThirdPartyIT;
 import com.demo.bait.mapper.ThirdPartyITMapper;
 import com.demo.bait.repository.ClientRepo;
+import com.demo.bait.repository.ClientWorkerRepo;
 import com.demo.bait.repository.ThirdPartyITRepo;
+import com.demo.bait.service.FileUploadServices.FileUploadService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -26,14 +30,25 @@ public class ThirdPartyITService {
     private ThirdPartyITRepo thirdPartyITRepo;
     private ThirdPartyITMapper thirdPartyITMapper;
     private ClientRepo clientRepo;
+    private ClientWorkerRepo clientWorkerRepo;
+    private FileUploadService fileUploadService;
 
     @Transactional
     public ThirdPartyITDTO addThirdPartyIT(ThirdPartyITDTO thirdPartyITDTO) {
         log.info("Adding a new Third Party IT with name: {}", thirdPartyITDTO.name());
         ThirdPartyIT thirdPartyIT = new ThirdPartyIT();
         thirdPartyIT.setName(thirdPartyITDTO.name());
+        thirdPartyIT.setCountry(thirdPartyITDTO.country());
+        thirdPartyIT.setCity(thirdPartyITDTO.city());
+        thirdPartyIT.setStreetAddress(thirdPartyITDTO.streetAddress());
+        updateContact(thirdPartyIT, thirdPartyITDTO);
         thirdPartyIT.setEmail(thirdPartyITDTO.email());
         thirdPartyIT.setPhone(thirdPartyITDTO.phone());
+
+        if (thirdPartyITDTO.fileIds() != null) {
+            Set<FileUpload> files = fileUploadService.fileIdsToFilesSet(thirdPartyITDTO.fileIds());
+            thirdPartyIT.setFiles(files);
+        }
         ThirdPartyIT savedThirdParty = thirdPartyITRepo.save(thirdPartyIT);
         log.info("Third Party IT added successfully with ID: {}", savedThirdParty.getId());
         return thirdPartyITMapper.toDto(savedThirdParty);
@@ -54,6 +69,10 @@ public class ThirdPartyITService {
             log.info("Removed Third Party IT association from client with ID: {}", client.getId());
         }
 
+        log.debug("Clearing all associations for Third Party IT ID: {}", id);
+        thirdPartyIT.setContact(null);
+        thirdPartyIT.getFiles().clear();
+
         thirdPartyITRepo.delete(thirdPartyIT);
         log.info("Third Party IT with ID: {} deleted successfully", id);
 
@@ -71,11 +90,40 @@ public class ThirdPartyITService {
         ThirdPartyIT thirdPartyIT = thirdPartyITOpt.get();
 
         updateName(thirdPartyIT, thirdPartyITDTO);
+        updateCountry(thirdPartyIT, thirdPartyITDTO);
+        updateCity(thirdPartyIT, thirdPartyITDTO);
+        updateStreetAddress(thirdPartyIT, thirdPartyITDTO);
+        updateContact(thirdPartyIT, thirdPartyITDTO);
         updateEmail(thirdPartyIT, thirdPartyITDTO);
         updatePhone(thirdPartyIT, thirdPartyITDTO);
         thirdPartyITRepo.save(thirdPartyIT);
         log.info("Third Party IT with ID: {} updated successfully", thirdPartyId);
         return new ResponseDTO("Third party IT updated successfully");
+    }
+
+    public void updateContact(ThirdPartyIT thirdPartyIT, ThirdPartyITDTO thirdPartyITDTO) {
+        if (thirdPartyITDTO.contactId() != null) {
+            Optional<ClientWorker> clientWorkerOpt = clientWorkerRepo.findById(thirdPartyITDTO.contactId());
+            clientWorkerOpt.ifPresent(thirdPartyIT::setContact);
+        }
+    }
+
+    public void updateCountry(ThirdPartyIT thirdPartyIT, ThirdPartyITDTO thirdPartyITDTO) {
+        if (thirdPartyITDTO.country() != null) {
+            thirdPartyIT.setCountry(thirdPartyITDTO.country());
+        }
+    }
+
+    public void updateCity(ThirdPartyIT thirdPartyIT, ThirdPartyITDTO thirdPartyITDTO) {
+        if (thirdPartyITDTO.city() != null) {
+            thirdPartyIT.setCity(thirdPartyITDTO.city());
+        }
+    }
+
+    public void updateStreetAddress(ThirdPartyIT thirdPartyIT, ThirdPartyITDTO thirdPartyITDTO) {
+        if (thirdPartyITDTO.streetAddress() != null) {
+            thirdPartyIT.setStreetAddress(thirdPartyITDTO.streetAddress());
+        }
     }
 
     public void updateName(ThirdPartyIT thirdPartyIT, ThirdPartyITDTO thirdPartyITDTO) {

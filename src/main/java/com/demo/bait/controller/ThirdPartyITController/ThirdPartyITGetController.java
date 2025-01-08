@@ -1,6 +1,8 @@
 package com.demo.bait.controller.ThirdPartyITController;
 
+import com.demo.bait.dto.FileUploadDTO;
 import com.demo.bait.dto.ThirdPartyITDTO;
+import com.demo.bait.service.ThirdPartyITServices.ThirdPartyITFileUploadService;
 import com.demo.bait.service.ThirdPartyITServices.ThirdPartyITService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,7 @@ import java.util.List;
 public class ThirdPartyITGetController {
 
     public final ThirdPartyITService thirdPartyITService;
+    public final ThirdPartyITFileUploadService thirdPartyITFileUploadService;
 
     @GetMapping("/all")
     public List<ThirdPartyITDTO> getAllThirdPartyITs() {
@@ -25,5 +28,10 @@ public class ThirdPartyITGetController {
     @GetMapping("/{thirdPartyId}")
     public ThirdPartyITDTO getThirdPartyITById(@PathVariable Integer thirdPartyId) {
         return thirdPartyITService.getThirdPartyITById(thirdPartyId);
+    }
+
+    @GetMapping("/files/{thirdPartyId}")
+    public List<FileUploadDTO> getThirdPartyITFiles(@PathVariable Integer thirdPartyId) {
+        return thirdPartyITFileUploadService.getThirdPartyITFiles(thirdPartyId);
     }
 }
