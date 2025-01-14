@@ -400,4 +400,16 @@ public class ClientWorkerService {
             throw e;
         }
     }
+
+    public ClientWorkerDTO getWorkerById(Integer workerId) {
+        log.info("Fetching worker with ID: {}", workerId);
+        Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
+        if (workerOpt.isEmpty()) {
+            log.warn("Worker with ID {} not found.", workerId);
+            throw new EntityNotFoundException("ClientWorker with id " + workerId + " not found");
+        }
+        ClientWorker worker = workerOpt.get();
+        log.info("Successfully fetched worker with ID: {}", workerId);
+        return clientWorkerMapper.toDto(worker);
+    }
 }
