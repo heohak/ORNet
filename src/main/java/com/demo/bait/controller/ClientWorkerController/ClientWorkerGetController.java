@@ -62,4 +62,9 @@ public class ClientWorkerGetController {
     public List<ClientWorkerDTO> getNotUsedContacts() {
         return clientWorkerService.getNotUsedContacts();
     }
+
+    @GetMapping("/id/{workerId}")
+    public ClientWorkerDTO getWorkerById(@PathVariable Integer workerId) {
+        return clientWorkerService.getWorkerById(workerId);
+    }
 }
