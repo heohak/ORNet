@@ -35,7 +35,7 @@ public class AuthController {
 
         if ("admin".equals(username) && "admin".equals(password)) {
             log.debug("Bypassing login for admin.");
-            
+
             List<String> roles = List.of("ROLE_CRMADMINS");
             // List<String> roles = List.of("ROLE_ADMINISTRATORS");
 
@@ -45,7 +45,7 @@ public class AuthController {
             return ResponseEntity.ok(Map.of("token", token));
         } else if ("user".equals(username) && "user".equals(password)) {
             log.debug("Bypassing login for user.");
-            
+
             List<String> roles = List.of("ROLE_CRMUSERS");
             // List<String> roles = List.of("ROLE_USERS");
 
@@ -57,7 +57,7 @@ public class AuthController {
 
         try {
             log.debug("Attempting login with LDAP for username: " + username);
-            
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
