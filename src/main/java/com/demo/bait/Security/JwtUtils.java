@@ -15,7 +15,7 @@ import java.util.List;
 public class JwtUtils {
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256); // stronger key in production
 
-    private final long expirationMs = 3600000;
+    private final long expirationMs = 8 * 60 * 60 * 1000;  // 60 * 60 * 1000 = 1hour
 
     public String generateToken(String username, List<String> roles) {
         return Jwts.builder()
@@ -36,6 +36,15 @@ public class JwtUtils {
                 .getSubject();
     }
 
+    public Date getExpirationDateFromToken(String token) {
+        return Jwts.parser()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+    }
+
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(key).build().parseSignedClaims(token);
@@ -54,5 +63,21 @@ public class JwtUtils {
                 .getPayload();
 
         return claims.get("roles", List.class); // Extract roles from the "roles" claim
+    }
+
+    public String refreshToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        // Update the expiration time
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expirationMs)) // Extend expiration
+                .signWith(key)
+                .compact();
     }
 }
