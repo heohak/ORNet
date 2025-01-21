@@ -121,7 +121,6 @@ public class ClientService {
                 activity.getContacts().clear();
                 activity.getWorkTypes().clear();
                 activity.getFiles().clear();
-                activity.getDevices().clear();
                 clientActivityRepo.delete(activity);
             }
 

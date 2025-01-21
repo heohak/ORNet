@@ -28,7 +28,7 @@ public class ClientActivity {
     @JoinColumn(name = "client_id", referencedColumnName = "id")
     private Client client;
     private String title;
-    private String clientNumeration;
+//    private String clientNumeration;
     @Column(columnDefinition = "TEXT")
     private String description;
     private LocalDateTime startDateTime;
@@ -65,13 +65,21 @@ public class ClientActivity {
             inverseJoinColumns = @JoinColumn(name = "file_upload_id")
     )
     private Set<FileUpload> files = new HashSet<>();
-    private Boolean paid;
-    private Boolean settled;
+//    private Boolean paid;
+//    private Boolean settled;
+//    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "client_activity_device",
+//            joinColumns = @JoinColumn(name = "client_activity_id"),
+//            inverseJoinColumns = @JoinColumn(name = "device_id")
+//    )
+//    private Set<Device> devices = new HashSet<>();
+
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
-            name = "client_activity_device",
+            name = "client_activity_comment",
             joinColumns = @JoinColumn(name = "client_activity_id"),
-            inverseJoinColumns = @JoinColumn(name = "device_id")
+            inverseJoinColumns = @JoinColumn(name = "activity_id")
     )
-    private Set<Device> devices = new HashSet<>();
+    private Set<Activity> activities = new HashSet<>();
 }
