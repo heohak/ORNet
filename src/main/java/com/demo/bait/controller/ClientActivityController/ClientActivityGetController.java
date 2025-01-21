@@ -1,7 +1,9 @@
 package com.demo.bait.controller.ClientActivityController;
 
+import com.demo.bait.dto.ActivityDTO;
 import com.demo.bait.dto.ClientActivityDTO;
 import com.demo.bait.dto.FileUploadDTO;
+import com.demo.bait.service.ClientActivityService.ClientActivityCommentService;
 import com.demo.bait.service.ClientActivityService.ClientActivityFileUploadService;
 import com.demo.bait.service.ClientActivityService.ClientActivitySpecificationService;
 import lombok.AllArgsConstructor;
@@ -16,6 +18,7 @@ public class ClientActivityGetController {
 
     public final ClientActivityFileUploadService clientActivityFileUploadService;
     public final ClientActivitySpecificationService clientActivitySpecificationService;
+    public final ClientActivityCommentService clientActivityCommentService;
 
     @GetMapping("/files/{clientActivityId}")
     public List<FileUploadDTO> getClientActivityFiles(@PathVariable Integer clientActivityId) {
@@ -27,5 +30,10 @@ public class ClientActivityGetController {
             @RequestParam(value = "statusId", required = false) Integer statusId,
             @RequestParam(value = "clientId", required = false) Integer clientId) {
         return clientActivitySpecificationService.searchAndFilterClientActivities(statusId, clientId);
+    }
+
+    @GetMapping("/activity/{clientActivityId}")
+    public List<ActivityDTO> getClientActivityActivities(@PathVariable Integer clientActivityId) {
+        return clientActivityCommentService.getClientActivityActivities(clientActivityId);
     }
 }

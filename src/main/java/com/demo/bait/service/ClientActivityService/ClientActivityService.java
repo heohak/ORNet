@@ -47,8 +47,6 @@ public class ClientActivityService {
             ClientActivity clientActivity = new ClientActivity();
             updateClientActivityFields(clientActivity, clientActivityDTO);
             clientActivity.setStartDateTime(LocalDateTime.now().withNano(0));
-            clientActivity.setPaid(false);
-            clientActivity.setSettled(false);
 
             clientActivityRepo.save(clientActivity);
             setClientActivityUpdateTime(clientActivity);
@@ -97,7 +95,6 @@ public class ClientActivityService {
             clientActivity.getContacts().clear();
             clientActivity.getWorkTypes().clear();
             clientActivity.getFiles().clear();
-            clientActivity.getDevices().clear();
             clientActivity.setBaitWorker(null);
             clientActivity.setStatus(null);
 
@@ -126,10 +123,6 @@ public class ClientActivityService {
 
         if (clientActivityDTO.title() != null) {
             clientActivity.setTitle(clientActivityDTO.title());
-        }
-
-        if (clientActivityDTO.clientNumeration() != null) {
-            clientActivity.setClientNumeration(clientActivityDTO.clientNumeration());
         }
 
         if (clientActivityDTO.description() != null) {
@@ -168,13 +161,5 @@ public class ClientActivityService {
             Set<FileUpload> files = fileUploadService.fileIdsToFilesSet(clientActivityDTO.fileIds());
             clientActivity.setFiles(files);
         }
-
-        if (clientActivityDTO.deviceIds() != null) {
-            Set<Device> devices = deviceService.deviceIdsToDevicesSet(clientActivityDTO.deviceIds());
-            clientActivity.setDevices(devices);
-        }
-
-        clientActivity.setPaid(clientActivityDTO.paid() != null ? clientActivityDTO.paid() : false);
-        clientActivity.setSettled(clientActivityDTO.settled() != null ? clientActivityDTO.settled() : false);
     }
 }
