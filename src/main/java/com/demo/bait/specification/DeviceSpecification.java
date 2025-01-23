@@ -41,6 +41,21 @@ public class DeviceSpecification implements Specification<Device> {
         };
     }
 
+    public static Specification<Device> hasCustomerRegisterNos(String searchTerm) {
+        return (root, query, criteriaBuilder) -> {
+            if (searchTerm == null || searchTerm.trim().isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            String likePattern = "%" + searchTerm.toLowerCase() + "%";
+
+            Predicate workstationPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("workstationNo")), likePattern);
+            Predicate cameraPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("cameraNo")), likePattern);
+            Predicate otherNoPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("otherNo")), likePattern);
+
+            return criteriaBuilder.or(workstationPredicate, cameraPredicate, otherNoPredicate);
+        };
+    }
+
     @Override
     public Predicate toPredicate(Root<Device> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
@@ -75,11 +90,13 @@ public class DeviceSpecification implements Specification<Device> {
         Join<Device, Maintenance> maintenanceJoin = root.join("maintenances", JoinType.LEFT);
         Predicate maintenancePredicate = criteriaBuilder.like(criteriaBuilder.lower(maintenanceJoin.get("maintenanceName")), likePattern);
 
+        Predicate customerRegisterNosPredicate = hasCustomerRegisterNos(searchTerm).toPredicate(root, query, criteriaBuilder);
+
         return criteriaBuilder.or(
                 deviceNamePredicate, departmentPredicate, roomPredicate, serialNumberPredicate, licenseNumberPredicate,
                 versionPredicate, firstIPAddressPredicate, secondIPAddressPredicate, subnetMaskPredicate, softwareKeyPredicate,
                 clientFullNamePredicate, clientShortNamePredicate, locationPredicate, commentPredicate, fileUploadPredicate,
-                maintenancePredicate
+                maintenancePredicate, customerRegisterNosPredicate
         );
     }
 }

@@ -77,4 +77,7 @@ public class Device {
     @Convert(converter = JsonConverter.class)
     private Map<String, Object> attributes;
 
+    private String workstationNo;
+    private String cameraNo;
+    private String otherNo;
 }

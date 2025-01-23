@@ -93,4 +93,5 @@ public class Ticket {
             inverseJoinColumns = @JoinColumn(name = "device_id")
     )
     private Set<Device> devices = new HashSet<>();
+    private String customerRegisterNos;
 }

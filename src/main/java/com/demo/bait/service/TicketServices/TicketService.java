@@ -99,6 +99,7 @@ public class TicketService {
         if (ticketDTO.deviceIds() != null) {
             Set<Device> devices = deviceService.deviceIdsToDevicesSet(ticketDTO.deviceIds());
             ticket.setDevices(devices);
+            ticketDeviceService.addCustomerRegisterNos(ticket, devices);
         }
 
         ticket.setTimeSpent(Duration.ZERO);
