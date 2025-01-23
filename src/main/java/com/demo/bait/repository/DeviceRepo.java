@@ -1,9 +1,6 @@
 package com.demo.bait.repository;
 
-import com.demo.bait.entity.Client;
-import com.demo.bait.entity.Comment;
-import com.demo.bait.entity.Device;
-import com.demo.bait.entity.Maintenance;
+import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.DeviceClassificator;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -27,5 +24,6 @@ public interface DeviceRepo extends JpaRepository<Device, Integer>, JpaSpecifica
     List<Device> findByClassificator(DeviceClassificator classificator);
     Device findByCommentsContaining(Comment comment);
     List<Device> findAllByClient(Client client);
+    List<Device> findAllByLocation(Location location);
 
 }
