@@ -5,11 +5,9 @@ import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.dto.LinkedDeviceDTO;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceCommentService;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceService;
+import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceSpecificationService;
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -20,6 +18,7 @@ public class LinkedDeviceGetController {
 
     public final LinkedDeviceService linkedDeviceService;
     public final LinkedDeviceCommentService linkedDeviceCommentService;
+    public final LinkedDeviceSpecificationService linkedDeviceSpecificationService;
 
     @GetMapping("/all")
     public List<LinkedDeviceDTO> getAllLinkedDevices() {
@@ -49,5 +48,14 @@ public class LinkedDeviceGetController {
     @GetMapping("/device/{linkedDeviceId}")
     public DeviceDTO getLinkedDeviceDevice(@PathVariable Integer linkedDeviceId) {
         return linkedDeviceService.getLinkedDeviceDevice(linkedDeviceId);
+    }
+
+    @GetMapping("/search")
+    public List<LinkedDeviceDTO> searchAndFilterLinkedDevices(
+            @RequestParam(value = "q", required = false) String query,
+            @RequestParam(value = "locationId", required = false) Integer locationId,
+            @RequestParam(value = "deviceId", required = false) Integer deviceId,
+            @RequestParam(value = "template", required = false) Boolean template) {
+        return linkedDeviceSpecificationService.searchAndFilterLinkedDevices(query, locationId, deviceId, template);
     }
 }
