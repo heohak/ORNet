@@ -21,7 +21,7 @@ public class DeviceSpecificationService {
     private DeviceMapper deviceMapper;
 
     public List<DeviceDTO> searchAndFilterDevices(String searchTerm, Integer classificatorId, Integer clientId,
-                                                  Integer locationId, Boolean writtenOff) {
+                                                  Integer locationId, Boolean writtenOff, String customerRegisterNos) {
         log.info("Searching and filtering devices with parameters - " +
                         "searchTerm: {}, classificatorId: {}, clientId: {}, locationId: {}, writtenOff: {}",
                 searchTerm, classificatorId, clientId, locationId, writtenOff);
@@ -57,6 +57,13 @@ public class DeviceSpecificationService {
                 log.debug("Adding written-off filter with value: {}", writtenOff);
                 Specification<Device> writtenOffSpec = DeviceSpecification.isWrittenOff(writtenOff);
                 combinedSpec = combinedSpec.and(writtenOffSpec);
+            }
+
+            if (customerRegisterNos != null) {
+                log.debug("Adding customer register number search term: {}", customerRegisterNos);
+                Specification<Device> customerRegisterNosSpec = DeviceSpecification
+                        .hasCustomerRegisterNos(customerRegisterNos);
+                combinedSpec = combinedSpec.and(customerRegisterNosSpec);
             }
 
             List<DeviceDTO> devices = deviceMapper.toDtoList(deviceRepo.findAll(combinedSpec));
