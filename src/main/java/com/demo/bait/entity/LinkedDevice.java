@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -38,4 +39,11 @@ public class LinkedDevice {
 
     @Convert(converter = JsonConverter.class)
     private Map<String, Object> attributes;
+    @Column(columnDefinition = "TEXT")
+    private String description;
+    private LocalDate introducedDate;
+    @ManyToOne
+    @JoinColumn(name = "location_id", referencedColumnName = "id")
+    private Location location;
+    private Boolean template;
 }

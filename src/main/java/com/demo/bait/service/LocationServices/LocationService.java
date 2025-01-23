@@ -34,6 +34,7 @@ public class LocationService {
     private ClientActivityRepo clientActivityRepo;
     private TicketRepo ticketRepo;
     private DeviceRepo deviceRepo;
+    private LinkedDeviceRepo linkedDeviceRepo;
 
     @Transactional
     public LocationDTO addLocation(LocationDTO locationDTO) {
@@ -138,6 +139,13 @@ public class LocationService {
         for (Device device : devices) {
             device.setLocation(null);
             deviceRepo.save(device);
+        }
+
+        log.info("Removing associations with Linked Devices");
+        List<LinkedDevice> linkedDevices = linkedDeviceRepo.findAllByLocation(location);
+        for (LinkedDevice linkedDevice : linkedDevices) {
+            linkedDevice.setLocation(null);
+            linkedDeviceRepo.save(linkedDevice);
         }
 
         log.info("Removing associations with Maintenances");
