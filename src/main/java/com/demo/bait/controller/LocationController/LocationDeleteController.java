@@ -10,13 +10,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/location")
+@RequestMapping("/api")
 public class LocationDeleteController {
 
     public final LocationService locationService;
 
-    @DeleteMapping("/{locationId}")
+    @DeleteMapping("/location/{locationId}")
     public ResponseDTO deleteLocation(@PathVariable Integer locationId) {
         return locationService.deleteLocation(locationId);
+    }
+
+    @DeleteMapping("/admin/location/force/{locationId}")
+    public ResponseDTO forceDeleteLocation(@PathVariable Integer locationId) {
+        return locationService.forceDeleteLocation(locationId);
     }
 }

@@ -2,11 +2,10 @@ package com.demo.bait.service.LocationServices;
 
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.ResponseDTO;
-import com.demo.bait.entity.Comment;
-import com.demo.bait.entity.Location;
+import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import com.demo.bait.mapper.LocationMapper;
-import com.demo.bait.repository.LocationRepo;
+import com.demo.bait.repository.*;
 import com.demo.bait.service.CommentServices.CommentService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -30,6 +29,11 @@ public class LocationService {
     private EntityManager entityManager;
     private LocationMaintenanceService locationMaintenanceService;
     private CommentService commentService;
+    private ClientWorkerRepo clientWorkerRepo;
+    private ClientRepo clientRepo;
+    private ClientActivityRepo clientActivityRepo;
+    private TicketRepo ticketRepo;
+    private DeviceRepo deviceRepo;
 
     @Transactional
     public LocationDTO addLocation(LocationDTO locationDTO) {
@@ -66,7 +70,84 @@ public class LocationService {
     public ResponseDTO deleteLocation(Integer locationId) {
         log.info("Deleting location with ID: {}", locationId);
         try {
-            locationRepo.deleteById(locationId);
+            Optional<Location> locationOpt = locationRepo.findById(locationId);
+            if (locationOpt.isEmpty()) {
+                log.error("Location with ID: {} not found", locationId);
+                throw new EntityNotFoundException("Location with ID " + locationId + " not found");
+            }
+
+            Location location = locationOpt.get();
+            log.info("Removing associations with Maintenances");
+            location.getMaintenances().clear();
+
+            log.info("Removing associations with Comments");
+            location.getComments().clear();
+
+            locationRepo.delete(location);
+            log.info("Location with ID {} deleted successfully", locationId);
+            return new ResponseDTO("Location deleted successfully");
+        } catch (Exception e) {
+            log.error("Error while deleting location with ID: {}", locationId, e);
+            throw e;
+        }
+    }
+
+    @Transactional
+    public ResponseDTO forceDeleteLocation(Integer locationId) {
+        log.info("Force deleting location with ID: {}", locationId);
+
+        Optional<Location> locationOpt = locationRepo.findById(locationId);
+        if (locationOpt.isEmpty()) {
+            log.error("Location with ID: {} not found", locationId);
+            throw new EntityNotFoundException("Location with ID " + locationId + " not found");
+        }
+
+        Location location = locationOpt.get();
+
+        log.info("Removing associations with ClientWorkers");
+        List<ClientWorker> clientWorkers = clientWorkerRepo.findAllByLocation(location);
+        for (ClientWorker clientWorker : clientWorkers) {
+            clientWorker.setLocation(null);
+            clientWorkerRepo.save(clientWorker);
+        }
+
+        log.info("Removing associations with Clients");
+        List<Client> clients = clientRepo.findAll();
+        for (Client client : clients) {
+            if (client.getLocations().remove(location)) {
+                clientRepo.save(client);
+            }
+        }
+
+        log.info("Removing associations with ClientActivities");
+        List<ClientActivity> clientActivities = clientActivityRepo.findAllByLocation(location);
+        for (ClientActivity clientActivity : clientActivities) {
+            clientActivity.setLocation(null);
+            clientActivityRepo.save(clientActivity);
+        }
+
+        log.info("Removing associations with Tickets");
+        List<Ticket> tickets = ticketRepo.findAllByLocation(location);
+        for (Ticket ticket : tickets) {
+            ticket.setLocation(null);
+            ticketRepo.save(ticket);
+        }
+
+        log.info("Removing associations with Devices");
+        List<Device> devices = deviceRepo.findAllByLocation(location);
+        for (Device device : devices) {
+            device.setLocation(null);
+            deviceRepo.save(device);
+        }
+
+        log.info("Removing associations with Maintenances");
+        location.getMaintenances().clear();
+
+        log.info("Removing associations with Comments");
+        location.getComments().clear();
+
+        try {
+            locationRepo.delete(location);
             log.info("Location with ID {} deleted successfully", locationId);
             return new ResponseDTO("Location deleted successfully");
         } catch (Exception e) {
