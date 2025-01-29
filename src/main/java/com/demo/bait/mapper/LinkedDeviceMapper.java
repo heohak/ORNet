@@ -19,6 +19,7 @@ public interface LinkedDeviceMapper {
     List<LinkedDeviceDTO> toDtoList(List<LinkedDevice> linkedDevice);
 
     @Mapping(source = "device.id", target = "deviceId")
+    @Mapping(source = "location.id", target = "locationId")
     @Mapping(target = "commentIds", expression = "java(mapCommentsToIds(linkedDevice.getComments()))")
     LinkedDeviceDTO toDto(LinkedDevice linkedDevice);
 

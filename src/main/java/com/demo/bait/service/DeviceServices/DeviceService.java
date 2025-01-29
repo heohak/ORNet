@@ -68,6 +68,9 @@ public class DeviceService {
             device.setSoftwareKey(deviceDTO.softwareKey());
             device.setIntroducedDate(deviceDTO.introducedDate());
             device.setWrittenOffDate(deviceDTO.writtenOffDate());
+            device.setWorkstationNo(deviceDTO.workstationNo());
+            device.setCameraNo(deviceDTO.cameraNo());
+            device.setOtherNo(deviceDTO.otherNo());
 
             if (deviceDTO.commentIds() != null) {
                 log.debug("Adding comments with IDs: {}", deviceDTO.commentIds());
@@ -290,12 +293,34 @@ public class DeviceService {
 
             updateDeviceClassificator(device, deviceDTO);
 
+            updateWorkstationNo(device, deviceDTO);
+            updateCameraNo(device, deviceDTO);
+            updateOtherNo(device, deviceDTO);
+
             deviceRepo.save(device);
             log.info("Successfully updated device with ID: {}", deviceId);
             return new ResponseDTO("Device updated successfully");
         } catch (Exception e) {
             log.error("Error while updating device with ID: {}", deviceId, e);
             throw e;
+        }
+    }
+
+    public void updateWorkstationNo(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.workstationNo() != null) {
+            device.setWorkstationNo(deviceDTO.workstationNo());
+        }
+    }
+
+    public void updateCameraNo(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.cameraNo() != null) {
+            device.setCameraNo(deviceDTO.cameraNo());
+        }
+    }
+
+    public void updateOtherNo(Device device, DeviceDTO deviceDTO) {
+        if (deviceDTO.otherNo() != null) {
+            device.setOtherNo(deviceDTO.otherNo());
         }
     }
 

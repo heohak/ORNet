@@ -7,6 +7,7 @@ import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.Comment;
 import com.demo.bait.entity.Device;
 import com.demo.bait.entity.LinkedDevice;
+import com.demo.bait.entity.Location;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import com.demo.bait.mapper.CommentMapper;
 import com.demo.bait.mapper.DeviceMapper;
@@ -14,6 +15,7 @@ import com.demo.bait.mapper.LinkedDeviceMapper;
 import com.demo.bait.repository.CommentRepo;
 import com.demo.bait.repository.DeviceRepo;
 import com.demo.bait.repository.LinkedDeviceRepo;
+import com.demo.bait.repository.LocationRepo;
 import com.demo.bait.service.CommentServices.CommentService;
 import com.demo.bait.service.DeviceServices.DeviceService;
 import jakarta.persistence.EntityManager;
@@ -38,6 +40,7 @@ public class LinkedDeviceService {
     private CommentService commentService;
     private EntityManager entityManager;
     private DeviceMapper deviceMapper;
+    private LocationRepo locationRepo;
 
     @Transactional
     public ResponseDTO addLinkedDevice(LinkedDeviceDTO linkedDeviceDTO) {
@@ -60,6 +63,11 @@ public class LinkedDeviceService {
             linkedDevice.setAttributes(linkedDeviceDTO.attributes() != null
                     ? linkedDeviceDTO.attributes()
                     : new HashMap<>());
+
+            linkedDevice.setDescription(linkedDeviceDTO.description());
+            linkedDevice.setIntroducedDate(linkedDeviceDTO.introducedDate());
+            updateLocation(linkedDevice, linkedDeviceDTO);
+            linkedDevice.setTemplate(linkedDeviceDTO.template());
 
             linkedDeviceRepo.save(linkedDevice);
             log.info("Linked device added successfully with ID: {}", linkedDevice.getId());
@@ -124,6 +132,11 @@ public class LinkedDeviceService {
             updateProductCode(linkedDevice, linkedDeviceDTO);
             updateSerialNumber(linkedDevice, linkedDeviceDTO);
 
+            updateDescription(linkedDevice, linkedDeviceDTO);
+            updateIntroducedDate(linkedDevice, linkedDeviceDTO);
+            updateLocation(linkedDevice, linkedDeviceDTO);
+            updateTemplate(linkedDevice, linkedDeviceDTO);
+
             linkedDeviceRepo.save(linkedDevice);
             log.info("Linked device with ID: {} updated successfully", linkedDeviceId);
             return new ResponseDTO("Linked Device updated successfully");
@@ -133,6 +146,30 @@ public class LinkedDeviceService {
         }
     }
 
+    public void updateLocation(LinkedDevice linkedDevice, LinkedDeviceDTO linkedDeviceDTO) {
+        if (linkedDeviceDTO.locationId() != null) {
+            Optional<Location> locationOpt = locationRepo.findById(linkedDeviceDTO.locationId());
+            locationOpt.ifPresent(linkedDevice::setLocation);
+        }
+    }
+
+    public void updateDescription(LinkedDevice linkedDevice, LinkedDeviceDTO linkedDeviceDTO) {
+        if (linkedDeviceDTO.description() != null) {
+            linkedDevice.setDescription(linkedDeviceDTO.description());
+        }
+    }
+
+    public void updateIntroducedDate(LinkedDevice linkedDevice, LinkedDeviceDTO linkedDeviceDTO) {
+        if (linkedDeviceDTO.introducedDate() != null) {
+            linkedDevice.setIntroducedDate(linkedDeviceDTO.introducedDate());
+        }
+    }
+
+    public void updateTemplate(LinkedDevice linkedDevice, LinkedDeviceDTO linkedDeviceDTO) {
+        if (linkedDeviceDTO.template() != null) {
+            linkedDevice.setTemplate(linkedDeviceDTO.template());
+        }
+    }
     public void updateDevice(LinkedDevice linkedDevice, LinkedDeviceDTO linkedDeviceDTO) {
         if (linkedDeviceDTO.deviceId() != null) {
             Optional<Device> deviceOpt = deviceRepo.findById(linkedDeviceDTO.deviceId());

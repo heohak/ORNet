@@ -1,10 +1,7 @@
 package com.demo.bait.mapper;
 
 import com.demo.bait.dto.ClientActivityDTO;
-import com.demo.bait.entity.ClientActivity;
-import com.demo.bait.entity.ClientWorker;
-import com.demo.bait.entity.Device;
-import com.demo.bait.entity.FileUpload;
+import com.demo.bait.entity.*;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -29,8 +26,14 @@ public interface ClientActivityMapper {
     @Mapping(target = "contactIds", expression = "java(mapContactsToIds(clientActivity.getContacts()))")
     @Mapping(target = "workTypeIds", expression = "java(mapWorkTypesToIds(clientActivity.getWorkTypes()))")
     @Mapping(target = "fileIds", expression = "java(mapFilesToIds(clientActivity.getFiles()))")
-    @Mapping(target = "deviceIds", expression = "java(mapDevicesToIds(clientActivity.getDevices()))")
+    @Mapping(target = "activityIds", expression = "java(mapActivitiesToIds(clientActivity.getActivities()))")
     ClientActivityDTO toDto(ClientActivity clientActivity);
+
+    default List<Integer> mapActivitiesToIds(Set<Activity> activities) {
+        return activities.stream()
+                .map(Activity::getId)
+                .collect(Collectors.toList());
+    }
 
     default List<Integer> mapContactsToIds(Set<ClientWorker> contacts) {
         return contacts.stream()
