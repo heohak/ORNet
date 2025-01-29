@@ -4,6 +4,7 @@ import com.demo.bait.dto.BaitWorkerDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.BaitWorker;
 import com.demo.bait.entity.ClientActivity;
+import com.demo.bait.entity.Comment;
 import com.demo.bait.entity.Ticket;
 import com.demo.bait.mapper.BaitWorkerMapper;
 import com.demo.bait.repository.BaitWorkerRepo;
@@ -16,8 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -153,5 +156,20 @@ public class BaitWorkerService {
         BaitWorkerDTO workerDTO = baitWorkerMapper.toDto(baitWorkerOpt.get());
         log.debug("Fetched Bait Worker: {}", workerDTO);
         return workerDTO;
+    }
+
+    public Set<BaitWorker> baitWorkerIdsToBaitWorkersSet(List<Integer> baitWorkerIds) {
+        log.info("Fetching bait workers by IDs: {}", baitWorkerIds);
+        Set<BaitWorker> baitWorkers = new HashSet<>();
+        for (Integer baitWorkerId : baitWorkerIds) {
+            BaitWorker baitWorker = baitWorkerRepo.findById(baitWorkerId)
+                    .orElseThrow(() -> {
+                        log.error("Invalid bait worker ID: {}", baitWorkerId);
+                        return new IllegalArgumentException("Invalid bait worker ID: " + baitWorkerId);
+                    });
+            baitWorkers.add(baitWorker);
+        }
+        log.info("Fetched bait workers: {}", baitWorkers.size());
+        return baitWorkers;
     }
 }
