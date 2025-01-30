@@ -1,10 +1,13 @@
 package com.demo.bait.controller.TicketController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.*;
 import com.demo.bait.dto.classificator.WorkTypeClassificatorDTO;
 import com.demo.bait.service.TicketServices.*;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,11 +25,13 @@ public class TicketGetController {
     public final TicketWorkTypeService ticketWorkTypeService;
     public final TicketDeviceService ticketDeviceService;
     public final TicketActivityService ticketActivityService;
+    private final RequestParamParser requestParamParser;
 
 
     @GetMapping("/client/{clientId}")
-    public List<TicketDTO> getTicketsByClientId(@PathVariable Integer clientId) {
-        return ticketService.getTicketsByClientId(clientId);
+    public List<TicketDTO> getTicketsByClientId(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "client ID");
+        return ticketService.getTicketsByClientId(parsedClientId);
     }
 
     @GetMapping("/all")
@@ -35,8 +40,9 @@ public class TicketGetController {
     }
 
     @GetMapping("/{ticketId}")
-    public TicketDTO getTicketById(@PathVariable Integer ticketId) {
-        return ticketService.getTicketById(ticketId);
+    public TicketDTO getTicketById(@PathVariable String ticketId) {
+        Integer parsedTicketId = requestParamParser.parseId(ticketId, "ticket ID");
+        return ticketService.getTicketById(parsedTicketId);
     }
 
     @GetMapping("/search")
@@ -52,32 +58,32 @@ public class TicketGetController {
     }
 
     @GetMapping("/activity/{ticketId}")
-    public List<ActivityDTO> getTicketActivities(@PathVariable Integer ticketId) {
-        return ticketActivityService.getTicketActivities(ticketId);
+    public List<ActivityDTO> getTicketActivities(@PathVariable String ticketId) {
+        Integer parsedTicketId = requestParamParser.parseId(ticketId, "ticket ID");
+        return ticketActivityService.getTicketActivities(parsedTicketId);
     }
 
     @GetMapping("/files/{ticketId}")
-    public List<FileUploadDTO> getTicketFiles(@PathVariable Integer ticketId) {
-        return ticketFileUploadService.getTicketFiles(ticketId);
+    public List<FileUploadDTO> getTicketFiles(@PathVariable String ticketId) {
+        Integer parsedTicketId = requestParamParser.parseId(ticketId, "ticket ID");
+        return ticketFileUploadService.getTicketFiles(parsedTicketId);
     }
 
     @GetMapping("/contacts/{ticketId}")
-    public List<ClientWorkerDTO> getTicketContacts(@PathVariable Integer ticketId) {
-        return ticketContactsService.getTicketContacts(ticketId);
+    public List<ClientWorkerDTO> getTicketContacts(@PathVariable String ticketId) {
+        Integer parsedTicketId = requestParamParser.parseId(ticketId, "ticket ID");
+        return ticketContactsService.getTicketContacts(parsedTicketId);
     }
 
     @GetMapping("/work-types/{ticketId}")
-    public List<WorkTypeClassificatorDTO> getTicketWorkTypes(@PathVariable Integer ticketId) {
-        return ticketWorkTypeService.getTicketWorkTypes(ticketId);
+    public List<WorkTypeClassificatorDTO> getTicketWorkTypes(@PathVariable String ticketId) {
+        Integer parsedTicketId = requestParamParser.parseId(ticketId, "ticket ID");
+        return ticketWorkTypeService.getTicketWorkTypes(parsedTicketId);
     }
 
     @GetMapping("/devices/{ticketId}")
-    public List<DeviceDTO> getTicketDevices(@PathVariable Integer ticketId) {
-        return ticketDeviceService.getTicketDevices(ticketId);
+    public List<DeviceDTO> getTicketDevices(@PathVariable String ticketId) {
+        Integer parsedTicketId = requestParamParser.parseId(ticketId, "ticket ID");
+        return ticketDeviceService.getTicketDevices(parsedTicketId);
     }
-
-//    @GetMapping("/paid-work/{ticketId}")
-//    public PaidWorkDTO getTicketPaidWork(@PathVariable Integer ticketId) {
-//        return ticketPaidWorkService.getTicketPaidWork(ticketId);
-//    }
 }

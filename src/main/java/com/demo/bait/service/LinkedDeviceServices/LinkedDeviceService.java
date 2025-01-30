@@ -216,6 +216,11 @@ public class LinkedDeviceService {
     }
 
     public List<LinkedDeviceDTO> getLinkedDevicesByDeviceId(Integer deviceId) {
+        if (deviceId == null) {
+            log.warn("Device ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching linked devices for device ID: {}", deviceId);
         List<LinkedDeviceDTO> devices = linkedDeviceMapper.toDtoList(linkedDeviceRepo.findByDeviceId(deviceId));
         log.info("Fetched {} linked devices for device ID: {}", devices.size(), deviceId);
@@ -223,6 +228,11 @@ public class LinkedDeviceService {
     }
 
     public List<LinkedDeviceDTO> getLinkedDeviceHistory(Integer linkedDeviceId) {
+        if (linkedDeviceId == null) {
+            log.warn("Linked device ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching history for linked device ID: {}", linkedDeviceId);
         try {
             AuditReader auditReader = AuditReaderFactory.get(entityManager);
@@ -243,6 +253,11 @@ public class LinkedDeviceService {
     }
 
     public DeviceDTO getLinkedDeviceDevice(Integer linkedDeviceId) {
+        if (linkedDeviceId == null) {
+            log.warn("Linked device ID is null. Returning null");
+            return null;
+        }
+
         log.info("Fetching associated device for linked device ID: {}", linkedDeviceId);
         LinkedDevice linkedDevice = linkedDeviceRepo.findById(linkedDeviceId)
                 .orElseThrow(() -> {

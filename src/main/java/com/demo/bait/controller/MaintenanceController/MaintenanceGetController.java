@@ -1,5 +1,6 @@
 package com.demo.bait.controller.MaintenanceController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.FileUploadDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.service.MaintenanceServices.MaintenanceFileUploadService;
@@ -19,6 +20,8 @@ public class MaintenanceGetController {
 
     public final MaintenanceService maintenanceService;
     public final MaintenanceFileUploadService maintenanceFileUploadService;
+    private final RequestParamParser requestParamParser;
+
 
     @GetMapping("/all")
     public List<MaintenanceDTO> getAllMaintenances() {
@@ -26,12 +29,14 @@ public class MaintenanceGetController {
     }
 
     @GetMapping("/files/{maintenanceId}")
-    public List<FileUploadDTO> getMaintenanceFiles(@PathVariable Integer maintenanceId) {
-        return maintenanceFileUploadService.getMaintenanceFiles(maintenanceId);
+    public List<FileUploadDTO> getMaintenanceFiles(@PathVariable String maintenanceId) {
+        Integer parsedMaintenanceId = requestParamParser.parseId(maintenanceId, "Maintenance ID");
+        return maintenanceFileUploadService.getMaintenanceFiles(parsedMaintenanceId);
     }
 
     @GetMapping("/{maintenanceId}")
-    public MaintenanceDTO getMaintenanceById(@PathVariable Integer maintenanceId) {
-        return maintenanceService.getMaintenanceById(maintenanceId);
+    public MaintenanceDTO getMaintenanceById(@PathVariable String maintenanceId) {
+        Integer parsedMaintenanceId = requestParamParser.parseId(maintenanceId, "Maintenance ID");
+        return maintenanceService.getMaintenanceById(parsedMaintenanceId);
     }
 }

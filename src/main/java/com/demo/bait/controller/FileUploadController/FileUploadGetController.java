@@ -1,5 +1,6 @@
 package com.demo.bait.controller.FileUploadController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.FileUploadDTO;
 import com.demo.bait.service.FileUploadServices.FileUploadService;
 import lombok.AllArgsConstructor;
@@ -18,10 +19,13 @@ import java.util.List;
 public class FileUploadGetController {
 
     public final FileUploadService fileUploadService;
+    private final RequestParamParser requestParamParser;
+
 
     @GetMapping("/thumbnail/{fileId}")
-    public ResponseEntity<byte[]> getThumbnail(@PathVariable Integer fileId) {
-        return fileUploadService.getThumbnail(fileId);
+    public ResponseEntity<byte[]> getThumbnail(@PathVariable String fileId) {
+        Integer parsedFileId = requestParamParser.parseId(fileId, "File ID");
+        return fileUploadService.getThumbnail(parsedFileId);
     }
 
     @GetMapping("/all")
@@ -30,17 +34,20 @@ public class FileUploadGetController {
     }
 
     @GetMapping("/download/{fileId}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable Integer fileId) {
-        return fileUploadService.downloadFile(fileId);
+    public ResponseEntity<Resource> downloadFile(@PathVariable String fileId) {
+        Integer parsedFileId = requestParamParser.parseId(fileId, "File ID");
+        return fileUploadService.downloadFile(parsedFileId);
     }
 
     @GetMapping("/open/{fileId}")
-    public ResponseEntity<Resource> openFile(@PathVariable Integer fileId) {
-        return fileUploadService.openFileInBrowser(fileId);
+    public ResponseEntity<Resource> openFile(@PathVariable String fileId) {
+        Integer parsedFileId = requestParamParser.parseId(fileId, "File ID");
+        return fileUploadService.openFileInBrowser(parsedFileId);
     }
 
     @GetMapping("/{fileId}")
-    public FileUploadDTO getFileById(@PathVariable Integer fileId) {
-        return fileUploadService.getFileById(fileId);
+    public FileUploadDTO getFileById(@PathVariable String fileId) {
+        Integer parsedFileId = requestParamParser.parseId(fileId, "File ID");
+        return fileUploadService.getFileById(parsedFileId);
     }
 }

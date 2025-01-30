@@ -1,5 +1,6 @@
 package com.demo.bait.controller.LocationController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.CommentDTO;
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.MaintenanceDTO;
@@ -21,6 +22,8 @@ public class LocationGetController {
     public final LocationSpecificationService locationSpecificationService;
     public final LocationMaintenanceService locationMaintenanceService;
     public final LocationCommentService locationCommentService;
+    private final RequestParamParser requestParamParser;
+
 
     @GetMapping("/all")
     public List<LocationDTO> getAllLocations() {
@@ -28,13 +31,15 @@ public class LocationGetController {
     }
 
     @GetMapping("/{locationId}")
-    public LocationDTO getLocationById(@PathVariable Integer locationId) {
-        return locationService.getLocationById(locationId);
+    public LocationDTO getLocationById(@PathVariable String locationId) {
+        Integer parsedLocationId = requestParamParser.parseId(locationId, "Location ID");
+        return locationService.getLocationById(parsedLocationId);
     }
 
     @GetMapping("/history/{locationId}")
-    public List<LocationDTO> getLocationHistory(@PathVariable Integer locationId) {
-        return locationService.getLocationHistory(locationId);
+    public List<LocationDTO> getLocationHistory(@PathVariable String locationId) {
+        Integer parsedLocationId = requestParamParser.parseId(locationId, "Location ID");
+        return locationService.getLocationHistory(parsedLocationId);
     }
 
     @GetMapping("/search")
@@ -43,13 +48,15 @@ public class LocationGetController {
     }
 
     @GetMapping("/maintenances/{locationId}")
-    public List<MaintenanceDTO> getLocationMaintenances(@PathVariable Integer locationId) {
-        return locationMaintenanceService.getLocationMaintenances(locationId);
+    public List<MaintenanceDTO> getLocationMaintenances(@PathVariable String locationId) {
+        Integer parsedLocationId = requestParamParser.parseId(locationId, "Location ID");
+        return locationMaintenanceService.getLocationMaintenances(parsedLocationId);
     }
 
     @GetMapping("/comments/{locationId}")
-    public List<CommentDTO> getLocationComments(@PathVariable Integer locationId) {
-        return locationCommentService.getLocationComments(locationId);
+    public List<CommentDTO> getLocationComments(@PathVariable String locationId) {
+        Integer parsedLocationId = requestParamParser.parseId(locationId, "Location ID");
+        return locationCommentService.getLocationComments(parsedLocationId);
     }
 
     @GetMapping("/countries")

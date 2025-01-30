@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -61,6 +62,11 @@ public class ClientMaintenanceService {
     }
 
     public List<MaintenanceDTO> getClientMaintenances(Integer clientId) {
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching maintenances for Client with ID: {}", clientId);
         try {
             Optional<Client> clientOpt = clientRepo.findById(clientId);

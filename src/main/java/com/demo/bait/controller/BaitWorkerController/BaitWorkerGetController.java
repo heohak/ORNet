@@ -1,5 +1,6 @@
 package com.demo.bait.controller.BaitWorkerController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.BaitWorkerDTO;
 import com.demo.bait.service.BaitWorkerServices.BaitWorkerService;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,8 @@ import java.util.List;
 public class BaitWorkerGetController {
 
     public final BaitWorkerService baitWorkerService;
+    private RequestParamParser requestParamParser;
+
 
     @GetMapping("/all")
     public List<BaitWorkerDTO> getAllWorkers() {
@@ -23,7 +26,8 @@ public class BaitWorkerGetController {
     }
 
     @GetMapping("/{workerId}")
-    public BaitWorkerDTO getBaitWorkerById(@PathVariable Integer workerId) {
-        return baitWorkerService.getBaitWorkerById(workerId);
+    public BaitWorkerDTO getBaitWorkerById(@PathVariable String workerId) {
+        Integer parsedWorkerId = requestParamParser.parseId(workerId, "workerId");
+        return baitWorkerService.getBaitWorkerById(parsedWorkerId);
     }
 }

@@ -12,10 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -57,6 +54,11 @@ public class DeviceSummaryService {
     }
 
     public Map<String, Integer> getClientDevicesSummary(Integer clientId) {
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning empty summary.");
+            return Collections.emptyMap();
+        }
+
         log.info("Generating device summary for client with ID: {}", clientId);
         try {
             Map<String, Integer> clientSummaryMap = new HashMap<>();

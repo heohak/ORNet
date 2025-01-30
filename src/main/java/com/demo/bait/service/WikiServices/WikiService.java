@@ -57,6 +57,11 @@ public class WikiService {
     }
 
     public WikiDTO getWikiById(Integer id) {
+        if (id == null) {
+            log.warn("Wiki ID is null. Returning null.");
+            return null;
+        }
+
         log.info("Fetching wiki entry with ID: {}", id);
         Optional<Wiki> wikiOpt = wikiRepo.findById(id);
         if (wikiOpt.isEmpty()) {

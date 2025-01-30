@@ -1,5 +1,6 @@
 package com.demo.bait.controller.ClientWorkerController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.ClientDTO;
 import com.demo.bait.dto.ClientWorkerDTO;
 import com.demo.bait.dto.LocationDTO;
@@ -20,6 +21,8 @@ public class ClientWorkerGetController {
     public final ClientWorkerService clientWorkerService;
     public final ClientWorkerRoleService clientWorkerRoleService;
     public final ClientWorkerSpecificationService clientWorkerSpecificationService;
+    private RequestParamParser requestParamParser;
+
 
     @GetMapping("/all")
     public List<ClientWorkerDTO> getAllWorkers() {
@@ -27,18 +30,21 @@ public class ClientWorkerGetController {
     }
 
     @GetMapping("/{clientId}")
-    public List<ClientWorkerDTO> getWorkersByClientId(@PathVariable Integer clientId) {
-        return clientWorkerService.getWorkersByClientId(clientId);
+    public List<ClientWorkerDTO> getWorkersByClientId(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "clientId");
+        return clientWorkerService.getWorkersByClientId(parsedClientId);
     }
 
     @GetMapping("/location/{workerId}")
-    public LocationDTO getWorkerLocation(@PathVariable Integer workerId) {
-        return clientWorkerService.getWorkerLocation(workerId);
+    public LocationDTO getWorkerLocation(@PathVariable String workerId) {
+        Integer parsedWorkerId = requestParamParser.parseId(workerId, "workerId");
+        return clientWorkerService.getWorkerLocation(parsedWorkerId);
     }
 
     @GetMapping("/role/{workerId}")
-    public List<ClientWorkerRoleClassificatorDTO> getWorkerRole(@PathVariable Integer workerId) {
-        return clientWorkerRoleService.getWorkerRoles(workerId);
+    public List<ClientWorkerRoleClassificatorDTO> getWorkerRole(@PathVariable String workerId) {
+        Integer parsedWorkerId = requestParamParser.parseId(workerId, "workerId");
+        return clientWorkerRoleService.getWorkerRoles(parsedWorkerId);
     }
 
     @GetMapping("/search")
@@ -54,8 +60,9 @@ public class ClientWorkerGetController {
     }
 
     @GetMapping("/employer/{workerId}")
-    public ClientDTO getWorkerEmployer(@PathVariable Integer workerId) {
-        return clientWorkerService.getWorkerEmployer(workerId);
+    public ClientDTO getWorkerEmployer(@PathVariable String workerId) {
+        Integer parsedWorkerId = requestParamParser.parseId(workerId, "workerId");
+        return clientWorkerService.getWorkerEmployer(parsedWorkerId);
     }
 
     @GetMapping("/not-used")
@@ -64,7 +71,8 @@ public class ClientWorkerGetController {
     }
 
     @GetMapping("/id/{workerId}")
-    public ClientWorkerDTO getWorkerById(@PathVariable Integer workerId) {
-        return clientWorkerService.getWorkerById(workerId);
+    public ClientWorkerDTO getWorkerById(@PathVariable String workerId) {
+        Integer parsedWorkerId = requestParamParser.parseId(workerId, "workerId");
+        return clientWorkerService.getWorkerById(parsedWorkerId);
     }
 }

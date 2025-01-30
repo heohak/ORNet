@@ -15,10 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -44,6 +41,11 @@ public class TicketContactsService {
     }
 
     public List<ClientWorkerDTO> getTicketContacts(Integer ticketId) {
+        if (ticketId == null) {
+            log.warn("Ticket ID is null. Returning empty list.");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching contacts for ticket with ID: {}", ticketId);
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
         if (ticketOpt.isEmpty()) {

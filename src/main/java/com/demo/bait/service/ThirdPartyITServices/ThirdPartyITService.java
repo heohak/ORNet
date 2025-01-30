@@ -152,6 +152,11 @@ public class ThirdPartyITService {
     }
 
     public ThirdPartyITDTO getThirdPartyITById(Integer thirdPartyId) {
+        if (thirdPartyId == null) {
+            log.warn("Third party IT ID is null. Returning null.");
+            return null;
+        }
+
         log.info("Fetching Third Party IT with ID: {}", thirdPartyId);
         Optional<ThirdPartyIT> thirdPartyITOpt = thirdPartyITRepo.findById(thirdPartyId);
         if (thirdPartyITOpt.isEmpty()) {

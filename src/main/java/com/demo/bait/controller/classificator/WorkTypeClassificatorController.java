@@ -1,5 +1,6 @@
 package com.demo.bait.controller.classificator;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.WorkTypeClassificatorDTO;
 import com.demo.bait.service.classificator.WorkTypeClassificatorService;
@@ -14,6 +15,8 @@ import java.util.List;
 public class WorkTypeClassificatorController {
 
     public final WorkTypeClassificatorService workTypeClassificatorService;
+    private RequestParamParser requestParamParser;
+
 
     @PostMapping("/add")
     public WorkTypeClassificatorDTO addWorkTypeClassificator(@RequestBody WorkTypeClassificatorDTO workTypeClassificatorDTO) {
@@ -37,8 +40,9 @@ public class WorkTypeClassificatorController {
     }
 
     @GetMapping("/history/{workTypeId}")
-    public List<WorkTypeClassificatorDTO> getWorkTypeHistory(@PathVariable Integer workTypeId) {
-        return workTypeClassificatorService.getWorkTypeHistory(workTypeId);
+    public List<WorkTypeClassificatorDTO> getWorkTypeHistory(@PathVariable String workTypeId) {
+        Integer parsedWorkTypeId = requestParamParser.parseId(workTypeId, "workTypeId");
+        return workTypeClassificatorService.getWorkTypeHistory(parsedWorkTypeId);
     }
 
     @GetMapping("/deleted")

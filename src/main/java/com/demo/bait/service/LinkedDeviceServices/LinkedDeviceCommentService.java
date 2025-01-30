@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -53,6 +54,11 @@ public class LinkedDeviceCommentService {
     }
 
     public List<CommentDTO> getLinkedDeviceComments(Integer linkedDeviceId) {
+        if (linkedDeviceId == null) {
+            log.warn("Linked device ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching comments for linked device with ID: {}", linkedDeviceId);
         try {
             Optional<LinkedDevice> linkedDeviceOpt = linkedDeviceRepo.findById(linkedDeviceId);

@@ -1,5 +1,6 @@
 package com.demo.bait.controller.classificator;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.DeviceClassificatorDTO;
 import com.demo.bait.entity.classificator.DeviceClassificator;
@@ -15,6 +16,8 @@ import java.util.List;
 public class DeviceClassificatorController {
 
     public final DeviceClassificatorService deviceClassificatorService;
+    private RequestParamParser requestParamParser;
+
 
     @PostMapping("/add")
     public DeviceClassificatorDTO addDeviceClassificator(@RequestBody DeviceClassificatorDTO deviceClassificatorDTO) {
@@ -27,8 +30,9 @@ public class DeviceClassificatorController {
     }
 
     @GetMapping("/{deviceClassificatorId}")
-    public DeviceClassificatorDTO getDeviceClassificatorById(@PathVariable Integer deviceClassificatorId) {
-        return deviceClassificatorService.getDeviceClassificatorById(deviceClassificatorId);
+    public DeviceClassificatorDTO getDeviceClassificatorById(@PathVariable String deviceClassificatorId) {
+        Integer parsedDeviceClassificatorId = requestParamParser.parseId(deviceClassificatorId, "deviceClassificatorId");
+        return deviceClassificatorService.getDeviceClassificatorById(parsedDeviceClassificatorId);
     }
 
     @PutMapping("/update/{deviceClassificatorId}")
@@ -43,8 +47,9 @@ public class DeviceClassificatorController {
     }
 
     @GetMapping("/history/{deviceClassificatorId}")
-    public List<DeviceClassificatorDTO> getDeviceClassificatorHistory(@PathVariable Integer deviceClassificatorId) {
-        return deviceClassificatorService.getDeviceClassificatorHistory(deviceClassificatorId);
+    public List<DeviceClassificatorDTO> getDeviceClassificatorHistory(@PathVariable String deviceClassificatorId) {
+        Integer parsedDeviceClassificatorId = requestParamParser.parseId(deviceClassificatorId, "deviceClassificatorId");
+        return deviceClassificatorService.getDeviceClassificatorHistory(parsedDeviceClassificatorId);
     }
 
     @GetMapping("/deleted")

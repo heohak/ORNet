@@ -260,6 +260,11 @@ public class ClientService {
     }
 
     public ClientDTO getClientById(Integer clientId) {
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning null");
+            return null;
+        }
+
         log.info("Fetching Client with ID: {}", clientId);
         try {
             Optional<Client> clientOpt = clientRepo.findById(clientId);
@@ -277,6 +282,11 @@ public class ClientService {
     }
 
     public List<ClientDTO> getClientHistory(Integer clientId) {
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching history for Client with ID: {}", clientId);
         try {
             AuditReader auditReader = AuditReaderFactory.get(entityManager);
@@ -297,6 +307,11 @@ public class ClientService {
     }
 
     public List<ClientActivityDTO> getClientActivitiesForClient(Integer clientId) {
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching Client Activities for Client with ID: {}", clientId);
         try {
             List<ClientActivityDTO> activities = clientActivityMapper.toDtoList(clientActivityRepo.findByClientId(clientId));

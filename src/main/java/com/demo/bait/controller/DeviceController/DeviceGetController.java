@@ -1,5 +1,6 @@
 package com.demo.bait.controller.DeviceController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.*;
 import com.demo.bait.service.DeviceServices.*;
 import lombok.AllArgsConstructor;
@@ -19,10 +20,13 @@ public class DeviceGetController {
     public final DeviceCommentService deviceCommentService;
     public final DeviceSpecificationService deviceSpecificationService;
     public final DeviceSummaryService deviceSummaryService;
+    private RequestParamParser requestParamParser;
+
 
     @GetMapping("/client/{clientId}")
-    public List<DeviceDTO> getDevicesByClientId(@PathVariable Integer clientId) {
-        return deviceService.getDevicesByClientId(clientId);
+    public List<DeviceDTO> getDevicesByClientId(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "clientId");
+        return deviceService.getDevicesByClientId(parsedClientId);
     }
 
     @GetMapping("/all")
@@ -31,13 +35,15 @@ public class DeviceGetController {
     }
 
     @GetMapping("/{deviceId}")
-    public DeviceDTO getDeviceById(@PathVariable Integer deviceId) {
-        return deviceService.getDeviceById(deviceId);
+    public DeviceDTO getDeviceById(@PathVariable String deviceId) {
+        Integer parsedDeviceId = requestParamParser.parseId(deviceId, "deviceId");
+        return deviceService.getDeviceById(parsedDeviceId);
     }
 
     @GetMapping("/maintenances/{deviceId}")
-    public List<MaintenanceDTO> getMaintenances(@PathVariable Integer deviceId) {
-        return deviceMaintenanceService.getDeviceMaintenances(deviceId);
+    public List<MaintenanceDTO> getMaintenances(@PathVariable String deviceId) {
+        Integer parsedDeviceId = requestParamParser.parseId(deviceId, "deviceId");
+        return deviceMaintenanceService.getDeviceMaintenances(parsedDeviceId);
     }
 
     @GetMapping("/search")
@@ -53,13 +59,15 @@ public class DeviceGetController {
     }
 
     @GetMapping("/comment/{deviceId}")
-    public List<CommentDTO> getDeviceComments(@PathVariable Integer deviceId) {
-        return deviceCommentService.getDeviceComments(deviceId);
+    public List<CommentDTO> getDeviceComments(@PathVariable String deviceId) {
+        Integer parsedDeviceId = requestParamParser.parseId(deviceId, "deviceId");
+        return deviceCommentService.getDeviceComments(parsedDeviceId);
     }
 
     @GetMapping("/files/{deviceId}")
-    public List<FileUploadDTO> getDeviceFiles(@PathVariable Integer deviceId) {
-        return deviceFileUploadService.getDeviceFiles(deviceId);
+    public List<FileUploadDTO> getDeviceFiles(@PathVariable String deviceId) {
+        Integer parsedDeviceId = requestParamParser.parseId(deviceId, "deviceId");
+        return deviceFileUploadService.getDeviceFiles(parsedDeviceId);
     }
 
     @GetMapping("/summary")
@@ -68,17 +76,20 @@ public class DeviceGetController {
     }
 
     @GetMapping("/client/summary/{clientId}")
-    public Map<String, Integer> getClientDevicesSummary(@PathVariable Integer clientId) {
-        return deviceSummaryService.getClientDevicesSummary(clientId);
+    public Map<String, Integer> getClientDevicesSummary(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "clientId");
+        return deviceSummaryService.getClientDevicesSummary(parsedClientId);
     }
 
     @GetMapping("/history/{deviceId}")
-    public List<DeviceDTO> getDeviceHistory(@PathVariable Integer deviceId) {
-        return deviceService.getDeviceHistory(deviceId);
+    public List<DeviceDTO> getDeviceHistory(@PathVariable String deviceId) {
+        Integer parsedDeviceId = requestParamParser.parseId(deviceId, "deviceId");
+        return deviceService.getDeviceHistory(parsedDeviceId);
     }
 
     @GetMapping("/tickets/{deviceId}")
-    public List<TicketDTO> getDeviceTickets(@PathVariable Integer deviceId) {
-        return deviceService.getDeviceTickets(deviceId);
+    public List<TicketDTO> getDeviceTickets(@PathVariable String deviceId) {
+        Integer parsedDeviceId = requestParamParser.parseId(deviceId, "deviceId");
+        return deviceService.getDeviceTickets(parsedDeviceId);
     }
 }

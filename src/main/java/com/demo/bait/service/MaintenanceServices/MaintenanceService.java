@@ -128,6 +128,11 @@ public class MaintenanceService {
     }
 
     public MaintenanceDTO getMaintenanceById(Integer id) {
+        if (id == null) {
+            log.warn("Maintenance ID is null. Returning null.");
+            return null;
+        }
+
         log.info("Fetching maintenance record with ID: {}", id);
         try {
             Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(id);

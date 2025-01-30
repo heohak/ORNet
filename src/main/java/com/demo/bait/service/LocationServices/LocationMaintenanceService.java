@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -74,6 +75,11 @@ public class LocationMaintenanceService {
     }
 
     public List<MaintenanceDTO> getLocationMaintenances(Integer locationId) {
+        if (locationId == null) {
+            log.warn("Location ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching maintenances for location ID: {}", locationId);
         try {
             Optional<Location> locationOpt = locationRepo.findById(locationId);
