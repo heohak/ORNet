@@ -1,5 +1,6 @@
 package com.demo.bait.controller.classificator;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.TicketStatusClassificatorDTO;
 import com.demo.bait.service.classificator.TicketStatusClassificatorService;
@@ -14,6 +15,8 @@ import java.util.List;
 public class TicketStatusClassificatorController {
 
     public final TicketStatusClassificatorService ticketStatusService;
+    private RequestParamParser requestParamParser;
+
 
     @PostMapping("/add")
     public ResponseDTO addTicketStatus(@RequestBody TicketStatusClassificatorDTO ticketStatusClassificatorDTO) {
@@ -26,8 +29,9 @@ public class TicketStatusClassificatorController {
     }
 
     @GetMapping("/{statusId}")
-    public TicketStatusClassificatorDTO getTicketStatusClassificatorById(@PathVariable Integer statusId) {
-        return ticketStatusService.getTicketStatusClassificatorById(statusId);
+    public TicketStatusClassificatorDTO getTicketStatusClassificatorById(@PathVariable String statusId) {
+        Integer parsedStatusId = requestParamParser.parseId(statusId, "statusId");
+        return ticketStatusService.getTicketStatusClassificatorById(parsedStatusId);
     }
 
     @PutMapping("/update/{statusId}")
@@ -42,8 +46,9 @@ public class TicketStatusClassificatorController {
     }
 
     @GetMapping("/history/{statusId}")
-    public List<TicketStatusClassificatorDTO> getTicketStatusClassificatorHistory(@PathVariable Integer statusId) {
-        return ticketStatusService.getTicketStatusHistory(statusId);
+    public List<TicketStatusClassificatorDTO> getTicketStatusClassificatorHistory(@PathVariable String statusId) {
+        Integer parsedStatusId = requestParamParser.parseId(statusId, "statusId");
+        return ticketStatusService.getTicketStatusHistory(parsedStatusId);
     }
 
     @GetMapping("/deleted")

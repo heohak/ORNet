@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -367,6 +368,11 @@ public class SoftwareService {
     }
 
     public List<SoftwareDTO> getSoftwareByClientId(Integer clientId) {
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning empty list.");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching software list for client with ID {}", clientId);
         List<SoftwareDTO> softwareList = softwareMapper.toDtoList(softwareRepo.findByClientId(clientId));
         log.info("Found {} software items for client with ID {}", softwareList.size(), clientId);
@@ -381,6 +387,11 @@ public class SoftwareService {
     }
 
     public SoftwareDTO getSoftwareById(Integer softwareId) {
+        if (softwareId == null) {
+            log.warn("Software ID is null. Returning null.");
+            return null;
+        }
+
         log.info("Fetching software details for ID {}", softwareId);
         SoftwareDTO software = softwareMapper.toDto(softwareRepo.getReferenceById(softwareId));
         log.info("Successfully fetched software details for ID {}", softwareId);

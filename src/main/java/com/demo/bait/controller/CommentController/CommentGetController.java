@@ -1,5 +1,6 @@
 package com.demo.bait.controller.CommentController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.CommentDTO;
 import com.demo.bait.service.CommentServices.CommentService;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,8 @@ import java.util.List;
 public class CommentGetController {
 
     public final CommentService commentService;
+    private RequestParamParser requestParamParser;
+
 
     @GetMapping("/all")
     public List<CommentDTO> getAllComments() {
@@ -23,7 +26,8 @@ public class CommentGetController {
     }
 
     @GetMapping("/{commentId}")
-    public CommentDTO getCommentById(@PathVariable Integer commentId) {
-        return commentService.getCommentById(commentId);
+    public CommentDTO getCommentById(@PathVariable String commentId) {
+        Integer parsedCommentId = requestParamParser.parseId(commentId, "commentId");
+        return commentService.getCommentById(parsedCommentId);
     }
 }

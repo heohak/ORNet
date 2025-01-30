@@ -23,6 +23,7 @@ import org.hibernate.envers.query.AuditQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -115,6 +116,11 @@ public class DeviceClassificatorService {
 
     @Transactional
     public DeviceClassificatorDTO getDeviceClassificatorById(Integer deviceClassificatorId) {
+        if (deviceClassificatorId == null) {
+            log.warn("Device Classificator ID is null. Returning null");
+            return null;
+        }
+
         log.info("Fetching Device Classificator with ID: {}", deviceClassificatorId);
         try {
             Optional<DeviceClassificator> deviceClassificatorOpt = deviceClassificatorRepo.findById(deviceClassificatorId);
@@ -132,6 +138,11 @@ public class DeviceClassificatorService {
     }
 
     public List<DeviceClassificatorDTO> getDeviceClassificatorHistory(Integer deviceClassificatorId) {
+        if (deviceClassificatorId == null) {
+            log.warn("Device Classificator ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching history for Device Classificator with ID: {}", deviceClassificatorId);
         try {
             AuditReader auditReader = AuditReaderFactory.get(entityManager);

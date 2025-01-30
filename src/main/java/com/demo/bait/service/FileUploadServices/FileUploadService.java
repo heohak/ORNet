@@ -144,6 +144,12 @@ public class FileUploadService {
     }
 
     public ResponseEntity<byte[]> getThumbnail(Integer fileId) {
+        if (fileId == null) {
+            log.warn("File ID is null, returning bad request.");
+            return ResponseEntity.badRequest()
+                    .body(null);
+        }
+
         log.info("Fetching thumbnail for file ID: {}", fileId);
         FileUpload fileUpload = fileUploadRepo.findById(fileId)
                 .orElseThrow(() -> {
@@ -166,11 +172,23 @@ public class FileUploadService {
     }
 
     public ResponseEntity<Resource> downloadFile(Integer fileId) {
+        if (fileId == null) {
+            log.warn("File ID is null, returning bad request.");
+            return ResponseEntity.badRequest()
+                    .body(null);
+        }
+
         log.info("Preparing download for file ID: {}", fileId);
         return prepareFileResponse(fileId, "attachment");
     }
 
     public ResponseEntity<Resource> openFileInBrowser(Integer fileId) {
+        if (fileId == null) {
+            log.warn("File ID is null, returning bad request.");
+            return ResponseEntity.badRequest()
+                    .body(null);
+        }
+
         log.info("Preparing to open file in browser for file ID: {}", fileId);
         return prepareFileResponse(fileId, "inline");
     }
@@ -233,6 +251,11 @@ public class FileUploadService {
     }
 
     public FileUploadDTO getFileById(Integer id) {
+        if (id == null) {
+            log.warn("File ID is null. Returning null");
+            return null;
+        }
+
         log.info("Fetching file with ID: {}", id);
         Optional<FileUpload> fileOpt = fileUploadRepo.findById(id);
         if (fileOpt.isEmpty()) {

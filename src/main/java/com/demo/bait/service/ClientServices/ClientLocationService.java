@@ -15,9 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -61,6 +59,11 @@ public class ClientLocationService {
     }
 
     public List<LocationDTO> getClientLocations(Integer clientId) {
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching locations for Client with ID: {}", clientId);
         try {
             Optional<Client> clientOpt = clientRepo.findById(clientId);

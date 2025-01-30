@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -52,6 +53,11 @@ public class LocationCommentService {
     }
 
     public List<CommentDTO> getLocationComments(Integer locationId) {
+        if (locationId == null) {
+            log.warn("Location ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching comments for location with ID: {}", locationId);
         try {
             Optional<Location> locationOpt = locationRepo.findById(locationId);

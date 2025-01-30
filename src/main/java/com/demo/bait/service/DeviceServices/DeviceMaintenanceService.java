@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -60,6 +61,11 @@ public class DeviceMaintenanceService {
     }
 
     public List<MaintenanceDTO> getDeviceMaintenances(Integer deviceId) {
+        if (deviceId == null) {
+            log.warn("Device ID is null. Returning empty list.");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching maintenances for device with ID: {}", deviceId);
         try {
             Optional<Device> deviceOpt = deviceRepo.findById(deviceId);

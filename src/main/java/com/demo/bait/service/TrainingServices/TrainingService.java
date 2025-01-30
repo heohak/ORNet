@@ -168,6 +168,12 @@ public class TrainingService {
 
     public List<TrainingDTO> getClientTrainings(Integer clientId) {
         log.info("Fetching all client trainings with clientId {}.", clientId);
+
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning empty list.");
+            return Collections.emptyList();
+        }
+
         try {
             Optional<Client> clientOpt = clientRepo.findById(clientId);
             if (clientOpt.isEmpty()) {
@@ -186,6 +192,12 @@ public class TrainingService {
 
     public LocalDate getLastTrainingDateForClient(Integer clientId) {
         log.info("Getting last training date for client with ID: {}", clientId);
+
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning null.");
+            return null;
+        }
+
         try {
             Optional<Client> clientOpt = clientRepo.findById(clientId);
             if (clientOpt.isEmpty()) {

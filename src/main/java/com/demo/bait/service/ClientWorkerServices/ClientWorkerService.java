@@ -24,10 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -273,6 +270,11 @@ public class ClientWorkerService {
     }
 
     public List<ClientWorkerDTO> getWorkersByClientId(Integer clientId) {
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching workers for client with ID: {}, ordered by favorite status.", clientId);
         try {
             List<ClientWorkerDTO> workers = clientWorkerMapper.toDtoList(clientWorkerRepo
@@ -286,6 +288,11 @@ public class ClientWorkerService {
     }
 
     public LocationDTO getWorkerLocation(Integer workerId) {
+        if (workerId == null) {
+            log.warn("Worker ID is null. Returning null");
+            return null;
+        }
+
         log.info("Fetching location for worker with ID: {}", workerId);
         try {
             Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
@@ -306,6 +313,11 @@ public class ClientWorkerService {
     }
 
     public ClientDTO getWorkerEmployer(Integer workerId) {
+        if (workerId == null) {
+            log.warn("Worker ID is null. Returning null");
+            return null;
+        }
+
         log.info("Fetching employer for worker with ID: {}", workerId);
         try {
             Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
@@ -402,6 +414,11 @@ public class ClientWorkerService {
     }
 
     public ClientWorkerDTO getWorkerById(Integer workerId) {
+        if (workerId == null) {
+            log.warn("Worker ID is null. Returning null");
+            return null;
+        }
+
         log.info("Fetching worker with ID: {}", workerId);
         Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
         if (workerOpt.isEmpty()) {

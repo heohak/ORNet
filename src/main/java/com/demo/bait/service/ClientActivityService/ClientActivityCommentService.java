@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +62,11 @@ public class ClientActivityCommentService {
     }
 
     public List<ActivityDTO> getClientActivityActivities(Integer clientActivityId) {
+        if (clientActivityId == null) {
+            log.warn("Client Activity ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching activities for client activity with ID: {}", clientActivityId);
 
         Optional<ClientActivity> clientActivityOpt = clientActivityRepo.findById(clientActivityId);

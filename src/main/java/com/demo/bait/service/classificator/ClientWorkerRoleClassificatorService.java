@@ -128,6 +128,11 @@ public class ClientWorkerRoleClassificatorService {
     }
 
     public List<ClientWorkerRoleClassificatorDTO> getWorkerRoleClassificatorHistory(Integer roleId) {
+        if (roleId == null) {
+            log.warn("Role ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching history for Worker Role Classificator with ID: {}", roleId);
         try {
             AuditReader auditReader = AuditReaderFactory.get(entityManager);

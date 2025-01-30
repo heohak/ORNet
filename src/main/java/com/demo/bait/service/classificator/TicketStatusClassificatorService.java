@@ -24,6 +24,7 @@ import org.hibernate.envers.query.AuditQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -128,6 +129,11 @@ public class TicketStatusClassificatorService {
     }
 
     public TicketStatusClassificatorDTO getTicketStatusClassificatorById(Integer ticketStatusId) {
+        if (ticketStatusId == null) {
+            log.warn("Ticket Status Classificator ID is null. Returning null");
+            return null;
+        }
+
         log.info("Fetching Ticket Status Classificator with ID: {}", ticketStatusId);
         try {
             Optional<TicketStatusClassificator> ticketStatusOpt = ticketStatusClassificatorRepo.findById(ticketStatusId);
@@ -145,6 +151,11 @@ public class TicketStatusClassificatorService {
     }
 
     public List<TicketStatusClassificatorDTO> getTicketStatusHistory(Integer statusId) {
+        if (statusId == null) {
+            log.warn("Ticket Status Classificator ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching history for Ticket Status Classificator with ID: {}", statusId);
         try {
             AuditReader auditReader = AuditReaderFactory.get(entityManager);

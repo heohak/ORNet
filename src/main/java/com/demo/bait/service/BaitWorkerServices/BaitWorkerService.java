@@ -147,6 +147,11 @@ public class BaitWorkerService {
     }
 
     public BaitWorkerDTO getBaitWorkerById(Integer workerId) {
+        if (workerId == null) {
+            log.warn("Bait Worker ID is null. Returning null");
+            return null;
+        }
+
         log.info("Fetching Bait Worker with ID: {}", workerId);
         Optional<BaitWorker> baitWorkerOpt = baitWorkerRepo.findById(workerId);
         if (baitWorkerOpt.isEmpty()) {

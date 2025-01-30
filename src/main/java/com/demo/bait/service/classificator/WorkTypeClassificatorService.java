@@ -142,6 +142,11 @@ public class WorkTypeClassificatorService {
     }
 
     public List<WorkTypeClassificatorDTO> getWorkTypeHistory(Integer workTypeId) {
+        if (workTypeId == null) {
+            log.warn("Work Type ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching history for Work Type Classificator with ID: {}", workTypeId);
         try {
             AuditReader auditReader = AuditReaderFactory.get(entityManager);

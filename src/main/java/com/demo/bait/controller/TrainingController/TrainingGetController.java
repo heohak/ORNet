@@ -1,11 +1,14 @@
 package com.demo.bait.controller.TrainingController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.TrainingDTO;
 import com.demo.bait.enums.TrainingType;
 import com.demo.bait.service.TrainingServices.TrainingService;
 import com.demo.bait.service.TrainingServices.TrainingSpecificationService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -17,6 +20,8 @@ public class TrainingGetController {
 
     public final TrainingService trainingService;
     public final TrainingSpecificationService trainingSpecificationService;
+    private final RequestParamParser requestParamParser;
+
 
     @GetMapping("/all")
     public List<TrainingDTO> getAllTrainings() {
@@ -24,13 +29,15 @@ public class TrainingGetController {
     }
 
     @GetMapping("/client/{clientId}")
-    public List<TrainingDTO> getClientTrainings(@PathVariable Integer clientId) {
-        return trainingService.getClientTrainings(clientId);
+    public List<TrainingDTO> getClientTrainings(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "client ID");
+        return trainingService.getClientTrainings(parsedClientId);
     }
 
     @GetMapping("/last/{clientId}")
-    public LocalDate getLastTrainingDateForClient(@PathVariable Integer clientId) {
-        return trainingService.getLastTrainingDateForClient(clientId);
+    public LocalDate getLastTrainingDateForClient(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "client ID");
+        return trainingService.getLastTrainingDateForClient(parsedClientId);
     }
 
     @GetMapping("/search")

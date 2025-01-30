@@ -1,5 +1,6 @@
 package com.demo.bait.controller.SoftwareController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.SoftwareDTO;
 import com.demo.bait.service.SoftwareServices.SoftwareService;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,8 @@ import java.util.List;
 public class SoftwareGetController {
 
     public final SoftwareService softwareService;
+    private final RequestParamParser requestParamParser;
+
 
     @GetMapping("/all")
     public List<SoftwareDTO> getAllSoftwareVariations() {
@@ -23,8 +26,9 @@ public class SoftwareGetController {
     }
 
     @GetMapping("/client/{clientId}")
-    public List<SoftwareDTO> getSoftwareByClientId(@PathVariable Integer clientId) {
-        return softwareService.getSoftwareByClientId(clientId);
+    public List<SoftwareDTO> getSoftwareByClientId(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "Client ID");
+        return softwareService.getSoftwareByClientId(parsedClientId);
     }
 
     @GetMapping("/not-used")
@@ -33,7 +37,8 @@ public class SoftwareGetController {
     }
 
     @GetMapping("/{softwareId}")
-    public SoftwareDTO getSoftwareById(@PathVariable Integer softwareId) {
-        return softwareService.getSoftwareById(softwareId);
+    public SoftwareDTO getSoftwareById(@PathVariable String softwareId) {
+        Integer parsedSoftwareId = requestParamParser.parseId(softwareId, "Software ID");
+        return softwareService.getSoftwareById(parsedSoftwareId);
     }
 }
