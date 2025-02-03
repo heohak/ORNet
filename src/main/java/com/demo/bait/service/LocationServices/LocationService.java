@@ -250,6 +250,11 @@ public class LocationService {
     }
 
     public LocationDTO getLocationById(Integer locationId) {
+        if (locationId == null) {
+            log.warn("Location ID is null. Returning null.");
+            return null;
+        }
+
         log.info("Fetching location with ID: {}", locationId);
         try {
             Optional<Location> locationOpt = locationRepo.findById(locationId);
@@ -296,6 +301,11 @@ public class LocationService {
     }
 
     public List<LocationDTO> getLocationHistory(Integer locationId) {
+        if (locationId == null) {
+            log.warn("Location ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching location history for ID: {}", locationId);
         try {
             AuditReader auditReader = AuditReaderFactory.get(entityManager);

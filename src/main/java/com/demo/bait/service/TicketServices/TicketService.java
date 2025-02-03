@@ -348,21 +348,43 @@ public class TicketService {
 
     public TicketDTO getTicketById(Integer ticketId) {
         log.info("Retrieving ticket with ID: {}", ticketId);
-        Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
-        if (ticketOpt.isEmpty()) {
-            log.error("Ticket with ID: {} not found", ticketId);
-            throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+
+        if (ticketId == null) {
+            log.warn("Ticket ID is null. Returning null.");
+            return null;
         }
 
-        log.info("Successfully retrieved ticket with ID: {}", ticketId);
-        return ticketMapper.toDto(ticketOpt.get());
+        try {
+            Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);
+            if (ticketOpt.isEmpty()) {
+                log.error("Ticket with ID: {} not found", ticketId);
+                throw new EntityNotFoundException("Ticket with id " + ticketId + " not found");
+            }
+
+            log.info("Successfully retrieved ticket with ID: {}", ticketId);
+            return ticketMapper.toDto(ticketOpt.get());
+        } catch (Exception e) {
+            log.error("Error while retrieving ticket with ID: {}", ticketId, e);
+            throw e;
+        }
     }
 
     public List<TicketDTO> getTicketsByClientId(Integer clientId) {
         log.info("Retrieving tickets for client ID: {}", clientId);
-        List<TicketDTO> tickets = ticketMapper.toDtoList(ticketRepo.findByClientId(clientId));
-        log.info("Retrieved {} tickets for client ID: {}", tickets.size(), clientId);
-        return tickets;
+
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning empty list.");
+            return Collections.emptyList();
+        }
+
+        try {
+            List<TicketDTO> tickets = ticketMapper.toDtoList(ticketRepo.findByClientId(clientId));
+            log.info("Retrieved {} tickets for client ID: {}", tickets.size(), clientId);
+            return tickets;
+        } catch (Exception e) {
+            log.error("Error while retrieving tickets for client ID: {}", clientId, e);
+            throw e;
+        }
     }
 
     public List<TicketDTO> getAllTickets() {

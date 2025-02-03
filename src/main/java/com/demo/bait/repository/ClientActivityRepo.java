@@ -19,5 +19,5 @@ public interface ClientActivityRepo extends JpaRepository<ClientActivity, Intege
     List<ClientActivity> findAllByClient(Client client);
     List<ClientActivity> findAllByContactsContaining(ClientWorker worker);
     List<ClientActivity> findAllByLocation(Location location);
-
+    List<ClientActivity> findByFilesContaining(FileUpload file);
 }

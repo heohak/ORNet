@@ -425,6 +425,11 @@ public class DeviceService {
     }
 
     public List<DeviceDTO> getDevicesByClientId(Integer clientId) {
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning empty list.");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching devices for client with ID: {}", clientId);
         try {
             List<DeviceDTO> devices = deviceMapper.toDtoList(deviceRepo.findByClientId(clientId));
@@ -449,6 +454,11 @@ public class DeviceService {
     }
 
     public DeviceDTO getDeviceById(Integer deviceId) {
+        if (deviceId == null) {
+            log.warn("Device ID is null. Returning null.");
+            return null;
+        }
+
         log.info("Fetching device with ID: {}", deviceId);
         try {
             Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
@@ -466,6 +476,11 @@ public class DeviceService {
     }
 
     public List<DeviceDTO> getDeviceHistory(Integer deviceId) {
+        if (deviceId == null) {
+            log.warn("Device ID is null. Returning empty list.");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching history for device with ID: {}", deviceId);
         try {
             AuditReader auditReader = AuditReaderFactory.get(entityManager);
@@ -486,6 +501,11 @@ public class DeviceService {
     }
 
     public List<TicketDTO> getDeviceTickets(Integer deviceId) {
+        if (deviceId == null) {
+            log.warn("Device ID is null. Returning empty list.");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching tickets for device with ID: {}", deviceId);
         try {
             Optional<Device> deviceOpt = deviceRepo.findById(deviceId);

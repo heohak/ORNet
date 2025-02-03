@@ -1,5 +1,6 @@
 package com.demo.bait.controller.ClientController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.*;
 import com.demo.bait.service.ClientServices.*;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,8 @@ public class ClientGetController {
     public final ClientMaintenanceService clientMaintenanceService;
     public final ClientSpecificationService clientSpecificationService;
     public final ClientLocationService clientLocationService;
+    private RequestParamParser requestParamParser;
+
 
     @GetMapping("/all")
     public List<ClientDTO> getAllClients() {
@@ -28,23 +31,27 @@ public class ClientGetController {
     }
 
     @GetMapping("/{clientId}")
-    public ClientDTO getClientById(@PathVariable Integer clientId) {
-        return clientService.getClientById(clientId);
+    public ClientDTO getClientById(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "clientId");
+        return clientService.getClientById(parsedClientId);
     }
 
     @GetMapping("/locations/{clientId}")
-    public List<LocationDTO> getClientLocations(@PathVariable Integer clientId) {
-        return clientLocationService.getClientLocations(clientId);
+    public List<LocationDTO> getClientLocations(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "clientId");
+        return clientLocationService.getClientLocations(parsedClientId);
     }
 
     @GetMapping("/third-parties/{clientId}")
-    public List<ThirdPartyITDTO> getClientThirdPartyITs(@PathVariable Integer clientId) {
-        return clientThirdPartyITService.getClientThirdPartyITs(clientId);
+    public List<ThirdPartyITDTO> getClientThirdPartyITs(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "clientId");
+        return clientThirdPartyITService.getClientThirdPartyITs(parsedClientId);
     }
 
     @GetMapping("/maintenance/{clientId}")
-    public List<MaintenanceDTO> getClientMaintenances(@PathVariable Integer clientId) {
-        return clientMaintenanceService.getClientMaintenances(clientId);
+    public List<MaintenanceDTO> getClientMaintenances(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "clientId");
+        return clientMaintenanceService.getClientMaintenances(parsedClientId);
     }
 
     /**
@@ -65,13 +72,15 @@ public class ClientGetController {
     }
 
     @GetMapping("/history/{clientId}")
-    public List<ClientDTO> getClientHistory(@PathVariable Integer clientId) {
-        return clientService.getClientHistory(clientId);
+    public List<ClientDTO> getClientHistory(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "clientId");
+        return clientService.getClientHistory(parsedClientId);
     }
 
     @GetMapping("/activities/{clientId}")
-    public List<ClientActivityDTO> getClientActivitiesForClient(@PathVariable Integer clientId) {
-        return clientService.getClientActivitiesForClient(clientId);
+    public List<ClientActivityDTO> getClientActivitiesForClient(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "clientId");
+        return clientService.getClientActivitiesForClient(parsedClientId);
     }
 
     @GetMapping("/countries")
@@ -84,6 +93,17 @@ public class ClientGetController {
         return clientService.getClientsActivityDates();
     }
 
+    @GetMapping("/terms/{clientId}")
+    public FileUploadDTO getClientContractTerms(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "clientId");
+        return clientMaintenanceService.getClientContractTerms(parsedClientId);
+    }
+
+    @GetMapping("/maintenance/description/{clientId}")
+    public ResponseDTO getClientMaintenanceDescription(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "clientId");
+        return clientMaintenanceService.getClientMaintenanceDescription(parsedClientId);
+    }
 
 //    @GetMapping("/location/history/{clientId}")
 //    public List<ClientLocationHistoryDTO> getClientLocationHistory(@PathVariable Integer clientId) {

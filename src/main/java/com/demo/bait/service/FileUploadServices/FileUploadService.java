@@ -1,9 +1,10 @@
 package com.demo.bait.service.FileUploadServices;
 
 import com.demo.bait.dto.FileUploadDTO;
-import com.demo.bait.entity.FileUpload;
+import com.demo.bait.dto.ResponseDTO;
+import com.demo.bait.entity.*;
 import com.demo.bait.mapper.FileUploadMapper;
-import com.demo.bait.repository.FileUploadRepo;
+import com.demo.bait.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -42,50 +43,59 @@ public class FileUploadService {
     private final FileUploadRepo fileUploadRepo;
     private final FileUploadMapper fileUploadMapper;
     private static final String UPLOAD_DIR = "uploads";
+    private DeviceRepo deviceRepo;
+    private TicketRepo ticketRepo;
+    private ClientActivityRepo clientActivityRepo;
+    private MaintenanceRepo maintenanceRepo;
+    private ThirdPartyITRepo thirdPartyITRepo;
 
     @Transactional
     public Set<FileUpload> uploadFiles(List<MultipartFile> files) throws IOException {
         log.info("Uploading {} files", files.size());
-        try {
-            Set<FileUpload> uploadedFiles = new HashSet<>();
-            File uploadDir = new File(UPLOAD_DIR);
-
-            if (!uploadDir.exists()) {
-                log.debug("Creating upload directory: {}", UPLOAD_DIR);
-                uploadDir.mkdirs();
-            }
-
-            for (MultipartFile file : files) {
-                log.debug("Processing file: {}", file.getOriginalFilename());
-                String uniqueFileName = UUID.randomUUID().toString();
-                String fileExtension = getFileExtension(file.getOriginalFilename());
-                String storedFileName = uniqueFileName + fileExtension;
-
-                Path filePath = Paths.get(UPLOAD_DIR, storedFileName);
-                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-                byte[] thumbnail = generateThumbnail(file);
-
-                FileUpload fileUpload = new FileUpload();
-                fileUpload.setFileName(file.getOriginalFilename());
-                fileUpload.setStoredFileName(storedFileName);
-                fileUpload.setFilePath(filePath.toString());
-                fileUpload.setFileSize(file.getSize());
-                fileUpload.setFileType(file.getContentType());
-                fileUpload.setThumbnail(thumbnail);
-
-                fileUploadRepo.save(fileUpload);
-                uploadedFiles.add(fileUpload);
-
-                log.info("File {} uploaded successfully as {}", file.getOriginalFilename(), storedFileName);
-            }
-
-            log.info("{} files uploaded successfully", uploadedFiles.size());
-            return uploadedFiles;
-        } catch (IOException e) {
-            log.error("Error during file upload", e);
-            throw e;
+        Set<FileUpload> uploadedFiles = new HashSet<>();
+        for (MultipartFile file : files) {
+            FileUpload fileUpload = processAndSaveFile(file);
+            uploadedFiles.add(fileUpload);
         }
+        log.info("{} files uploaded successfully", uploadedFiles.size());
+        return uploadedFiles;
+    }
+
+    @Transactional
+    public FileUpload uploadFile(MultipartFile file) throws IOException {
+        log.info("Uploading file: {}", file.getOriginalFilename());
+        return processAndSaveFile(file);
+    }
+
+    private FileUpload processAndSaveFile(MultipartFile file) throws IOException {
+        File uploadDir = new File(UPLOAD_DIR);
+        if (!uploadDir.exists()) {
+            log.debug("Creating upload directory: {}", UPLOAD_DIR);
+            uploadDir.mkdirs();
+        }
+
+        log.debug("Processing file: {}", file.getOriginalFilename());
+        String uniqueFileName = UUID.randomUUID().toString();
+        String fileExtension = getFileExtension(file.getOriginalFilename());
+        String storedFileName = uniqueFileName + fileExtension;
+
+        Path filePath = Paths.get(UPLOAD_DIR, storedFileName);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        byte[] thumbnail = generateThumbnail(file);
+
+        FileUpload fileUpload = new FileUpload();
+        fileUpload.setFileName(file.getOriginalFilename());
+        fileUpload.setStoredFileName(storedFileName);
+        fileUpload.setFilePath(filePath.toString());
+        fileUpload.setFileSize(file.getSize());
+        fileUpload.setFileType(file.getContentType());
+        fileUpload.setThumbnail(thumbnail);
+
+        fileUploadRepo.save(fileUpload);
+        log.info("File {} uploaded successfully as {}", file.getOriginalFilename(), storedFileName);
+
+        return fileUpload;
     }
 
     private String getFileExtension(String fileName) {
@@ -144,6 +154,12 @@ public class FileUploadService {
     }
 
     public ResponseEntity<byte[]> getThumbnail(Integer fileId) {
+        if (fileId == null) {
+            log.warn("File ID is null, returning bad request.");
+            return ResponseEntity.badRequest()
+                    .body(null);
+        }
+
         log.info("Fetching thumbnail for file ID: {}", fileId);
         FileUpload fileUpload = fileUploadRepo.findById(fileId)
                 .orElseThrow(() -> {
@@ -166,11 +182,23 @@ public class FileUploadService {
     }
 
     public ResponseEntity<Resource> downloadFile(Integer fileId) {
+        if (fileId == null) {
+            log.warn("File ID is null, returning bad request.");
+            return ResponseEntity.badRequest()
+                    .body(null);
+        }
+
         log.info("Preparing download for file ID: {}", fileId);
         return prepareFileResponse(fileId, "attachment");
     }
 
     public ResponseEntity<Resource> openFileInBrowser(Integer fileId) {
+        if (fileId == null) {
+            log.warn("File ID is null, returning bad request.");
+            return ResponseEntity.badRequest()
+                    .body(null);
+        }
+
         log.info("Preparing to open file in browser for file ID: {}", fileId);
         return prepareFileResponse(fileId, "inline");
     }
@@ -233,6 +261,11 @@ public class FileUploadService {
     }
 
     public FileUploadDTO getFileById(Integer id) {
+        if (id == null) {
+            log.warn("File ID is null. Returning null");
+            return null;
+        }
+
         log.info("Fetching file with ID: {}", id);
         Optional<FileUpload> fileOpt = fileUploadRepo.findById(id);
         if (fileOpt.isEmpty()) {
@@ -242,5 +275,69 @@ public class FileUploadService {
         FileUpload file = fileOpt.get();
         log.info("File with ID {} fetched successfully", id);
         return fileUploadMapper.toDto(file);
+    }
+
+    @Transactional
+    public ResponseDTO deleteFileById(Integer fileId) {
+        log.info("Deleting File with ID: {}", fileId);
+        try {
+            Optional<FileUpload> fileUploadOpt = fileUploadRepo.findById(fileId);
+            if (fileUploadOpt.isEmpty()) {
+                log.warn("File with ID {} not found", fileId);
+                throw new EntityNotFoundException("File with ID " + fileId + " not found");
+            }
+            FileUpload fileUpload = fileUploadOpt.get();
+
+            log.debug("Unlinking file from Tickets for File ID: {}", fileId);
+            List<Ticket> tickets = ticketRepo.findByFilesContaining(fileUpload);
+            for (Ticket ticket : tickets) {
+                ticket.getFiles().remove(fileUpload);
+                ticketRepo.save(ticket);
+            }
+
+            log.debug("Unlinking file from Client Activities for File ID: {}", fileId);
+            List<ClientActivity> clientActivities = clientActivityRepo.findByFilesContaining(fileUpload);
+            for (ClientActivity clientActivity : clientActivities) {
+                clientActivity.getFiles().remove(fileUpload);
+                clientActivityRepo.save(clientActivity);
+            }
+
+            log.debug("Unlinking file from Maintenances for File ID: {}", fileId);
+            List<Maintenance> maintenances = maintenanceRepo.findByFilesContaining(fileUpload);
+            for (Maintenance maintenance : maintenances) {
+                maintenance.getFiles().remove(fileUpload);
+                maintenanceRepo.save(maintenance);
+            }
+
+            log.debug("Unlinking file from Devices for File ID: {}", fileId);
+            List<Device> devices = deviceRepo.findByFilesContaining(fileUpload);
+            for (Device device : devices) {
+                device.getFiles().remove(fileUpload);
+                deviceRepo.save(device);
+            }
+
+            log.debug("Unlinking file from Third Party ITs for File ID: {}", fileId);
+            List<ThirdPartyIT> thirdPartyITs = thirdPartyITRepo.findByFilesContaining(fileUpload);
+            for (ThirdPartyIT thirdPartyIT : thirdPartyITs) {
+                thirdPartyIT.getFiles().remove(fileUpload);
+                thirdPartyITRepo.save(thirdPartyIT);
+            }
+
+            Path filePath = Paths.get(fileUpload.getFilePath());
+            try {
+                Files.deleteIfExists(filePath);
+                log.info("Deleted physical file from filesystem: {}", filePath);
+            } catch (IOException e) {
+                log.error("Error deleting physical file for File ID: {}", fileId, e);
+                throw new RuntimeException("Could not delete physical file", e);
+            }
+
+            fileUploadRepo.delete(fileUpload);
+            log.info("File with ID {} successfully deleted", fileId);
+            return new ResponseDTO("File deleted successfully");
+        } catch (Exception e) {
+            log.error("Error occurred while deleting File with ID: {}", fileId, e);
+            throw e;
+        }
     }
 }

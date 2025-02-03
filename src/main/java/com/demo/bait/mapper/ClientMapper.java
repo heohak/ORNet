@@ -19,6 +19,7 @@ public interface ClientMapper {
 
     List<ClientDTO> toDtoList(List<Client> clientList);
 
+    @Mapping(source = "contractTerms.id", target = "contractTermsId")
     @Mapping(target = "locationIds", expression = "java(mapLocationsToIds(client.getLocations()))")
     @Mapping(target = "thirdPartyIds", expression = "java(mapThirdPartyITsToIds(client.getThirdPartyITs()))")
     @Mapping(target = "maintenanceIds", expression = "java(mapMaintenancesToIds(client.getMaintenances()))")

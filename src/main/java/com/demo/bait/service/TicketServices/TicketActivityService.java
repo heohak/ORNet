@@ -15,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -66,6 +67,11 @@ public class TicketActivityService {
     }
 
     public List<ActivityDTO> getTicketActivities(Integer ticketId) {
+        if (ticketId == null) {
+            log.warn("Ticket ID is null. Returning empty list.");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching activities for ticket with ID: {}", ticketId);
 
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);

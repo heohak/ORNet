@@ -1,5 +1,6 @@
 package com.demo.bait.controller.ThirdPartyITController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.FileUploadDTO;
 import com.demo.bait.dto.ThirdPartyITDTO;
 import com.demo.bait.service.ThirdPartyITServices.ThirdPartyITFileUploadService;
@@ -19,6 +20,8 @@ public class ThirdPartyITGetController {
 
     public final ThirdPartyITService thirdPartyITService;
     public final ThirdPartyITFileUploadService thirdPartyITFileUploadService;
+    private final RequestParamParser requestParamParser;
+
 
     @GetMapping("/all")
     public List<ThirdPartyITDTO> getAllThirdPartyITs() {
@@ -26,12 +29,14 @@ public class ThirdPartyITGetController {
     }
 
     @GetMapping("/{thirdPartyId}")
-    public ThirdPartyITDTO getThirdPartyITById(@PathVariable Integer thirdPartyId) {
-        return thirdPartyITService.getThirdPartyITById(thirdPartyId);
+    public ThirdPartyITDTO getThirdPartyITById(@PathVariable String thirdPartyId) {
+        Integer parsedThirdPartyId = requestParamParser.parseId(thirdPartyId, "ThirdParty IT ID");
+        return thirdPartyITService.getThirdPartyITById(parsedThirdPartyId);
     }
 
     @GetMapping("/files/{thirdPartyId}")
-    public List<FileUploadDTO> getThirdPartyITFiles(@PathVariable Integer thirdPartyId) {
-        return thirdPartyITFileUploadService.getThirdPartyITFiles(thirdPartyId);
+    public List<FileUploadDTO> getThirdPartyITFiles(@PathVariable String thirdPartyId) {
+        Integer parsedThirdPartyId = requestParamParser.parseId(thirdPartyId, "ThirdParty IT ID");
+        return thirdPartyITFileUploadService.getThirdPartyITFiles(parsedThirdPartyId);
     }
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -51,6 +52,11 @@ public class TicketFileUploadService {
     }
 
     public List<FileUploadDTO> getTicketFiles(Integer ticketId) {
+        if (ticketId == null) {
+            log.warn("Ticket ID is null. Returning empty list.");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching files for ticket with ID: {}", ticketId);
 
         Optional<Ticket> ticketOpt = ticketRepo.findById(ticketId);

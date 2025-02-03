@@ -1,5 +1,6 @@
 package com.demo.bait.controller.classificator;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.dto.classificator.ClientWorkerRoleClassificatorDTO;
 import com.demo.bait.service.classificator.ClientWorkerRoleClassificatorService;
@@ -14,6 +15,8 @@ import java.util.List;
 public class ClientWorkerRoleClassificatorController {
 
     public final ClientWorkerRoleClassificatorService workerRoleClassificatorService;
+    private RequestParamParser requestParamParser;
+
 
     @PostMapping("/add")
     public ClientWorkerRoleClassificatorDTO addWorkerRoleClassificator(@RequestBody ClientWorkerRoleClassificatorDTO workerRoleDTO) {
@@ -37,8 +40,9 @@ public class ClientWorkerRoleClassificatorController {
     }
 
     @GetMapping("/history/{roleId}")
-    public List<ClientWorkerRoleClassificatorDTO> getWorkerRoleClassificatorHistory(@PathVariable Integer roleId) {
-        return workerRoleClassificatorService.getWorkerRoleClassificatorHistory(roleId);
+    public List<ClientWorkerRoleClassificatorDTO> getWorkerRoleClassificatorHistory(@PathVariable String roleId) {
+        Integer parsedRoleId = requestParamParser.parseId(roleId, "roleId");
+        return workerRoleClassificatorService.getWorkerRoleClassificatorHistory(parsedRoleId);
     }
 
     @GetMapping("/deleted")

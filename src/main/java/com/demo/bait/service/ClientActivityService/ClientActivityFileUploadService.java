@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -59,6 +60,11 @@ public class ClientActivityFileUploadService {
     }
 
     public List<FileUploadDTO> getClientActivityFiles(Integer clientActivityId) {
+        if (clientActivityId == null) {
+            log.warn("Client Activity ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching files for Client Activity with ID: {}", clientActivityId);
         try {
             Optional<ClientActivity> clientActivityOpt = clientActivityRepo.findById(clientActivityId);

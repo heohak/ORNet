@@ -114,6 +114,11 @@ public class CommentService {
     }
 
     public CommentDTO getCommentById(Integer id) {
+        if (id == null) {
+            log.warn("Comment ID is null. Returning null");
+            return null;
+        }
+
         log.info("Fetching comment by ID: {}", id);
         Optional<Comment> commentOpt = commentRepo.findById(id);
         if (commentOpt.isEmpty()) {

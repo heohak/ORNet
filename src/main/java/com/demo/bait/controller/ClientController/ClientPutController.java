@@ -7,6 +7,7 @@ import com.demo.bait.service.ClientServices.*;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -38,5 +39,17 @@ public class ClientPutController {
     @PutMapping("/update/{clientId}")
     public ResponseDTO updateClient(@PathVariable Integer clientId, @RequestBody ClientDTO clientDTO) {
         return clientService.updateClient(clientId, clientDTO);
+    }
+
+    @PutMapping("/maintenance/conditions/{clientId}")
+    public ResponseDTO updateClientMaintenanceConditions(@PathVariable Integer clientId,
+                                                         @RequestBody ClientDTO clientDTO) {
+        return clientMaintenanceService.updateClientMaintenanceConditions(clientId, clientDTO);
+    }
+
+    @PutMapping("/upload/terms/{clientId}")
+    public ResponseDTO uploadContractTermsForClient(@PathVariable Integer clientId,
+                                                    @RequestParam("file") MultipartFile file) {
+        return clientMaintenanceService.uploadContractTermsForClient(clientId, file);
     }
 }

@@ -1,5 +1,6 @@
 package com.demo.bait.controller.LinkedDeviceController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.CommentDTO;
 import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.dto.LinkedDeviceDTO;
@@ -19,6 +20,8 @@ public class LinkedDeviceGetController {
     public final LinkedDeviceService linkedDeviceService;
     public final LinkedDeviceCommentService linkedDeviceCommentService;
     public final LinkedDeviceSpecificationService linkedDeviceSpecificationService;
+    private final RequestParamParser requestParamParser;
+
 
     @GetMapping("/all")
     public List<LinkedDeviceDTO> getAllLinkedDevices() {
@@ -26,13 +29,15 @@ public class LinkedDeviceGetController {
     }
 
     @GetMapping("/{deviceId}")
-    public List<LinkedDeviceDTO> getLinkedDevicesByDeviceId(@PathVariable Integer deviceId) {
-        return linkedDeviceService.getLinkedDevicesByDeviceId(deviceId);
+    public List<LinkedDeviceDTO> getLinkedDevicesByDeviceId(@PathVariable String deviceId) {
+        Integer parsedDeviceId = requestParamParser.parseId(deviceId, "Device ID");
+        return linkedDeviceService.getLinkedDevicesByDeviceId(parsedDeviceId);
     }
 
     @GetMapping("/comment/{linkedDeviceId}")
-    public List<CommentDTO> getLinkedDeviceComments(@PathVariable Integer linkedDeviceId) {
-        return linkedDeviceCommentService.getLinkedDeviceComments(linkedDeviceId);
+    public List<CommentDTO> getLinkedDeviceComments(@PathVariable String linkedDeviceId) {
+        Integer parsedLinkedDeviceId = requestParamParser.parseId(linkedDeviceId, "Linked Device ID");
+        return linkedDeviceCommentService.getLinkedDeviceComments(parsedLinkedDeviceId);
     }
 
     @GetMapping("/not-used")
@@ -41,13 +46,15 @@ public class LinkedDeviceGetController {
     }
 
     @GetMapping("/history/{linkedDeviceId}")
-    public List<LinkedDeviceDTO> getLinkedDeviceHistory(@PathVariable Integer linkedDeviceId) {
-        return linkedDeviceService.getLinkedDeviceHistory(linkedDeviceId);
+    public List<LinkedDeviceDTO> getLinkedDeviceHistory(@PathVariable String linkedDeviceId) {
+        Integer parsedLinkedDeviceId = requestParamParser.parseId(linkedDeviceId, "Linked Device ID");
+        return linkedDeviceService.getLinkedDeviceHistory(parsedLinkedDeviceId);
     }
 
     @GetMapping("/device/{linkedDeviceId}")
-    public DeviceDTO getLinkedDeviceDevice(@PathVariable Integer linkedDeviceId) {
-        return linkedDeviceService.getLinkedDeviceDevice(linkedDeviceId);
+    public DeviceDTO getLinkedDeviceDevice(@PathVariable String linkedDeviceId) {
+        Integer parsedLinkedDeviceId = requestParamParser.parseId(linkedDeviceId, "Linked Device ID");
+        return linkedDeviceService.getLinkedDeviceDevice(parsedLinkedDeviceId);
     }
 
     @GetMapping("/search")

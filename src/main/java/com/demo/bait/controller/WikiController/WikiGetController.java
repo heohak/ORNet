@@ -1,5 +1,6 @@
 package com.demo.bait.controller.WikiController;
 
+import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.WikiDTO;
 import com.demo.bait.service.WikiServices.WikiService;
 import com.demo.bait.service.WikiServices.WikiSpecificationService;
@@ -15,6 +16,8 @@ public class WikiGetController {
 
     public final WikiService wikiService;
     public final WikiSpecificationService wikiSpecificationService;
+    private final RequestParamParser requestParamParser;
+
 
     @GetMapping("/all")
     public List<WikiDTO> getAllWikis() {
@@ -22,8 +25,9 @@ public class WikiGetController {
     }
 
     @GetMapping("/{wikiId}")
-    public WikiDTO getWikiById(@PathVariable Integer wikiId) {
-        return wikiService.getWikiById(wikiId);
+    public WikiDTO getWikiById(@PathVariable String wikiId) {
+        Integer parsedWikiId = requestParamParser.parseId(wikiId, "Wiki ID");
+        return wikiService.getWikiById(parsedWikiId);
     }
 
     @GetMapping("/search")

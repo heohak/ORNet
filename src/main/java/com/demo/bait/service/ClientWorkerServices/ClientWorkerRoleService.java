@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -88,6 +89,11 @@ public class ClientWorkerRoleService {
     }
 
     public List<ClientWorkerRoleClassificatorDTO> getWorkerRoles(Integer workerId) {
+        if (workerId == null) {
+            log.warn("Worker ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
         log.info("Fetching roles for worker with ID: {}", workerId);
         try {
             Optional<ClientWorker> workerOpt = clientWorkerRepo.findById(workerId);
