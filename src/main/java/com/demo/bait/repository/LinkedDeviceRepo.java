@@ -12,4 +12,5 @@ public interface LinkedDeviceRepo extends JpaRepository<LinkedDevice, Integer>, 
     List<LinkedDevice> findByDeviceId(Integer deviceId);
     LinkedDevice findByCommentsContaining(Comment comment);
     List<LinkedDevice> findAllByLocation(Location location);
+    List<LinkedDevice> findByDeviceIsNullAndTemplateFalse();
 }
