@@ -52,46 +52,50 @@ public class FileUploadService {
     @Transactional
     public Set<FileUpload> uploadFiles(List<MultipartFile> files) throws IOException {
         log.info("Uploading {} files", files.size());
-        try {
-            Set<FileUpload> uploadedFiles = new HashSet<>();
-            File uploadDir = new File(UPLOAD_DIR);
-
-            if (!uploadDir.exists()) {
-                log.debug("Creating upload directory: {}", UPLOAD_DIR);
-                uploadDir.mkdirs();
-            }
-
-            for (MultipartFile file : files) {
-                log.debug("Processing file: {}", file.getOriginalFilename());
-                String uniqueFileName = UUID.randomUUID().toString();
-                String fileExtension = getFileExtension(file.getOriginalFilename());
-                String storedFileName = uniqueFileName + fileExtension;
-
-                Path filePath = Paths.get(UPLOAD_DIR, storedFileName);
-                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-                byte[] thumbnail = generateThumbnail(file);
-
-                FileUpload fileUpload = new FileUpload();
-                fileUpload.setFileName(file.getOriginalFilename());
-                fileUpload.setStoredFileName(storedFileName);
-                fileUpload.setFilePath(filePath.toString());
-                fileUpload.setFileSize(file.getSize());
-                fileUpload.setFileType(file.getContentType());
-                fileUpload.setThumbnail(thumbnail);
-
-                fileUploadRepo.save(fileUpload);
-                uploadedFiles.add(fileUpload);
-
-                log.info("File {} uploaded successfully as {}", file.getOriginalFilename(), storedFileName);
-            }
-
-            log.info("{} files uploaded successfully", uploadedFiles.size());
-            return uploadedFiles;
-        } catch (IOException e) {
-            log.error("Error during file upload", e);
-            throw e;
+        Set<FileUpload> uploadedFiles = new HashSet<>();
+        for (MultipartFile file : files) {
+            FileUpload fileUpload = processAndSaveFile(file);
+            uploadedFiles.add(fileUpload);
         }
+        log.info("{} files uploaded successfully", uploadedFiles.size());
+        return uploadedFiles;
+    }
+
+    @Transactional
+    public FileUpload uploadFile(MultipartFile file) throws IOException {
+        log.info("Uploading file: {}", file.getOriginalFilename());
+        return processAndSaveFile(file);
+    }
+
+    private FileUpload processAndSaveFile(MultipartFile file) throws IOException {
+        File uploadDir = new File(UPLOAD_DIR);
+        if (!uploadDir.exists()) {
+            log.debug("Creating upload directory: {}", UPLOAD_DIR);
+            uploadDir.mkdirs();
+        }
+
+        log.debug("Processing file: {}", file.getOriginalFilename());
+        String uniqueFileName = UUID.randomUUID().toString();
+        String fileExtension = getFileExtension(file.getOriginalFilename());
+        String storedFileName = uniqueFileName + fileExtension;
+
+        Path filePath = Paths.get(UPLOAD_DIR, storedFileName);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        byte[] thumbnail = generateThumbnail(file);
+
+        FileUpload fileUpload = new FileUpload();
+        fileUpload.setFileName(file.getOriginalFilename());
+        fileUpload.setStoredFileName(storedFileName);
+        fileUpload.setFilePath(filePath.toString());
+        fileUpload.setFileSize(file.getSize());
+        fileUpload.setFileType(file.getContentType());
+        fileUpload.setThumbnail(thumbnail);
+
+        fileUploadRepo.save(fileUpload);
+        log.info("File {} uploaded successfully as {}", file.getOriginalFilename(), storedFileName);
+
+        return fileUpload;
     }
 
     private String getFileExtension(String fileName) {

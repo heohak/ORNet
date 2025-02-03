@@ -61,4 +61,9 @@ public class Client {
             inverseJoinColumns = @JoinColumn(name = "maintenance_id")
     )
     private Set<Maintenance> maintenances = new HashSet<>();
+    @Column(columnDefinition = "TEXT")
+    private String maintenanceDescription;
+    @ManyToOne
+    @JoinColumn(name = "file_upload_id", referencedColumnName = "id")
+    private FileUpload contractTerms;
 }
