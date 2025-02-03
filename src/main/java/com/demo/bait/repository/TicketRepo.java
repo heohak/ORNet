@@ -29,6 +29,6 @@ public interface TicketRepo extends JpaRepository<Ticket, Integer>, JpaSpecifica
     List<Ticket> findAllByContactsContaining(ClientWorker worker);
     List<Ticket> findAllByClient(Client client);
     List<Ticket> findAllByLocation(Location location);
-
+    List<Ticket> findByFilesContaining(FileUpload file);
 
 }
