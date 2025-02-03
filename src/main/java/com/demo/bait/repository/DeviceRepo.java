@@ -25,5 +25,5 @@ public interface DeviceRepo extends JpaRepository<Device, Integer>, JpaSpecifica
     Device findByCommentsContaining(Comment comment);
     List<Device> findAllByClient(Client client);
     List<Device> findAllByLocation(Location location);
-
+    List<Device> findByFilesContaining(FileUpload file);
 }
