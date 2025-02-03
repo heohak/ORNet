@@ -93,6 +93,17 @@ public class ClientGetController {
         return clientService.getClientsActivityDates();
     }
 
+    @GetMapping("/terms/{clientId}")
+    public FileUploadDTO getClientContractTerms(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "clientId");
+        return clientMaintenanceService.getClientContractTerms(parsedClientId);
+    }
+
+    @GetMapping("/maintenance/description/{clientId}")
+    public ResponseDTO getClientMaintenanceDescription(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "clientId");
+        return clientMaintenanceService.getClientMaintenanceDescription(parsedClientId);
+    }
 
 //    @GetMapping("/location/history/{clientId}")
 //    public List<ClientLocationHistoryDTO> getClientLocationHistory(@PathVariable Integer clientId) {
