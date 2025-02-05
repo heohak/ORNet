@@ -48,6 +48,7 @@ public class FileUploadService {
     private ClientActivityRepo clientActivityRepo;
     private MaintenanceRepo maintenanceRepo;
     private ThirdPartyITRepo thirdPartyITRepo;
+    private ClientRepo clientRepo;
 
     @Transactional
     public Set<FileUpload> uploadFiles(List<MultipartFile> files) throws IOException {
@@ -321,6 +322,13 @@ public class FileUploadService {
             for (ThirdPartyIT thirdPartyIT : thirdPartyITs) {
                 thirdPartyIT.getFiles().remove(fileUpload);
                 thirdPartyITRepo.save(thirdPartyIT);
+            }
+
+            log.debug("Unlinking file from Clients for File ID: {}", fileId);
+            List<Client> clients = clientRepo.findByContractTerms(fileUpload);
+            for (Client client : clients) {
+                client.setContractTerms(null);
+                clientRepo.save(client);
             }
 
             Path filePath = Paths.get(fileUpload.getFilePath());
