@@ -15,9 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -418,5 +416,25 @@ public class SoftwareService {
         softwareRepo.save(software);
         log.info("Successfully removed client association from software with ID {}", softwareId);
         return new ResponseDTO("Software removed from client");
+    }
+
+    public Set<Software> softwareIdsToSoftwareSet(List<Integer> softwareIds) {
+        log.info("Converting software IDs to Software set: {}", softwareIds);
+        try {
+            Set<Software> softwares = new HashSet<>();
+            for (Integer softwareId : softwareIds) {
+                Software software = softwareRepo.findById(softwareId)
+                        .orElseThrow(() -> {
+                            log.warn("Invalid software ID: {}", softwareId);
+                            return new IllegalArgumentException("Invalid software ID: " + softwareId);
+                        });
+                softwares.add(software);
+            }
+            log.info("Converted {} software IDs to Software set.", softwares.size());
+            return softwares;
+        } catch (Exception e) {
+            log.error("Error while converting software IDs to Software set: {}", softwareIds, e);
+            throw e;
+        }
     }
 }

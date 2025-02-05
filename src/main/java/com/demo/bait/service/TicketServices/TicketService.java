@@ -8,6 +8,7 @@ import com.demo.bait.mapper.*;
 import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.TicketStatusClassificatorRepo;
 import com.demo.bait.service.ClientWorkerServices.ClientWorkerService;
+import com.demo.bait.service.DeviceServices.DeviceHelperService;
 import com.demo.bait.service.DeviceServices.DeviceService;
 import com.demo.bait.service.FileUploadServices.FileUploadService;
 import com.demo.bait.service.classificator.WorkTypeClassificatorService;
@@ -38,7 +39,7 @@ public class TicketService {
     private FileUploadService fileUploadService;
     private WorkTypeClassificatorService workTypeClassificatorService;
     private ClientWorkerService clientWorkerService;
-    private DeviceService deviceService;
+    private DeviceHelperService deviceHelperService;
     private TicketDeviceService ticketDeviceService;
 
 
@@ -97,7 +98,7 @@ public class TicketService {
         }
 
         if (ticketDTO.deviceIds() != null) {
-            Set<Device> devices = deviceService.deviceIdsToDevicesSet(ticketDTO.deviceIds());
+            Set<Device> devices = deviceHelperService.deviceIdsToDevicesSet(ticketDTO.deviceIds());
             ticket.setDevices(devices);
             ticketDeviceService.addCustomerRegisterNos(ticket, devices);
         }
