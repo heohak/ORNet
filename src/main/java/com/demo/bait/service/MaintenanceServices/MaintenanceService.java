@@ -3,13 +3,18 @@ package com.demo.bait.service.MaintenanceServices;
 import com.demo.bait.dto.FileUploadDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
-import com.demo.bait.entity.FileUpload;
-import com.demo.bait.entity.Maintenance;
+import com.demo.bait.entity.*;
 import com.demo.bait.mapper.FileUploadMapper;
 import com.demo.bait.mapper.MaintenanceMapper;
+import com.demo.bait.repository.BaitWorkerRepo;
 import com.demo.bait.repository.FileUploadRepo;
+import com.demo.bait.repository.LocationRepo;
 import com.demo.bait.repository.MaintenanceRepo;
+import com.demo.bait.service.DeviceServices.DeviceHelperService;
+import com.demo.bait.service.DeviceServices.DeviceService;
 import com.demo.bait.service.FileUploadServices.FileUploadService;
+import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceService;
+import com.demo.bait.service.SoftwareServices.SoftwareService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -18,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +37,11 @@ public class MaintenanceService {
     private MaintenanceRepo maintenanceRepo;
     private MaintenanceMapper maintenanceMapper;
     private FileUploadService fileUploadService;
+    private LocationRepo locationRepo;
+    private BaitWorkerRepo baitWorkerRepo;
+    private DeviceHelperService deviceHelperService;
+    private LinkedDeviceService linkedDeviceService;
+    private SoftwareService softwareService;
 
     @Transactional
     public ResponseDTO addMaintenance(MaintenanceDTO maintenanceDTO) {
@@ -39,12 +50,45 @@ public class MaintenanceService {
             Maintenance maintenance = new Maintenance();
             maintenance.setMaintenanceName(maintenanceDTO.maintenanceName());
             maintenance.setMaintenanceDate(maintenanceDTO.maintenanceDate());
+            maintenance.setLastDate(maintenanceDTO.lastDate());
             maintenance.setComment(maintenanceDTO.comment());
 
             if (maintenanceDTO.fileIds() != null) {
                 log.debug("Attaching {} files to maintenance record", maintenanceDTO.fileIds().size());
                 Set<FileUpload> files = fileUploadService.fileIdsToFilesSet(maintenanceDTO.fileIds());
                 maintenance.setFiles(files);
+            }
+
+            if (maintenanceDTO.locationId() != null) {
+                Optional<Location> locationOpt = locationRepo.findById(maintenanceDTO.locationId());
+                locationOpt.ifPresent(maintenance::setLocation);
+            }
+
+            maintenance.setMaintenanceStatus(maintenanceDTO.maintenanceStatus());
+            maintenance.setTimeSpent(Duration.ZERO);
+
+            if (maintenanceDTO.baitWorkerId() != null) {
+                Optional<BaitWorker> baitWorkerOpt = baitWorkerRepo.findById(maintenanceDTO.baitWorkerId());
+                baitWorkerOpt.ifPresent(maintenance::setBaitWorker);
+            }
+
+            if (maintenanceDTO.deviceIds() != null) {
+                log.debug("Attaching {} devices to maintenance record", maintenanceDTO.deviceIds().size());
+                Set<Device> devices = deviceHelperService.deviceIdsToDevicesSet(maintenanceDTO.deviceIds());
+                maintenance.setDevices(devices);
+            }
+
+            if (maintenanceDTO.linkedDeviceIds() != null) {
+                log.debug("Attaching {} linked devices to maintenance record", maintenanceDTO.linkedDeviceIds().size());
+                Set<LinkedDevice> linkedDevices = linkedDeviceService.linkedDeviceIdsToLinkedDeviceSet(
+                        maintenanceDTO.linkedDeviceIds());
+                maintenance.setLinkedDevices(linkedDevices);
+            }
+
+            if (maintenanceDTO.softwareIds() != null) {
+                log.debug("Attaching {} software to maintenance record", maintenanceDTO.softwareIds().size());
+                Set<Software> softwares = softwareService.softwareIdsToSoftwareSet(maintenanceDTO.softwareIds());
+                maintenance.setSoftwares(softwares);
             }
 
             maintenanceRepo.save(maintenance);
@@ -63,13 +107,24 @@ public class MaintenanceService {
             Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
             if (maintenanceOpt.isEmpty()) {
                 log.warn("Maintenance record with ID {} not found", maintenanceId);
-                throw new EntityNotFoundException("Maintenance with " + maintenanceId + " not found");
+                throw new EntityNotFoundException("Maintenance with ID " + maintenanceId + " not found");
             }
 
             Maintenance maintenance = maintenanceOpt.get();
+
             updateMaintenanceName(maintenance, maintenanceDTO);
             updateMaintenanceDate(maintenance, maintenanceDTO);
+            updateLastDate(maintenance, maintenanceDTO);
             updateMaintenanceComment(maintenance, maintenanceDTO);
+            updateMaintenanceStatus(maintenance, maintenanceDTO);
+            updateTimeSpent(maintenance, maintenanceDTO);
+            updateBaitWorker(maintenance, maintenanceDTO);
+            updateLocation(maintenance, maintenanceDTO);
+            updateFiles(maintenance, maintenanceDTO);
+            updateDevices(maintenance, maintenanceDTO);
+            updateLinkedDevices(maintenance, maintenanceDTO);
+            updateSoftware(maintenance, maintenanceDTO);
+
             maintenanceRepo.save(maintenance);
 
             log.info("Maintenance record updated successfully with ID: {}", maintenanceId);
@@ -95,6 +150,70 @@ public class MaintenanceService {
     public void updateMaintenanceComment(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
         if (maintenanceDTO.comment() != null) {
             maintenance.setComment(maintenanceDTO.comment());
+        }
+    }
+
+    public void updateLastDate(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.lastDate() != null) {
+            maintenance.setLastDate(maintenanceDTO.lastDate());
+        }
+    }
+
+    public void updateMaintenanceStatus(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.maintenanceStatus() != null) {
+            maintenance.setMaintenanceStatus(maintenanceDTO.maintenanceStatus());
+        }
+    }
+
+    public void updateTimeSpent(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.timeSpent() != null) {
+            maintenance.setTimeSpent(maintenanceDTO.timeSpent());
+        }
+    }
+
+    public void updateBaitWorker(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.baitWorkerId() != null) {
+            Optional<BaitWorker> baitWorkerOpt = baitWorkerRepo.findById(maintenanceDTO.baitWorkerId());
+            baitWorkerOpt.ifPresent(maintenance::setBaitWorker);
+        }
+    }
+
+    public void updateLocation(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.locationId() != null) {
+            Optional<Location> locationOpt = locationRepo.findById(maintenanceDTO.locationId());
+            locationOpt.ifPresent(maintenance::setLocation);
+        }
+    }
+
+    public void updateFiles(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.fileIds() != null) {
+            log.debug("Updating attached files for maintenance record");
+            Set<FileUpload> files = fileUploadService.fileIdsToFilesSet(maintenanceDTO.fileIds());
+            maintenance.setFiles(files);
+        }
+    }
+
+    public void updateDevices(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.deviceIds() != null) {
+            log.debug("Updating attached devices for maintenance record");
+            Set<Device> devices = deviceHelperService.deviceIdsToDevicesSet(maintenanceDTO.deviceIds());
+            maintenance.setDevices(devices);
+        }
+    }
+
+    public void updateLinkedDevices(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.linkedDeviceIds() != null) {
+            log.debug("Updating attached linked devices for maintenance record");
+            Set<LinkedDevice> linkedDevices = linkedDeviceService.linkedDeviceIdsToLinkedDeviceSet(maintenanceDTO.linkedDeviceIds());
+            maintenance.setLinkedDevices(linkedDevices);
+        }
+    }
+
+    public void updateSoftware(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.softwareIds() != null) {
+            log.debug("Updating attached software for maintenance record");
+            Set<Software> software = softwareService.softwareIdsToSoftwareSet(maintenanceDTO.softwareIds());
+            maintenance.setSoftwares(software);
         }
     }
 

@@ -290,4 +290,24 @@ public class LinkedDeviceService {
             throw e;
         }
     }
+
+    public Set<LinkedDevice> linkedDeviceIdsToLinkedDeviceSet(List<Integer> linkedDeviceIds) {
+        log.info("Converting linked device IDs to LinkedDevice set: {}", linkedDeviceIds);
+        try {
+            Set<LinkedDevice> linkedDevices = new HashSet<>();
+            for (Integer linkedDeviceId : linkedDeviceIds) {
+                LinkedDevice linkedDevice = linkedDeviceRepo.findById(linkedDeviceId)
+                        .orElseThrow(() -> {
+                            log.warn("Invalid linked device ID: {}", linkedDeviceId);
+                            return new IllegalArgumentException("Invalid linked device ID: " + linkedDeviceId);
+                        });
+                linkedDevices.add(linkedDevice);
+            }
+            log.info("Converted {} linked device IDs to LinkedDevice set.", linkedDevices.size());
+            return linkedDevices;
+        } catch (Exception e) {
+            log.error("Error while converting linked device IDs to LinkedDevice set: {}", linkedDeviceIds, e);
+            throw e;
+        }
+    }
 }

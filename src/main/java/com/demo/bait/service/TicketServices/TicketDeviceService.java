@@ -6,6 +6,7 @@ import com.demo.bait.entity.Device;
 import com.demo.bait.entity.Ticket;
 import com.demo.bait.mapper.DeviceMapper;
 import com.demo.bait.repository.TicketRepo;
+import com.demo.bait.service.DeviceServices.DeviceHelperService;
 import com.demo.bait.service.DeviceServices.DeviceService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -21,15 +22,15 @@ import java.util.*;
 public class TicketDeviceService {
 
     private TicketRepo ticketRepo;
-    private DeviceService deviceService;
     private DeviceMapper deviceMapper;
+    private DeviceHelperService deviceHelperService;
 
     @Transactional
     public void addDevicesToTicket(Ticket ticket, TicketDTO ticketDTO) {
         log.info("Adding devices to ticket with ID: {}", ticket.getId());
         if (ticketDTO.deviceIds() != null) {
             log.debug("Device IDs provided: {}", ticketDTO.deviceIds());
-            Set<Device> devices = deviceService.deviceIdsToDevicesSet(ticketDTO.deviceIds());
+            Set<Device> devices = deviceHelperService.deviceIdsToDevicesSet(ticketDTO.deviceIds());
             ticket.setDevices(devices);
             addCustomerRegisterNos(ticket, devices);
             ticketRepo.save(ticket);
