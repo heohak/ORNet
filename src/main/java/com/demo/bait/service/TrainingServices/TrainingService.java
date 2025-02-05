@@ -205,9 +205,10 @@ public class TrainingService {
                 throw new EntityNotFoundException("Client with ID " + clientId + " not found");
             }
             Client client = clientOpt.get();
+            LocalDate today = LocalDate.now();
             return trainingRepo.findAllByClient(client).stream()
                     .map(Training::getTrainingDate)
-                    .filter(Objects::nonNull)
+                    .filter(date -> date != null && !date.isAfter(today))
                     .max(Comparator.naturalOrder())
                     .orElse(null);
         } catch (Exception e) {
