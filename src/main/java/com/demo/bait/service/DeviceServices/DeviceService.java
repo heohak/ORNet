@@ -11,6 +11,7 @@ import com.demo.bait.repository.classificator.DeviceClassificatorRepo;
 import com.demo.bait.service.CommentServices.CommentService;
 import com.demo.bait.service.FileUploadServices.FileUploadService;
 import com.demo.bait.service.MaintenanceServices.MaintenanceService;
+import com.demo.bait.service.MaintenanceServices.MaintenanceSpecificationService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -42,6 +43,7 @@ public class DeviceService {
     private DeviceCommentService deviceCommentService;
     private TicketRepo ticketRepo;
     private TicketMapper ticketMapper;
+    private MaintenanceSpecificationService maintenanceSpecificationService;
 
     @Transactional
     public ResponseDTO addDevice(DeviceDTO deviceDTO) {
@@ -520,6 +522,27 @@ public class DeviceService {
             return ticketMapper.toDtoList(tickets);
         } catch (Exception e) {
             log.error("Error while fetching tickets for device with ID: {}", deviceId, e);
+            throw e;
+        }
+    }
+
+    public List<MaintenanceDTO> getDeviceMaintenances(Integer deviceId) {
+        if (deviceId == null) {
+            log.warn("Device ID is null. Returning empty list.");
+            return Collections.emptyList();
+        }
+
+        try {
+            Optional<Device> deviceOpt = deviceRepo.findById(deviceId);
+            if (deviceOpt.isEmpty()) {
+                log.warn("Device with ID {} not found.", deviceId);
+                throw new EntityNotFoundException("Device with id " + deviceId + " not found");
+            }
+
+            return maintenanceSpecificationService.searchAndFilterMaintenances(null, null, null,
+                    deviceId, null, null, null);
+        } catch (Exception e) {
+            log.error("Error while fetching maintenances for device with ID: {}", deviceId, e);
             throw e;
         }
     }

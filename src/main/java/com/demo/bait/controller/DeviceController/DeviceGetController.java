@@ -46,6 +46,12 @@ public class DeviceGetController {
 //        return deviceMaintenanceService.getDeviceMaintenances(parsedDeviceId);
 //    }
 
+    @GetMapping("/maintenances/{deviceId}")
+    public List<MaintenanceDTO> getMaintenances(@PathVariable String deviceId) {
+        Integer parsedDeviceId = requestParamParser.parseId(deviceId, "deviceId");
+        return deviceService.getDeviceMaintenances(parsedDeviceId);
+    }
+
     @GetMapping("/search")
     public List<DeviceDTO> searchAndFilterDevices(
             @RequestParam(value = "q", required = false) String query,

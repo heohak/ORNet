@@ -4,6 +4,7 @@ import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.CommentDTO;
 import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.dto.LinkedDeviceDTO;
+import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceCommentService;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceService;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceSpecificationService;
@@ -64,5 +65,11 @@ public class LinkedDeviceGetController {
             @RequestParam(value = "deviceId", required = false) Integer deviceId,
             @RequestParam(value = "template", required = false) Boolean template) {
         return linkedDeviceSpecificationService.searchAndFilterLinkedDevices(query, locationId, deviceId, template);
+    }
+
+    @GetMapping("/maintenances/{linkedDeviceId}")
+    public List<MaintenanceDTO> getLinkedDeviceMaintenances(@PathVariable String linkedDeviceId) {
+        Integer parsedLinkedDeviceId = requestParamParser.parseId(linkedDeviceId, "Linked Device ID");
+        return linkedDeviceService.getLinkedDeviceMaintenances(parsedLinkedDeviceId);
     }
 }

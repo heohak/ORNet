@@ -1,9 +1,6 @@
 package com.demo.bait.service.LinkedDeviceServices;
 
-import com.demo.bait.dto.CommentDTO;
-import com.demo.bait.dto.DeviceDTO;
-import com.demo.bait.dto.LinkedDeviceDTO;
-import com.demo.bait.dto.ResponseDTO;
+import com.demo.bait.dto.*;
 import com.demo.bait.entity.Comment;
 import com.demo.bait.entity.Device;
 import com.demo.bait.entity.LinkedDevice;
@@ -18,6 +15,7 @@ import com.demo.bait.repository.LinkedDeviceRepo;
 import com.demo.bait.repository.LocationRepo;
 import com.demo.bait.service.CommentServices.CommentService;
 import com.demo.bait.service.DeviceServices.DeviceService;
+import com.demo.bait.service.MaintenanceServices.MaintenanceSpecificationService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -41,6 +39,7 @@ public class LinkedDeviceService {
     private EntityManager entityManager;
     private DeviceMapper deviceMapper;
     private LocationRepo locationRepo;
+    private MaintenanceSpecificationService maintenanceSpecificationService;
 
     @Transactional
     public ResponseDTO addLinkedDevice(LinkedDeviceDTO linkedDeviceDTO) {
@@ -307,6 +306,27 @@ public class LinkedDeviceService {
             return linkedDevices;
         } catch (Exception e) {
             log.error("Error while converting linked device IDs to LinkedDevice set: {}", linkedDeviceIds, e);
+            throw e;
+        }
+    }
+
+    public List<MaintenanceDTO> getLinkedDeviceMaintenances(Integer linkedDeviceId) {
+        if (linkedDeviceId == null) {
+            log.warn("Linked device ID is null. Returning empty list");
+            return Collections.emptyList();
+        }
+
+        try {
+            Optional<LinkedDevice> linkedDeviceOpt = linkedDeviceRepo.findById(linkedDeviceId);
+            if (linkedDeviceOpt.isEmpty()) {
+                log.warn("Linked Device with ID {} not found.", linkedDeviceId);
+                throw new EntityNotFoundException("Device with id " + linkedDeviceId + " not found");
+            }
+
+            return maintenanceSpecificationService.searchAndFilterMaintenances(null, null, null,
+                    null, linkedDeviceId, null, null);
+        } catch (Exception e) {
+            log.error("Error while fetching maintenances for linked device with ID: {}", linkedDeviceId, e);
             throw e;
         }
     }
