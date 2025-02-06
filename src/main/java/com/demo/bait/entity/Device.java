@@ -43,13 +43,13 @@ public class Device {
     private String version;
     private LocalDate versionUpdateDate;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "device_maintenance",
-            joinColumns = @JoinColumn(name = "device_id"),
-            inverseJoinColumns = @JoinColumn(name = "maintenance_id")
-    )
-    private Set<Maintenance> maintenances = new HashSet<>();
+//    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "device_maintenance",
+//            joinColumns = @JoinColumn(name = "device_id"),
+//            inverseJoinColumns = @JoinColumn(name = "maintenance_id")
+//    )
+//    private Set<Maintenance> maintenances = new HashSet<>();
 
     private String firstIPAddress;
     private String secondIPAddress;

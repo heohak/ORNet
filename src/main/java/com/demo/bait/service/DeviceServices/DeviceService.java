@@ -36,7 +36,7 @@ public class DeviceService {
     private DeviceClassificatorRepo deviceClassificatorRepo;
     private FileUploadService fileUploadService;
     private CommentService commentService;
-    private DeviceMaintenanceService deviceMaintenanceService;
+//    private DeviceMaintenanceService deviceMaintenanceService;
     private EntityManager entityManager;
     private DeviceAttributeService deviceAttributeService;
     private DeviceCommentService deviceCommentService;
@@ -60,7 +60,7 @@ public class DeviceService {
             device.setVersion(deviceDTO.version());
             device.setVersionUpdateDate(deviceDTO.versionUpdateDate());
 
-            deviceMaintenanceService.updateMaintenances(device, deviceDTO);
+//            deviceMaintenanceService.updateMaintenances(device, deviceDTO);
 
             device.setFirstIPAddress(deviceDTO.firstIPAddress());
             device.setSecondIPAddress(deviceDTO.secondIPAddress());
@@ -282,7 +282,7 @@ public class DeviceService {
             updateLicenceNumber(device, deviceDTO);
             updateVersion(device, deviceDTO);
             updateVersionUpdateDate(device, deviceDTO);
-            deviceMaintenanceService.updateMaintenances(device, deviceDTO);
+//            deviceMaintenanceService.updateMaintenances(device, deviceDTO);
             updateFirstIPAddress(device, deviceDTO);
             updateSecondIPAddress(device, deviceDTO);
             updateSubnetMask(device, deviceDTO);

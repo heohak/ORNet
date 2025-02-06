@@ -23,16 +23,16 @@ public interface DeviceMapper {
     @Mapping(source = "client.id", target = "clientId")
     @Mapping(source = "location.id", target = "locationId")
     @Mapping(source = "classificator.id", target = "classificatorId")
-    @Mapping(target = "maintenanceIds", expression = "java(mapMaintenancesToIds(device.getMaintenances()))")
+//    @Mapping(target = "maintenanceIds", expression = "java(mapMaintenancesToIds(device.getMaintenances()))")
     @Mapping(target = "commentIds", expression = "java(mapCommentsToIds(device.getComments()))")
     @Mapping(target = "fileIds", expression = "java(mapFilesToIds(device.getFiles()))")
     DeviceDTO toDto(Device device);
 
-    default List<Integer> mapMaintenancesToIds(Set<Maintenance> maintenances) {
-        return maintenances.stream()
-                .map(Maintenance::getId)
-                .collect(Collectors.toList());
-    }
+//    default List<Integer> mapMaintenancesToIds(Set<Maintenance> maintenances) {
+//        return maintenances.stream()
+//                .map(Maintenance::getId)
+//                .collect(Collectors.toList());
+//    }
 
     default List<Integer> mapFilesToIds(Set<FileUpload> files) {
         return files.stream()

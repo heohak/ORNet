@@ -1,6 +1,5 @@
 package com.demo.bait.controller.ReportController;
 
-import com.demo.bait.service.ReportService.ClientMaintenanceReportService;
 import com.demo.bait.service.ReportService.ClientTicketReportService;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -19,7 +18,7 @@ import java.time.LocalDate;
 public class ReportController {
 
     private ClientTicketReportService clientTicketReportService;
-    private ClientMaintenanceReportService clientMaintenanceReportService;
+//    private ClientMaintenanceReportService clientMaintenanceReportService;
 
     @GetMapping("/client-tickets")
     public ResponseEntity<Resource> generateClientTicketsReport(
@@ -30,14 +29,14 @@ public class ReportController {
         return clientTicketReportService.generateClientTicketsReport(clientId, startDate, endDate, fileName);
     }
 
-    @GetMapping("/client-maintenances")
-    public ResponseEntity<Resource> generateClientMaintenancesReport(
-            @RequestParam("clientId") Integer clientId,
-            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam("fileName") String fileName) {
-        return clientMaintenanceReportService.generateClientMaintenanceReport(clientId, startDate, endDate, fileName);
-    }
+//    @GetMapping("/client-maintenances")
+//    public ResponseEntity<Resource> generateClientMaintenancesReport(
+//            @RequestParam("clientId") Integer clientId,
+//            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+//            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+//            @RequestParam("fileName") String fileName) {
+//        return clientMaintenanceReportService.generateClientMaintenanceReport(clientId, startDate, endDate, fileName);
+//    }
 
     @GetMapping("/all-clients-tickets")
     public ResponseEntity<Resource> generateAllClientsTicketsReport(
@@ -47,11 +46,11 @@ public class ReportController {
         return clientTicketReportService.generateAllClientsTicketsReport(startDate, endDate, fileName);
     }
 
-    @GetMapping("/all-clients-maintenances")
-    public ResponseEntity<Resource> generateAllClientsMaintenancesReport(
-            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam("fileName") String fileName) {
-        return clientMaintenanceReportService.generateAllClientsMaintenancesReport(startDate, endDate, fileName);
-    }
+//    @GetMapping("/all-clients-maintenances")
+//    public ResponseEntity<Resource> generateAllClientsMaintenancesReport(
+//            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+//            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+//            @RequestParam("fileName") String fileName) {
+//        return clientMaintenanceReportService.generateAllClientsMaintenancesReport(startDate, endDate, fileName);
+//    }
 }

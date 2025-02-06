@@ -15,7 +15,7 @@ import java.util.Map;
 public class DeviceGetController {
 
     public final DeviceService deviceService;
-    public final DeviceMaintenanceService deviceMaintenanceService;
+//    public final DeviceMaintenanceService deviceMaintenanceService;
     public final DeviceFileUploadService deviceFileUploadService;
     public final DeviceCommentService deviceCommentService;
     public final DeviceSpecificationService deviceSpecificationService;
@@ -40,11 +40,11 @@ public class DeviceGetController {
         return deviceService.getDeviceById(parsedDeviceId);
     }
 
-    @GetMapping("/maintenances/{deviceId}")
-    public List<MaintenanceDTO> getMaintenances(@PathVariable String deviceId) {
-        Integer parsedDeviceId = requestParamParser.parseId(deviceId, "deviceId");
-        return deviceMaintenanceService.getDeviceMaintenances(parsedDeviceId);
-    }
+//    @GetMapping("/maintenances/{deviceId}")
+//    public List<MaintenanceDTO> getMaintenances(@PathVariable String deviceId) {
+//        Integer parsedDeviceId = requestParamParser.parseId(deviceId, "deviceId");
+//        return deviceMaintenanceService.getDeviceMaintenances(parsedDeviceId);
+//    }
 
     @GetMapping("/search")
     public List<DeviceDTO> searchAndFilterDevices(
