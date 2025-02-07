@@ -71,4 +71,14 @@ public class LinkedDeviceSpecificationService {
             throw e;
         }
     }
+
+    public List<LinkedDeviceDTO> getNotUsedLinkedDevices() {
+        log.info("Fetching all linked devices not associated with any device and with template set to false or null");
+
+        List<LinkedDevice> linkedDevices = linkedDeviceRepo.findAll(LinkedDeviceSpecification.isNotUsed());
+        List<LinkedDeviceDTO> devices = linkedDeviceMapper.toDtoList(linkedDevices);
+
+        log.info("Fetched {} linked devices not associated with any device and with template set to false or null", devices.size());
+        return devices;
+    }
 }

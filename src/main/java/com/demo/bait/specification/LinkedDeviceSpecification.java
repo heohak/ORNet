@@ -61,6 +61,17 @@ public class LinkedDeviceSpecification implements Specification<LinkedDevice> {
         };
     }
 
+    public static Specification<LinkedDevice> isNotUsed() {
+        return (Root<LinkedDevice> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
+            Predicate deviceIsNull = criteriaBuilder.isNull(root.get("device"));
+            Predicate templateIsFalseOrNull = criteriaBuilder.or(
+                    criteriaBuilder.equal(root.get("template"), false),
+                    criteriaBuilder.isNull(root.get("template"))
+            );
+            return criteriaBuilder.and(deviceIsNull, templateIsFalseOrNull);
+        };
+    }
+
     @Override
     public Predicate toPredicate(Root<LinkedDevice> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {

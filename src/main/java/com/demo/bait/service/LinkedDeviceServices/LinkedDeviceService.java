@@ -93,6 +93,9 @@ public class LinkedDeviceService {
                     });
 
             linkedDevice.setDevice(device);
+            if (linkedDevice.getTemplate() == null) {
+                linkedDevice.setTemplate(false);
+            }
             linkedDeviceRepo.save(linkedDevice);
             log.info("Device linked successfully to linked device ID: {}", linkedDeviceId);
             return new ResponseDTO("Device linked successfully");
@@ -200,14 +203,14 @@ public class LinkedDeviceService {
         }
     }
 
-    public List<LinkedDeviceDTO> getNotUsedLinkedDevices() {
-        log.info("Fetching all linked devices not associated with any device and with template set to false");
-        List<LinkedDeviceDTO> devices = linkedDeviceMapper.toDtoList(
-                linkedDeviceRepo.findByDeviceIsNullAndTemplateFalse()
-        );
-        log.info("Fetched {} linked devices not associated with any device and with template set to false", devices.size());
-        return devices;
-    }
+//    public List<LinkedDeviceDTO> getNotUsedLinkedDevices() {
+//        log.info("Fetching all linked devices not associated with any device and with template set to false");
+//        List<LinkedDeviceDTO> devices = linkedDeviceMapper.toDtoList(
+//                linkedDeviceRepo.findByDeviceIsNullAndTemplateFalse()
+//        );
+//        log.info("Fetched {} linked devices not associated with any device and with template set to false", devices.size());
+//        return devices;
+//    }
 
     public List<LinkedDeviceDTO> getAllLinkedDevices() {
         log.info("Fetching all linked devices");
