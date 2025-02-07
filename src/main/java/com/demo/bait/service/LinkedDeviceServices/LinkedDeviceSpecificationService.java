@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -24,7 +25,7 @@ public class LinkedDeviceSpecificationService {
     private LinkedDeviceMapper linkedDeviceMapper;
 
     public List<LinkedDeviceDTO> searchAndFilterLinkedDevices(String searchTerm, Integer locationId, Integer deviceId,
-                                                              Boolean template) {
+                                                              Boolean template, LocalDate date, String comparison) {
         log.info("Searching and filtering linked devices with parameters - " +
                         "searchTerm: {}, locationId: {}, deviceId: {}, template: {}",
                 searchTerm, locationId, deviceId, template);
@@ -54,6 +55,12 @@ public class LinkedDeviceSpecificationService {
                 log.debug("Adding template filter with value: {}", template);
                 Specification<LinkedDevice> templateSpec = LinkedDeviceSpecification.isTemplate(template);
                 combinedSpec = combinedSpec.and(templateSpec);
+            }
+
+            if (date != null && comparison != null && !comparison.trim().isEmpty()) {
+                log.debug("Adding filter date: {} and comparison: {}", date, comparison);
+                Specification<LinkedDevice> dateSpec = LinkedDeviceSpecification.hasIntroducedDate(date, comparison);
+                combinedSpec = combinedSpec.and(dateSpec);
             }
 
             List<LinkedDeviceDTO> linkedDevices = linkedDeviceMapper.toDtoList(linkedDeviceRepo.findAll(combinedSpec));

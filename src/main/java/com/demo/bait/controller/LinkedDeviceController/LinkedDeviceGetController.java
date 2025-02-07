@@ -9,8 +9,10 @@ import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceCommentService;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceService;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceSpecificationService;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -63,8 +65,11 @@ public class LinkedDeviceGetController {
             @RequestParam(value = "q", required = false) String query,
             @RequestParam(value = "locationId", required = false) Integer locationId,
             @RequestParam(value = "deviceId", required = false) Integer deviceId,
-            @RequestParam(value = "template", required = false) Boolean template) {
-        return linkedDeviceSpecificationService.searchAndFilterLinkedDevices(query, locationId, deviceId, template);
+            @RequestParam(value = "template", required = false) Boolean template,
+            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(value = "comparison", required = false) String comparison) {
+        return linkedDeviceSpecificationService.searchAndFilterLinkedDevices(query, locationId, deviceId, template,
+                date, comparison);
     }
 
     @GetMapping("/maintenances/{linkedDeviceId}")

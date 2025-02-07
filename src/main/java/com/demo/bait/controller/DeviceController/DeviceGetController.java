@@ -4,8 +4,10 @@ import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.*;
 import com.demo.bait.service.DeviceServices.*;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -59,9 +61,11 @@ public class DeviceGetController {
             @RequestParam(value = "clientId", required = false) Integer clientId,
             @RequestParam(value = "locationId", required = false) Integer locationId,
             @RequestParam(value = "writtenOff", required = false) Boolean writtenOff,
-            @RequestParam(value = "customerRegisterNos", required = false) String customerRegisterNos) {
+            @RequestParam(value = "customerRegisterNos", required = false) String customerRegisterNos,
+            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(value = "comparison", required = false) String comparison) {
         return deviceSpecificationService.searchAndFilterDevices(query, classificatorId, clientId, locationId,
-                writtenOff, customerRegisterNos);
+                writtenOff, customerRegisterNos, date, comparison);
     }
 
     @GetMapping("/comment/{deviceId}")

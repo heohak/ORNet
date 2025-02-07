@@ -8,6 +8,8 @@ import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.LocalDate;
+
 @AllArgsConstructor
 public class LinkedDeviceSpecification implements Specification<LinkedDevice> {
 
@@ -31,6 +33,29 @@ public class LinkedDeviceSpecification implements Specification<LinkedDevice> {
         return (root, query, criteriaBuilder) -> {
             if (template != null) {
                 return criteriaBuilder.equal(root.get("template"), template);
+            }
+            return criteriaBuilder.conjunction();
+        };
+    }
+
+    /**
+     * Filters linked devices based on their introducedDate.
+     *
+     * @param date the reference date to compare against.
+     * @param comparison "before" or "after"
+     *                   if "before", returns devices with introducedDate less than the date and with the same date;
+     *                   if "after", returns devices with introducedDate greater than the date and with the same date.
+     * @return the specification predicate.
+     */
+    public static Specification<LinkedDevice> hasIntroducedDate(LocalDate date, String comparison) {
+        return (Root<LinkedDevice> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
+            if (date == null || comparison == null || comparison.trim().isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            if ("before".equalsIgnoreCase(comparison)) {
+                return criteriaBuilder.lessThanOrEqualTo(root.get("introducedDate"), date);
+            } else if ("after".equalsIgnoreCase(comparison)) {
+                return criteriaBuilder.greaterThanOrEqualTo(root.get("introducedDate"), date);
             }
             return criteriaBuilder.conjunction();
         };
