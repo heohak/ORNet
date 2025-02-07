@@ -18,15 +18,15 @@ import java.util.Map;
 public class DevicePutController {
 
     public final DeviceService deviceService;
-    public final DeviceMaintenanceService deviceMaintenanceService;
+//    public final DeviceMaintenanceService deviceMaintenanceService;
     public final DeviceFileUploadService deviceFileUploadService;
     public final DeviceCommentService deviceCommentService;
     public final DeviceAttributeService deviceAttributeService;
 
-    @PutMapping("/maintenance/{deviceId}/{maintenanceId}")
-    public ResponseDTO addMaintenance(@PathVariable Integer deviceId, @PathVariable Integer maintenanceId) {
-        return deviceMaintenanceService.addMaintenanceToDevice(deviceId, maintenanceId);
-    }
+//    @PutMapping("/maintenance/{deviceId}/{maintenanceId}")
+//    public ResponseDTO addMaintenance(@PathVariable Integer deviceId, @PathVariable Integer maintenanceId) {
+//        return deviceMaintenanceService.addMaintenanceToDevice(deviceId, maintenanceId);
+//    }
 
     @PutMapping("/upload/{deviceId}")
     public ResponseDTO uploadFiles(@PathVariable Integer deviceId, @RequestParam("files") List<MultipartFile> files)

@@ -30,4 +30,11 @@ public class MaintenancePutController {
                                          @RequestBody MaintenanceDTO maintenanceDTO) {
         return maintenanceService.updateMaintenance(maintenanceId, maintenanceDTO);
     }
+
+    @PutMapping("/time/{maintenanceId}")
+    public ResponseDTO addTimeToMaintenance(@PathVariable Integer maintenanceId,
+                                            @RequestParam(value = "hours", required = false) Integer hours,
+                                            @RequestParam(value = "minutes", required = false) Integer minutes) {
+        return maintenanceService.addTimeSpentToMaintenance(maintenanceId, hours, minutes);
+    }
 }

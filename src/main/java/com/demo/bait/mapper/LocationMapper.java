@@ -18,15 +18,15 @@ import java.util.stream.Collectors;
 public interface LocationMapper {
 
     List<LocationDTO> toDtoList(List<Location> locationList);
-    @Mapping(target = "maintenanceIds", expression = "java(mapMaintenancesToIds(location.getMaintenances()))")
+//    @Mapping(target = "maintenanceIds", expression = "java(mapMaintenancesToIds(location.getMaintenances()))")
     @Mapping(target = "commentIds", expression = "java(mapCommentsToIds(location.getComments()))")
     LocationDTO toDto(Location location);
 
-    default List<Integer> mapMaintenancesToIds(Set<Maintenance> maintenances) {
-        return maintenances.stream()
-                .map(Maintenance::getId)
-                .collect(Collectors.toList());
-    }
+//    default List<Integer> mapMaintenancesToIds(Set<Maintenance> maintenances) {
+//        return maintenances.stream()
+//                .map(Maintenance::getId)
+//                .collect(Collectors.toList());
+//    }
 
     default List<Integer> mapCommentsToIds(Set<Comment> comments) {
         return comments.stream()

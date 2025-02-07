@@ -35,13 +35,13 @@ public class Location {
     private String email;
     private LocalDate lastMaintenance;
     private LocalDate nextMaintenance;
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "location_maintenance",
-            joinColumns = @JoinColumn(name = "location_id"),
-            inverseJoinColumns = @JoinColumn(name = "maintenance_id")
-    )
-    private Set<Maintenance> maintenances = new HashSet<>();
+//    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+//    @JoinTable(
+//            name = "location_maintenance",
+//            joinColumns = @JoinColumn(name = "location_id"),
+//            inverseJoinColumns = @JoinColumn(name = "maintenance_id")
+//    )
+//    private Set<Maintenance> maintenances = new HashSet<>();
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
             name = "location_comment",
