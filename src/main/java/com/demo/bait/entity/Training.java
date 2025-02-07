@@ -41,4 +41,11 @@ public class Training {
     private LocalDate trainingDate;
     @Enumerated(EnumType.STRING)
     private TrainingType trainingType;
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "training_file_upload",
+            joinColumns = @JoinColumn(name = "training_id"),
+            inverseJoinColumns = @JoinColumn(name = "file_upload_id")
+    )
+    private Set<FileUpload> files = new HashSet<>();
 }
