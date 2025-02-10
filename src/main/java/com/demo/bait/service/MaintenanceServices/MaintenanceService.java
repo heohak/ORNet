@@ -1,15 +1,13 @@
 package com.demo.bait.service.MaintenanceServices;
 
+import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.dto.FileUploadDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.*;
-import com.demo.bait.mapper.FileUploadMapper;
-import com.demo.bait.mapper.MaintenanceMapper;
-import com.demo.bait.repository.BaitWorkerRepo;
-import com.demo.bait.repository.FileUploadRepo;
-import com.demo.bait.repository.LocationRepo;
-import com.demo.bait.repository.MaintenanceRepo;
+import com.demo.bait.enums.MaintenanceStatus;
+import com.demo.bait.mapper.*;
+import com.demo.bait.repository.*;
 import com.demo.bait.service.DeviceServices.DeviceHelperService;
 import com.demo.bait.service.DeviceServices.DeviceService;
 import com.demo.bait.service.FileUploadServices.FileUploadService;
@@ -24,10 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -42,6 +38,10 @@ public class MaintenanceService {
     private DeviceHelperService deviceHelperService;
     private LinkedDeviceService linkedDeviceService;
     private SoftwareService softwareService;
+    private DeviceMapper deviceMapper;
+    private LinkedDeviceMapper linkedDeviceMapper;
+    private SoftwareMapper softwareMapper;
+    private MaintenanceCommentRepo maintenanceCommentRepo;
 
     @Transactional
     public ResponseDTO addMaintenance(MaintenanceDTO maintenanceDTO) {
@@ -75,6 +75,11 @@ public class MaintenanceService {
             if (maintenanceDTO.deviceIds() != null) {
                 log.debug("Attaching {} devices to maintenance record", maintenanceDTO.deviceIds().size());
                 Set<Device> devices = deviceHelperService.deviceIdsToDevicesSet(maintenanceDTO.deviceIds());
+                for (Device device : devices) {
+                    MaintenanceComment maintenanceComment = createInitialMaintenanceComment(maintenance);
+                    maintenanceComment.setDevice(device);
+                    maintenanceCommentRepo.save(maintenanceComment);
+                }
                 maintenance.setDevices(devices);
             }
 
@@ -82,12 +87,22 @@ public class MaintenanceService {
                 log.debug("Attaching {} linked devices to maintenance record", maintenanceDTO.linkedDeviceIds().size());
                 Set<LinkedDevice> linkedDevices = linkedDeviceService.linkedDeviceIdsToLinkedDeviceSet(
                         maintenanceDTO.linkedDeviceIds());
+                for (LinkedDevice linkedDevice : linkedDevices) {
+                    MaintenanceComment maintenanceComment = createInitialMaintenanceComment(maintenance);
+                    maintenanceComment.setLinkedDevice(linkedDevice);
+                    maintenanceCommentRepo.save(maintenanceComment);
+                }
                 maintenance.setLinkedDevices(linkedDevices);
             }
 
             if (maintenanceDTO.softwareIds() != null) {
                 log.debug("Attaching {} software to maintenance record", maintenanceDTO.softwareIds().size());
                 Set<Software> softwares = softwareService.softwareIdsToSoftwareSet(maintenanceDTO.softwareIds());
+                for (Software software : softwares) {
+                    MaintenanceComment maintenanceComment = createInitialMaintenanceComment(maintenance);
+                    maintenanceComment.setSoftware(software);
+                    maintenanceCommentRepo.save(maintenanceComment);
+                }
                 maintenance.setSoftwares(softwares);
             }
 
@@ -133,6 +148,47 @@ public class MaintenanceService {
             log.error("Error while updating maintenance record with ID: {}", maintenanceId, e);
             throw e;
         }
+    }
+
+    @Transactional
+    public ResponseDTO addTimeSpentToMaintenance(Integer maintenanceId, Integer hours, Integer minutes) {
+        log.info("Adding spent time to maintenance with ID: {}", maintenanceId);
+        try {
+            Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
+            if (maintenanceOpt.isEmpty()) {
+                log.warn("Maintenance record with ID {} not found", maintenanceId);
+                throw new EntityNotFoundException("Maintenance with ID " + maintenanceId + " not found");
+            }
+
+            Maintenance maintenance = maintenanceOpt.get();
+
+            Duration duration = maintenance.getTimeSpent();
+            if (duration == null) {
+                duration = Duration.ZERO;
+            }
+
+            if (hours != null) {
+                duration = duration.plusHours(hours);
+            }
+
+            if (minutes != null) {
+                duration = duration.plusMinutes(minutes);
+            }
+
+            maintenance.setTimeSpent(duration);
+            maintenanceRepo.save(maintenance);
+            return new ResponseDTO("Spent time added to maintenance successfully");
+        } catch (Exception e) {
+            log.error("Error while adding spent time to maintenance with ID: {}", maintenanceId, e);
+            throw e;
+        }
+    }
+
+    public MaintenanceComment createInitialMaintenanceComment(Maintenance maintenance) {
+        MaintenanceComment maintenanceComment = new MaintenanceComment();
+        maintenanceComment.setMaintenance(maintenance);
+        maintenanceComment.setMaintenanceStatus(MaintenanceStatus.OPEN);
+        return maintenanceComment;
     }
 
     public void updateMaintenanceName(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
@@ -197,6 +253,15 @@ public class MaintenanceService {
         if (maintenanceDTO.deviceIds() != null) {
             log.debug("Updating attached devices for maintenance record");
             Set<Device> devices = deviceHelperService.deviceIdsToDevicesSet(maintenanceDTO.deviceIds());
+            for (Device device : devices) {
+                List<MaintenanceComment> maintenanceComments = maintenanceCommentRepo
+                        .findByMaintenanceAndDevice(maintenance, device);
+                if (maintenanceComments.isEmpty()) {
+                    MaintenanceComment maintenanceComment = createInitialMaintenanceComment(maintenance);
+                    maintenanceComment.setDevice(device);
+                    maintenanceCommentRepo.save(maintenanceComment);
+                }
+            }
             maintenance.setDevices(devices);
         }
     }
@@ -204,7 +269,17 @@ public class MaintenanceService {
     public void updateLinkedDevices(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
         if (maintenanceDTO.linkedDeviceIds() != null) {
             log.debug("Updating attached linked devices for maintenance record");
-            Set<LinkedDevice> linkedDevices = linkedDeviceService.linkedDeviceIdsToLinkedDeviceSet(maintenanceDTO.linkedDeviceIds());
+            Set<LinkedDevice> linkedDevices = linkedDeviceService.linkedDeviceIdsToLinkedDeviceSet(
+                    maintenanceDTO.linkedDeviceIds());
+            for (LinkedDevice linkedDevice : linkedDevices) {
+                List<MaintenanceComment> maintenanceComments = maintenanceCommentRepo
+                        .findByMaintenanceAndLinkedDevice(maintenance, linkedDevice);
+                if (maintenanceComments.isEmpty()) {
+                    MaintenanceComment maintenanceComment = createInitialMaintenanceComment(maintenance);
+                    maintenanceComment.setLinkedDevice(linkedDevice);
+                    maintenanceCommentRepo.save(maintenanceComment);
+                }
+            }
             maintenance.setLinkedDevices(linkedDevices);
         }
     }
@@ -213,6 +288,15 @@ public class MaintenanceService {
         if (maintenanceDTO.softwareIds() != null) {
             log.debug("Updating attached software for maintenance record");
             Set<Software> software = softwareService.softwareIdsToSoftwareSet(maintenanceDTO.softwareIds());
+            for (Software oneSoftware : software) {
+                List<MaintenanceComment> maintenanceComments = maintenanceCommentRepo
+                        .findByMaintenanceAndSoftware(maintenance, oneSoftware);
+                if (maintenanceComments.isEmpty()) {
+                    MaintenanceComment maintenanceComment = createInitialMaintenanceComment(maintenance);
+                    maintenanceComment.setSoftware(oneSoftware);
+                    maintenanceCommentRepo.save(maintenanceComment);
+                }
+            }
             maintenance.setSoftwares(software);
         }
     }
@@ -265,6 +349,36 @@ public class MaintenanceService {
             return maintenanceMapper.toDto(maintenance);
         } catch (Exception e) {
             log.error("Error while fetching maintenance record with ID: {}", id, e);
+            throw e;
+        }
+    }
+
+    public Map<String, List<?>> getMaintenanceConnectionsMap(Integer maintenanceId) {
+        if (maintenanceId == null) {
+            log.warn("Maintenance ID is null. Returning empty map.");
+            return Collections.emptyMap();
+        }
+
+        log.info("Fetching maintenance connections for Devices, Linked Devices and Software with maintenance ID: {}",
+                maintenanceId);
+        try {
+            Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
+            if (maintenanceOpt.isEmpty()) {
+                log.warn("Maintenance record with ID {} not found", maintenanceId);
+                throw new EntityNotFoundException("Maintenance with " + maintenanceId + " not found");
+            }
+            Maintenance maintenance = maintenanceOpt.get();
+
+            Map<String, List<?>> connections = new HashMap<>();
+
+            connections.put("Devices", deviceMapper.toDtoList(new ArrayList<>(maintenance.getDevices())));
+            connections.put("LinkedDevices", linkedDeviceMapper.toDtoList(new ArrayList<>(maintenance.getLinkedDevices())));
+            connections.put("Software", softwareMapper.toDtoList(new ArrayList<>(maintenance.getSoftwares())));
+
+            log.info("Maintenance connections map built: {}", connections);
+            return connections;
+        } catch (Exception e) {
+            log.error("Error while fetching maintenance connections with ID: {}", maintenanceId, e);
             throw e;
         }
     }

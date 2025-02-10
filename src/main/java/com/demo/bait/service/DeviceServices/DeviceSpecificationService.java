@@ -2,14 +2,17 @@ package com.demo.bait.service.DeviceServices;
 
 import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.entity.Device;
+import com.demo.bait.entity.LinkedDevice;
 import com.demo.bait.mapper.DeviceMapper;
 import com.demo.bait.repository.DeviceRepo;
 import com.demo.bait.specification.DeviceSpecification;
+import com.demo.bait.specification.LinkedDeviceSpecification;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -21,7 +24,8 @@ public class DeviceSpecificationService {
     private DeviceMapper deviceMapper;
 
     public List<DeviceDTO> searchAndFilterDevices(String searchTerm, Integer classificatorId, Integer clientId,
-                                                  Integer locationId, Boolean writtenOff, String customerRegisterNos) {
+                                                  Integer locationId, Boolean writtenOff, String customerRegisterNos,
+                                                  LocalDate date, String comparison) {
         log.info("Searching and filtering devices with parameters - " +
                         "searchTerm: {}, classificatorId: {}, clientId: {}, locationId: {}, writtenOff: {}",
                 searchTerm, classificatorId, clientId, locationId, writtenOff);
@@ -64,6 +68,12 @@ public class DeviceSpecificationService {
                 Specification<Device> customerRegisterNosSpec = DeviceSpecification
                         .hasCustomerRegisterNos(customerRegisterNos);
                 combinedSpec = combinedSpec.and(customerRegisterNosSpec);
+            }
+
+            if (date != null && comparison != null && !comparison.trim().isEmpty()) {
+                log.debug("Adding filter date: {} and comparison: {}", date, comparison);
+                Specification<Device> dateSpec = DeviceSpecification.hasIntroducedDate(date, comparison);
+                combinedSpec = combinedSpec.and(dateSpec);
             }
 
             List<DeviceDTO> devices = deviceMapper.toDtoList(deviceRepo.findAll(combinedSpec));

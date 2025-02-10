@@ -20,7 +20,7 @@ public record LocationDTO(
         String email,
         LocalDate lastMaintenance,
         LocalDate nextMaintenance,
-        List<Integer> maintenanceIds,
+//        List<Integer> maintenanceIds,
         List<Integer> commentIds
 ) {
 }

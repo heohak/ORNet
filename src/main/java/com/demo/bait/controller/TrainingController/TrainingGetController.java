@@ -1,8 +1,10 @@
 package com.demo.bait.controller.TrainingController;
 
 import com.demo.bait.components.RequestParamParser;
+import com.demo.bait.dto.FileUploadDTO;
 import com.demo.bait.dto.TrainingDTO;
 import com.demo.bait.enums.TrainingType;
+import com.demo.bait.service.TrainingServices.TrainingFileUploadService;
 import com.demo.bait.service.TrainingServices.TrainingService;
 import com.demo.bait.service.TrainingServices.TrainingSpecificationService;
 import lombok.AllArgsConstructor;
@@ -21,6 +23,7 @@ public class TrainingGetController {
     public final TrainingService trainingService;
     public final TrainingSpecificationService trainingSpecificationService;
     private final RequestParamParser requestParamParser;
+    private final TrainingFileUploadService trainingFileUploadService;
 
 
     @GetMapping("/all")
@@ -49,5 +52,11 @@ public class TrainingGetController {
             @RequestParam(value = "type", required = false) TrainingType trainingType) {
         return trainingSpecificationService.searchAndFilterTrainings(query, clientId, locationId, trainingDate,
                 trainingType);
+    }
+
+    @GetMapping("/files/{trainingId}")
+    public List<FileUploadDTO> getTrainingFiles(@PathVariable String trainingId) {
+        Integer parsedTrainingId = requestParamParser.parseId(trainingId, "training ID");
+        return trainingFileUploadService.getTrainingFiles(parsedTrainingId);
     }
 }

@@ -27,7 +27,7 @@ public class LocationService {
     private LocationRepo locationRepo;
     private LocationMapper locationMapper;
     private EntityManager entityManager;
-    private LocationMaintenanceService locationMaintenanceService;
+//    private LocationMaintenanceService locationMaintenanceService;
     private CommentService commentService;
     private ClientWorkerRepo clientWorkerRepo;
     private ClientRepo clientRepo;
@@ -51,7 +51,7 @@ public class LocationService {
             location.setLastMaintenance(locationDTO.lastMaintenance());
             location.setNextMaintenance(locationDTO.nextMaintenance());
 
-            locationMaintenanceService.updateLocationMaintenance(location, locationDTO);
+//            locationMaintenanceService.updateLocationMaintenance(location, locationDTO);
 
             if (locationDTO.commentIds() != null) {
                 Set<Comment> comments = commentService.commentIdsToCommentsSet(locationDTO.commentIds());
@@ -78,8 +78,8 @@ public class LocationService {
             }
 
             Location location = locationOpt.get();
-            log.info("Removing associations with Maintenances");
-            location.getMaintenances().clear();
+//            log.info("Removing associations with Maintenances");
+//            location.getMaintenances().clear();
 
             log.info("Removing associations with Comments");
             location.getComments().clear();
@@ -148,8 +148,8 @@ public class LocationService {
             linkedDeviceRepo.save(linkedDevice);
         }
 
-        log.info("Removing associations with Maintenances");
-        location.getMaintenances().clear();
+//        log.info("Removing associations with Maintenances");
+//        location.getMaintenances().clear();
 
         log.info("Removing associations with Comments");
         location.getComments().clear();
@@ -184,7 +184,7 @@ public class LocationService {
             updateEmail(location, locationDTO);
             updateLastMaintenance(location, locationDTO);
             updateNextMaintenance(location, locationDTO);
-            locationMaintenanceService.updateLocationMaintenance(location, locationDTO);
+//            locationMaintenanceService.updateLocationMaintenance(location, locationDTO);
 
             locationRepo.save(location);
             log.info("Location with ID {} updated successfully", locationId);

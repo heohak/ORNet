@@ -6,6 +6,8 @@ import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.LocalDate;
+
 @AllArgsConstructor
 public class DeviceSpecification implements Specification<Device> {
 
@@ -56,6 +58,29 @@ public class DeviceSpecification implements Specification<Device> {
         };
     }
 
+    /**
+     * Filters devices based on their introducedDate.
+     *
+     * @param date the reference date to compare against.
+     * @param comparison "before" or "after"
+     *                   if "before", returns devices with introducedDate less than the date and with the same date;
+     *                   if "after", returns devices with introducedDate greater than the date and with the same date.
+     * @return the specification predicate.
+     */
+    public static Specification<Device> hasIntroducedDate(LocalDate date, String comparison) {
+        return (Root<Device> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) -> {
+            if (date == null || comparison == null || comparison.trim().isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            if ("before".equalsIgnoreCase(comparison)) {
+                return criteriaBuilder.lessThanOrEqualTo(root.get("introducedDate"), date);
+            } else if ("after".equalsIgnoreCase(comparison)) {
+                return criteriaBuilder.greaterThanOrEqualTo(root.get("introducedDate"), date);
+            }
+            return criteriaBuilder.conjunction();
+        };
+    }
+
     @Override
     public Predicate toPredicate(Root<Device> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
@@ -87,8 +112,8 @@ public class DeviceSpecification implements Specification<Device> {
         Join<Device, FileUpload> fileUploadJoin = root.join("files", JoinType.LEFT);
         Predicate fileUploadPredicate = criteriaBuilder.like(criteriaBuilder.lower(fileUploadJoin.get("fileName")), likePattern);
 
-        Join<Device, Maintenance> maintenanceJoin = root.join("maintenances", JoinType.LEFT);
-        Predicate maintenancePredicate = criteriaBuilder.like(criteriaBuilder.lower(maintenanceJoin.get("maintenanceName")), likePattern);
+//        Join<Device, Maintenance> maintenanceJoin = root.join("maintenances", JoinType.LEFT);
+//        Predicate maintenancePredicate = criteriaBuilder.like(criteriaBuilder.lower(maintenanceJoin.get("maintenanceName")), likePattern);
 
         Predicate customerRegisterNosPredicate = hasCustomerRegisterNos(searchTerm).toPredicate(root, query, criteriaBuilder);
 
@@ -96,7 +121,7 @@ public class DeviceSpecification implements Specification<Device> {
                 deviceNamePredicate, departmentPredicate, roomPredicate, serialNumberPredicate, licenseNumberPredicate,
                 versionPredicate, firstIPAddressPredicate, secondIPAddressPredicate, subnetMaskPredicate, softwareKeyPredicate,
                 clientFullNamePredicate, clientShortNamePredicate, locationPredicate, commentPredicate, fileUploadPredicate,
-                maintenancePredicate, customerRegisterNosPredicate
+                customerRegisterNosPredicate
         );
     }
 }

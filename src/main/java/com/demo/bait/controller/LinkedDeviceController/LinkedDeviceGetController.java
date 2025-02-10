@@ -4,12 +4,15 @@ import com.demo.bait.components.RequestParamParser;
 import com.demo.bait.dto.CommentDTO;
 import com.demo.bait.dto.DeviceDTO;
 import com.demo.bait.dto.LinkedDeviceDTO;
+import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceCommentService;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceService;
 import com.demo.bait.service.LinkedDeviceServices.LinkedDeviceSpecificationService;
 import lombok.AllArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -42,7 +45,7 @@ public class LinkedDeviceGetController {
 
     @GetMapping("/not-used")
     public List<LinkedDeviceDTO> getNotUsedLinkedDevices() {
-        return linkedDeviceService.getNotUsedLinkedDevices();
+        return linkedDeviceSpecificationService.getNotUsedLinkedDevices();
     }
 
     @GetMapping("/history/{linkedDeviceId}")
@@ -62,7 +65,16 @@ public class LinkedDeviceGetController {
             @RequestParam(value = "q", required = false) String query,
             @RequestParam(value = "locationId", required = false) Integer locationId,
             @RequestParam(value = "deviceId", required = false) Integer deviceId,
-            @RequestParam(value = "template", required = false) Boolean template) {
-        return linkedDeviceSpecificationService.searchAndFilterLinkedDevices(query, locationId, deviceId, template);
+            @RequestParam(value = "template", required = false) Boolean template,
+            @RequestParam(value = "date", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(value = "comparison", required = false) String comparison) {
+        return linkedDeviceSpecificationService.searchAndFilterLinkedDevices(query, locationId, deviceId, template,
+                date, comparison);
+    }
+
+    @GetMapping("/maintenances/{linkedDeviceId}")
+    public List<MaintenanceDTO> getLinkedDeviceMaintenances(@PathVariable String linkedDeviceId) {
+        Integer parsedLinkedDeviceId = requestParamParser.parseId(linkedDeviceId, "Linked Device ID");
+        return linkedDeviceService.getLinkedDeviceMaintenances(parsedLinkedDeviceId);
     }
 }

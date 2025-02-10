@@ -5,7 +5,6 @@ import com.demo.bait.dto.CommentDTO;
 import com.demo.bait.dto.LocationDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.service.LocationServices.LocationCommentService;
-import com.demo.bait.service.LocationServices.LocationMaintenanceService;
 import com.demo.bait.service.LocationServices.LocationService;
 import com.demo.bait.service.LocationServices.LocationSpecificationService;
 import lombok.AllArgsConstructor;
@@ -20,7 +19,7 @@ public class LocationGetController {
 
     public final LocationService locationService;
     public final LocationSpecificationService locationSpecificationService;
-    public final LocationMaintenanceService locationMaintenanceService;
+//    public final LocationMaintenanceService locationMaintenanceService;
     public final LocationCommentService locationCommentService;
     private final RequestParamParser requestParamParser;
 
@@ -47,11 +46,11 @@ public class LocationGetController {
         return locationSpecificationService.searchLocations(query);
     }
 
-    @GetMapping("/maintenances/{locationId}")
-    public List<MaintenanceDTO> getLocationMaintenances(@PathVariable String locationId) {
-        Integer parsedLocationId = requestParamParser.parseId(locationId, "Location ID");
-        return locationMaintenanceService.getLocationMaintenances(parsedLocationId);
-    }
+//    @GetMapping("/maintenances/{locationId}")
+//    public List<MaintenanceDTO> getLocationMaintenances(@PathVariable String locationId) {
+//        Integer parsedLocationId = requestParamParser.parseId(locationId, "Location ID");
+//        return locationMaintenanceService.getLocationMaintenances(parsedLocationId);
+//    }
 
     @GetMapping("/comments/{locationId}")
     public List<CommentDTO> getLocationComments(@PathVariable String locationId) {
