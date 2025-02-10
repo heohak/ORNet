@@ -5,11 +5,9 @@ import com.demo.bait.dto.FileUploadDTO;
 import com.demo.bait.dto.MaintenanceDTO;
 import com.demo.bait.dto.ResponseDTO;
 import com.demo.bait.entity.*;
+import com.demo.bait.enums.MaintenanceStatus;
 import com.demo.bait.mapper.*;
-import com.demo.bait.repository.BaitWorkerRepo;
-import com.demo.bait.repository.FileUploadRepo;
-import com.demo.bait.repository.LocationRepo;
-import com.demo.bait.repository.MaintenanceRepo;
+import com.demo.bait.repository.*;
 import com.demo.bait.service.DeviceServices.DeviceHelperService;
 import com.demo.bait.service.DeviceServices.DeviceService;
 import com.demo.bait.service.FileUploadServices.FileUploadService;
@@ -43,6 +41,7 @@ public class MaintenanceService {
     private DeviceMapper deviceMapper;
     private LinkedDeviceMapper linkedDeviceMapper;
     private SoftwareMapper softwareMapper;
+    private MaintenanceCommentRepo maintenanceCommentRepo;
 
     @Transactional
     public ResponseDTO addMaintenance(MaintenanceDTO maintenanceDTO) {
@@ -76,6 +75,11 @@ public class MaintenanceService {
             if (maintenanceDTO.deviceIds() != null) {
                 log.debug("Attaching {} devices to maintenance record", maintenanceDTO.deviceIds().size());
                 Set<Device> devices = deviceHelperService.deviceIdsToDevicesSet(maintenanceDTO.deviceIds());
+                for (Device device : devices) {
+                    MaintenanceComment maintenanceComment = createInitialMaintenanceComment(maintenance);
+                    maintenanceComment.setDevice(device);
+                    maintenanceCommentRepo.save(maintenanceComment);
+                }
                 maintenance.setDevices(devices);
             }
 
@@ -83,12 +87,22 @@ public class MaintenanceService {
                 log.debug("Attaching {} linked devices to maintenance record", maintenanceDTO.linkedDeviceIds().size());
                 Set<LinkedDevice> linkedDevices = linkedDeviceService.linkedDeviceIdsToLinkedDeviceSet(
                         maintenanceDTO.linkedDeviceIds());
+                for (LinkedDevice linkedDevice : linkedDevices) {
+                    MaintenanceComment maintenanceComment = createInitialMaintenanceComment(maintenance);
+                    maintenanceComment.setLinkedDevice(linkedDevice);
+                    maintenanceCommentRepo.save(maintenanceComment);
+                }
                 maintenance.setLinkedDevices(linkedDevices);
             }
 
             if (maintenanceDTO.softwareIds() != null) {
                 log.debug("Attaching {} software to maintenance record", maintenanceDTO.softwareIds().size());
                 Set<Software> softwares = softwareService.softwareIdsToSoftwareSet(maintenanceDTO.softwareIds());
+                for (Software software : softwares) {
+                    MaintenanceComment maintenanceComment = createInitialMaintenanceComment(maintenance);
+                    maintenanceComment.setSoftware(software);
+                    maintenanceCommentRepo.save(maintenanceComment);
+                }
                 maintenance.setSoftwares(softwares);
             }
 
@@ -170,6 +184,13 @@ public class MaintenanceService {
         }
     }
 
+    public MaintenanceComment createInitialMaintenanceComment(Maintenance maintenance) {
+        MaintenanceComment maintenanceComment = new MaintenanceComment();
+        maintenanceComment.setMaintenance(maintenance);
+        maintenanceComment.setMaintenanceStatus(MaintenanceStatus.OPEN);
+        return maintenanceComment;
+    }
+
     public void updateMaintenanceName(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
         if (maintenanceDTO.maintenanceName() != null) {
             maintenance.setMaintenanceName(maintenanceDTO.maintenanceName());
@@ -232,6 +253,15 @@ public class MaintenanceService {
         if (maintenanceDTO.deviceIds() != null) {
             log.debug("Updating attached devices for maintenance record");
             Set<Device> devices = deviceHelperService.deviceIdsToDevicesSet(maintenanceDTO.deviceIds());
+            for (Device device : devices) {
+                List<MaintenanceComment> maintenanceComments = maintenanceCommentRepo
+                        .findByMaintenanceAndDevice(maintenance, device);
+                if (maintenanceComments.isEmpty()) {
+                    MaintenanceComment maintenanceComment = createInitialMaintenanceComment(maintenance);
+                    maintenanceComment.setDevice(device);
+                    maintenanceCommentRepo.save(maintenanceComment);
+                }
+            }
             maintenance.setDevices(devices);
         }
     }
@@ -241,6 +271,15 @@ public class MaintenanceService {
             log.debug("Updating attached linked devices for maintenance record");
             Set<LinkedDevice> linkedDevices = linkedDeviceService.linkedDeviceIdsToLinkedDeviceSet(
                     maintenanceDTO.linkedDeviceIds());
+            for (LinkedDevice linkedDevice : linkedDevices) {
+                List<MaintenanceComment> maintenanceComments = maintenanceCommentRepo
+                        .findByMaintenanceAndLinkedDevice(maintenance, linkedDevice);
+                if (maintenanceComments.isEmpty()) {
+                    MaintenanceComment maintenanceComment = createInitialMaintenanceComment(maintenance);
+                    maintenanceComment.setLinkedDevice(linkedDevice);
+                    maintenanceCommentRepo.save(maintenanceComment);
+                }
+            }
             maintenance.setLinkedDevices(linkedDevices);
         }
     }
@@ -249,6 +288,15 @@ public class MaintenanceService {
         if (maintenanceDTO.softwareIds() != null) {
             log.debug("Updating attached software for maintenance record");
             Set<Software> software = softwareService.softwareIdsToSoftwareSet(maintenanceDTO.softwareIds());
+            for (Software oneSoftware : software) {
+                List<MaintenanceComment> maintenanceComments = maintenanceCommentRepo
+                        .findByMaintenanceAndSoftware(maintenance, oneSoftware);
+                if (maintenanceComments.isEmpty()) {
+                    MaintenanceComment maintenanceComment = createInitialMaintenanceComment(maintenance);
+                    maintenanceComment.setSoftware(oneSoftware);
+                    maintenanceCommentRepo.save(maintenanceComment);
+                }
+            }
             maintenance.setSoftwares(software);
         }
     }
