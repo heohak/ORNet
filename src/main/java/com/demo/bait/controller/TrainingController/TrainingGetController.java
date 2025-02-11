@@ -59,4 +59,10 @@ public class TrainingGetController {
         Integer parsedTrainingId = requestParamParser.parseId(trainingId, "training ID");
         return trainingFileUploadService.getTrainingFiles(parsedTrainingId);
     }
+
+    @GetMapping("/{trainingId}")
+    public TrainingDTO getTraining(@PathVariable String trainingId) {
+        Integer parsedTrainingId = requestParamParser.parseId(trainingId, "training ID");
+        return trainingService.getTraining(parsedTrainingId);
+    }
 }
