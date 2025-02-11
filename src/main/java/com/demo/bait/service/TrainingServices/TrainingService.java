@@ -120,6 +120,8 @@ public class TrainingService {
         if (trainingDTO.locationId() != null) {
             Optional<Location> locationOpt = locationRepo.findById(trainingDTO.locationId());
             locationOpt.ifPresent(training::setLocation);
+        } else {
+            training.setLocation(null);
         }
     }
 
@@ -162,6 +164,27 @@ public class TrainingService {
             return trainings;
         } catch (Exception e) {
             log.error("Error while fetching all trainings.", e);
+            throw e;
+        }
+    }
+
+    public TrainingDTO getTraining(Integer trainingId) {
+        if (trainingId == null) {
+            log.warn("Training id is null. Returning null.");
+            return null;
+        }
+
+        log.info("Fetching training with ID: {}", trainingId);
+        try {
+            Optional<Training> trainingOpt = trainingRepo.findById(trainingId);
+            if (trainingOpt.isEmpty()) {
+                log.warn("Training with ID: {} not found", trainingId);
+                throw new EntityNotFoundException("Training with ID: " +  trainingId + " not found");
+            }
+            Training training = trainingOpt.get();
+            return trainingMapper.toDto(training);
+        } catch (Exception e) {
+            log.error("Error while fetching training with ID: {}", trainingId, e);
             throw e;
         }
     }
