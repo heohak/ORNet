@@ -30,7 +30,7 @@ services:
 
   frontend:
     build:
-      context: C:/Users/ohakh/WebstormProjects/ornet-frontend
+      context: ${FRONTEND_CONTEXT}
     ports:
       - '3000:80'
     depends_on:
