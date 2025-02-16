@@ -9,6 +9,8 @@ import jakarta.persistence.criteria.*;
 import lombok.AllArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.List;
+
 @AllArgsConstructor
 public class ClientWorkerSpecification implements Specification<ClientWorker> {
 
@@ -18,6 +20,16 @@ public class ClientWorkerSpecification implements Specification<ClientWorker> {
         return (root, query, criteriaBuilder) -> {
             Join<ClientWorker, Client> clientJoin = root.join("client");
             return criteriaBuilder.equal(clientJoin.get("id"), clientId);
+        };
+    }
+
+    public static Specification<ClientWorker> hasAnyClientId(List<Integer> clientIds) {
+        return (root, query, criteriaBuilder) -> {
+            if (clientIds == null || clientIds.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            Join<ClientWorker, Client> clientJoin = root.join("client");
+            return clientJoin.get("id").in(clientIds);
         };
     }
 
@@ -43,6 +55,16 @@ public class ClientWorkerSpecification implements Specification<ClientWorker> {
         return (root, query, criteriaBuilder) -> {
             Join<ClientWorker, Location> locationJoin = root.join("location", JoinType.LEFT);
             return criteriaBuilder.equal(criteriaBuilder.lower(locationJoin.get("country")), country.toLowerCase());
+        };
+    }
+
+    public static Specification<ClientWorker> locatedInCountries(List<String> countries) {
+        return (root, query, criteriaBuilder) -> {
+            if (countries == null || countries.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            Join<ClientWorker, Client> clientJoin = root.join("client");
+            return clientJoin.get("country").in(countries);
         };
     }
 

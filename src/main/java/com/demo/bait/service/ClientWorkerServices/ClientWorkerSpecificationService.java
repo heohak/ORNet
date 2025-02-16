@@ -22,7 +22,8 @@ public class ClientWorkerSpecificationService {
     private ClientWorkerMapper clientWorkerMapper;
 
     public List<ClientWorkerDTO> searchAndFilterClientWorkers(String searchTerm, Integer roleId, Integer clientId,
-                                                              Boolean favorite, Integer locationId, String country) {
+                                                              Boolean favorite, Integer locationId, String country,
+                                                              List<Integer> clientIds, List<String> countries) {
         log.info("Starting search and filter for Client Workers with parameters - " +
                         "searchTerm: {}, roleId: {}, clientId: {}, favorite: {}, locationId: {}, country: {}",
                 searchTerm, roleId, clientId, favorite, locationId, country);
@@ -64,6 +65,18 @@ public class ClientWorkerSpecificationService {
                 log.debug("Adding country filter: {}", country);
                 Specification<ClientWorker> countrySpec = ClientWorkerSpecification.hasLocationCountry(country);
                 combinedSpec = combinedSpec.and(countrySpec);
+            }
+
+            if (clientIds != null && !clientIds.isEmpty()) {
+                log.debug("Adding client filter with clientIds: {}", clientIds);
+                Specification<ClientWorker> clientsSpec = ClientWorkerSpecification.hasAnyClientId(clientIds);
+                combinedSpec = combinedSpec.and(clientsSpec);
+            }
+
+            if (countries != null && !countries.isEmpty()) {
+                log.debug("Adding countries filter with countries: {}", countries);
+                Specification<ClientWorker> countriesSpec = ClientWorkerSpecification.locatedInCountries(countries);
+                combinedSpec = combinedSpec.and(countriesSpec);
             }
 
             List<ClientWorkerDTO> result = clientWorkerMapper.toDtoList(
