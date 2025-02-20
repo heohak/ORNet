@@ -9,6 +9,7 @@ import com.demo.bait.service.MaintenanceServices.MaintenanceSpecificationService
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -58,5 +59,11 @@ public class MaintenanceGetController {
     public Map<String, List<?>> getMaintenanceConnectionsMap(@PathVariable String maintenanceId) {
         Integer parsedMaintenanceId = requestParamParser.parseId(maintenanceId, "Maintenance ID");
         return maintenanceService.getMaintenanceConnectionsMap(parsedMaintenanceId);
+    }
+
+    @GetMapping("/next/{clientId}")
+    public LocalDate getNextMaintenanceDateForClient(@PathVariable String clientId) {
+        Integer parsedClientId = requestParamParser.parseId(clientId, "client ID");
+        return maintenanceService.getNextMaintenanceDateForClient(parsedClientId);
     }
 }

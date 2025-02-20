@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -434,6 +435,42 @@ public class MaintenanceService {
             return connections;
         } catch (Exception e) {
             log.error("Error while fetching maintenance connections with ID: {}", maintenanceId, e);
+            throw e;
+        }
+    }
+
+    @Transactional
+    public LocalDate getNextMaintenanceDateForClient(Integer clientId) {
+        log.info("Getting next maintenance date for client with ID: {}", clientId);
+
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning null.");
+            return null;
+        }
+
+        try {
+            Optional<Client> clientOpt = clientRepo.findById(clientId);
+            if (clientOpt.isEmpty()) {
+                log.error("Client with ID {} not found", clientId);
+                throw new EntityNotFoundException("Client with ID " + clientId + " not found");
+            }
+            Client client = clientOpt.get();
+            LocalDate today = LocalDate.now();
+            LocalDate nextMaintenanceDate = client.getMaintenances().stream()
+                    .map(Maintenance::getMaintenanceDate)
+                    .filter(date -> date != null && (date.isEqual(today) || date.isAfter(today)))
+                    .min(LocalDate::compareTo)
+                    .orElse(null);
+
+            client.setNextMaintenance(nextMaintenanceDate);
+            clientRepo.save(client);
+
+            if (nextMaintenanceDate == null) {
+                log.info("No upcoming maintenance date found for client with ID: {}", clientId);
+            }
+            return nextMaintenanceDate;
+        } catch (Exception e) {
+            log.error("Error while getting next maintenance date for client with ID: {}", clientId, e);
             throw e;
         }
     }
