@@ -22,4 +22,5 @@ public interface ClientRepo extends JpaRepository<Client, Integer>, JpaSpecifica
     List<Maintenance> findMaintenancesByClientAndDateRange(@Param("clientId") Integer clientId,
                                                            @Param("startDate") LocalDate startDate,
                                                            @Param("endDate") LocalDate endDate);
+    List<Client> findAllByMaintenancesContaining(Maintenance maintenance);
 }

@@ -42,6 +42,7 @@ public class MaintenanceService {
     private LinkedDeviceMapper linkedDeviceMapper;
     private SoftwareMapper softwareMapper;
     private MaintenanceCommentRepo maintenanceCommentRepo;
+    private ClientRepo clientRepo;
 
     @Transactional
     public ResponseDTO addMaintenance(MaintenanceDTO maintenanceDTO) {
@@ -298,6 +299,51 @@ public class MaintenanceService {
                 }
             }
             maintenance.setSoftwares(software);
+        }
+    }
+
+    @Transactional
+    public ResponseDTO deleteMaintenanceById(Integer maintenanceId) {
+        if (maintenanceId == null) {
+            log.debug("Maintenance ID is null. Cant delete maintenance.");
+            return null;
+        }
+        try {
+            Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
+            if (maintenanceOpt.isEmpty()) {
+                log.warn("Maintenance record with ID {} not found", maintenanceId);
+                throw new EntityNotFoundException("Maintenance with ID " + maintenanceId + " not found");
+            }
+            Maintenance maintenance = maintenanceOpt.get();
+
+            List<MaintenanceComment> comments = maintenanceCommentRepo.findAllByMaintenance(maintenance);
+            if (comments != null && !comments.isEmpty()) {
+                comments.forEach(comment -> {
+                    comment.getFiles().clear();
+                    maintenanceCommentRepo.delete(comment);
+                });
+            }
+
+            List<Client> clients = clientRepo.findAllByMaintenancesContaining(maintenance);
+            if (clients != null && !clients.isEmpty()) {
+                clients.forEach(client -> {
+                    client.getMaintenances().remove(maintenance);
+                    clientRepo.save(client);
+                });
+            }
+
+            maintenance.getFiles().clear();
+            maintenance.getDevices().clear();
+            maintenance.getLinkedDevices().clear();
+            maintenance.getSoftwares().clear();
+
+            maintenanceRepo.delete(maintenance);
+            log.debug("Maintenance with ID {} was deleted successfully.", maintenanceId);
+
+            return new ResponseDTO("Maintenance deleted successfully.");
+        } catch (Exception e) {
+            log.error("Error while deleting maintenance with ID: {}", maintenanceId, e);
+            throw e;
         }
     }
 
