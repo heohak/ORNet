@@ -28,7 +28,7 @@ public class Maintenance {
     private LocalDate maintenanceDate;
     private LocalDate lastDate;
     @Column(columnDefinition = "TEXT")
-    private String comment;  // description
+    private String comment;  // this is actually the description
 
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinTable(
@@ -68,4 +68,6 @@ public class Maintenance {
             inverseJoinColumns = @JoinColumn(name = "software_id")
     )
     private Set<Software> softwares = new HashSet<>();
+    @Column(columnDefinition = "TEXT")
+    private String internalComment;
 }

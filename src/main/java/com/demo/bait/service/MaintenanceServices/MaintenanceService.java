@@ -52,7 +52,7 @@ public class MaintenanceService {
             maintenance.setMaintenanceName(maintenanceDTO.maintenanceName());
             maintenance.setMaintenanceDate(maintenanceDTO.maintenanceDate());
             maintenance.setLastDate(maintenanceDTO.lastDate());
-            maintenance.setComment(maintenanceDTO.comment());
+            maintenance.setComment(maintenanceDTO.description());
 
             if (maintenanceDTO.fileIds() != null) {
                 log.debug("Attaching {} files to maintenance record", maintenanceDTO.fileIds().size());
@@ -107,6 +107,8 @@ public class MaintenanceService {
                 maintenance.setSoftwares(softwares);
             }
 
+            maintenance.setInternalComment(maintenanceDTO.internalComment());
+
             maintenanceRepo.save(maintenance);
             log.info("Maintenance record added successfully with ID: {}", maintenance.getId());
             return new ResponseDTO(maintenance.getId().toString());
@@ -140,6 +142,7 @@ public class MaintenanceService {
             updateDevices(maintenance, maintenanceDTO);
             updateLinkedDevices(maintenance, maintenanceDTO);
             updateSoftware(maintenance, maintenanceDTO);
+            updateMaintenanceInternalComment(maintenance, maintenanceDTO);
 
             maintenanceRepo.save(maintenance);
 
@@ -205,8 +208,14 @@ public class MaintenanceService {
     }
 
     public void updateMaintenanceComment(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
-        if (maintenanceDTO.comment() != null) {
-            maintenance.setComment(maintenanceDTO.comment());
+        if (maintenanceDTO.description() != null) {
+            maintenance.setComment(maintenanceDTO.description());
+        }
+    }
+
+    public void updateMaintenanceInternalComment(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.internalComment() != null) {
+            maintenance.setInternalComment(maintenanceDTO.internalComment());
         }
     }
 
