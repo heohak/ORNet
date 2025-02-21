@@ -474,4 +474,45 @@ public class MaintenanceService {
             throw e;
         }
     }
+
+    public LocalDate getLastMaintenanceDateForLocation(Integer locationId) {
+        log.info("Getting last maintenance date for location with ID: {}", locationId);
+
+        if (locationId == null) {
+            log.warn("Location ID is null. Returning null.");
+            return null;
+        }
+
+        try {
+            Optional<Location> locationOpt = locationRepo.findById(locationId);
+            if (locationOpt.isEmpty()) {
+                log.error("Location with ID: {} not found", locationId);
+                throw new EntityNotFoundException("Location with ID " + locationId + " not found");
+            }
+            Location location = locationOpt.get();
+
+            List<Maintenance> maintenances = maintenanceRepo.findAllByLocation(location);
+            if (maintenances == null || maintenances.isEmpty()) {
+                log.info("No maintenances found for location with ID: {}", locationId);
+                return null;
+            }
+
+            LocalDate today = LocalDate.now();
+
+            Optional<LocalDate> lastMaintenanceDate = maintenances.stream()
+                    .map(Maintenance::getMaintenanceDate)
+                    .filter(date -> date != null && date.isBefore(today))
+                    .max(LocalDate::compareTo);
+
+            if (lastMaintenanceDate.isPresent()) {
+                return lastMaintenanceDate.get();
+            } else {
+                log.info("No maintenance date before today found for location with ID: {}", locationId);
+                return null;
+            }
+        } catch (Exception e) {
+            log.error("Error while getting last maintenance date for location with ID: {}", locationId, e);
+            throw e;
+        }
+    }
 }
