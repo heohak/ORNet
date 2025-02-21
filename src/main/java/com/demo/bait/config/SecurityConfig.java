@@ -3,10 +3,9 @@ package com.demo.bait.config;
 import com.demo.bait.Security.CustomAuthenticationEntryPoint;
 import com.demo.bait.Security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.ObjectPostProcessor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -16,8 +15,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
 import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
+import org.springframework.security.ldap.authentication.BindAuthenticator;
 import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
-import org.springframework.security.ldap.authentication.PasswordComparisonAuthenticator;
 import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -25,21 +24,20 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
 import java.util.List;
 
-
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     @Bean
     public DefaultSpringSecurityContextSource contextSource() {
-        // Configure the LDAP server URL and base DN
-//        return new DefaultSpringSecurityContextSource(
-//                List.of("ldap://localhost:10389"), "dc=example,dc=com");
-        return new DefaultSpringSecurityContextSource(
-                List.of("ldap://bait-dc.bait.local:389"), "DC=bait,DC=local");
+        log.info("Initializing LDAP context source with URL: ldap://bait-dc.bait.local:389 and base DN: DC=bait,DC=local");
+        DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(
+                List.of("ldap://bait-dc.bait.local:389"),
+                "DC=bait,DC=local");
+        return contextSource;
     }
 
     @Bean
@@ -50,31 +48,28 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter)
             throws Exception {
+        log.info("Configuring security filter chain");
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(authz -> authz
-                                .requestMatchers("/api/auth/**").permitAll()
-//                        .requestMatchers("/api/admin/**").hasRole("ADMINISTRATORS")
-//                        .requestMatchers("/api/**").hasAnyRole("USERS", "ADMINISTRATORS")
-                                .requestMatchers("/api/admin/**").hasRole("CRMADMINS")
-                                .requestMatchers("/api/**").hasAnyRole("CRMUSERS", "CRMADMINS")
-                                .anyRequest().authenticated()
-//                        .anyRequest().permitAll()
-                )
-                .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(exceptionHandling ->
-                        exceptionHandling.authenticationEntryPoint(new CustomAuthenticationEntryPoint())
-                );
+            .csrf(AbstractHttpConfigurer::disable)
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .authorizeHttpRequests(authz -> authz
+                .requestMatchers("/api/auth/**").permitAll()
+                // Adjust role names as required; Spring Security prefixes roles with "ROLE_"
+                .requestMatchers("/api/admin/**").hasRole("CRMADMINS")
+                .requestMatchers("/api/**").hasAnyRole("CRMUSERS", "CRMADMINS")
+                .anyRequest().authenticated())
+            .sessionManagement(sessionManagement ->
+                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .exceptionHandling(exceptionHandling ->
+                exceptionHandling.authenticationEntryPoint(new CustomAuthenticationEntryPoint()));
 
         return http.build();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(DefaultSpringSecurityContextSource contextSource) throws Exception {
+        log.info("Configuring LDAP authentication manager");
         AuthenticationManagerBuilder authBuilder = new AuthenticationManagerBuilder(new ObjectPostProcessor<>() {
             @Override
             public <O> O postProcess(O object) {
@@ -82,41 +77,33 @@ public class SecurityConfig {
             }
         });
 
-        // Define an LdapAuthoritiesPopulator
-//        DefaultLdapAuthoritiesPopulator authoritiesPopulator =
-//                new DefaultLdapAuthoritiesPopulator(contextSource, "");
+        // Define the LDAP authorities populator to search for groups under "CN=Users,DC=bait,DC=local"
         DefaultLdapAuthoritiesPopulator authoritiesPopulator =
                 new DefaultLdapAuthoritiesPopulator(contextSource, "CN=Users");
-//        authoritiesPopulator.setGroupSearchFilter("(member={0})"); // Matches groups by membership
-//        authoritiesPopulator.setGroupRoleAttribute("cn"); // Use the group's 'cn' as the role name
         authoritiesPopulator.setGroupSearchFilter("(member={0})");
         authoritiesPopulator.setGroupRoleAttribute("cn");
-        authoritiesPopulator.setConvertToUpperCase(true); // Roles will be in uppercase (e.g., ROLE_ADMINISTRATORS)
+        authoritiesPopulator.setConvertToUpperCase(true);
 
-        // Configure the PasswordComparisonAuthenticator
-        PasswordComparisonAuthenticator authenticator = new PasswordComparisonAuthenticator(contextSource);
-//        authenticator.setUserDnPatterns(new String[]{"uid={0},ou=users"}); // User DN pattern
-//        authenticator.setUserDnPatterns(new String[]{"CN={0},CN=Users,DC=bait,DC=local"});
-        authenticator.setUserDnPatterns(new String[]{
-                "CN={0},OU=SBSUsers,OU=Users,OU=MyBusiness,DC=bait,DC=local"
+        // Use BindAuthenticator to authenticate via LDAP bind with user credentials
+        BindAuthenticator bindAuthenticator = new BindAuthenticator(contextSource);
+        // NOTE: Ensure that the login username does not include a domain prefix like "bait\"
+        bindAuthenticator.setUserDnPatterns(new String[]{
+            "CN={0},OU=SBSUsers,OU=Users,OU=MyBusiness,DC=bait,DC=local"
         });
-        authenticator.setPasswordEncoder(passwordEncoder());
-        authenticator.setPasswordAttributeName("userPassword");
 
-        // Create the LdapAuthenticationProvider
+        // Create the LDAP authentication provider using the bind authenticator and authorities populator
         LdapAuthenticationProvider ldapAuthenticationProvider =
-                new LdapAuthenticationProvider(authenticator, authoritiesPopulator);
-
-        // Add the custom LDAP AuthenticationProvider
+                new LdapAuthenticationProvider(bindAuthenticator, authoritiesPopulator);
         authBuilder.authenticationProvider(ldapAuthenticationProvider);
 
+        log.info("LDAP authentication provider configured successfully");
         return authBuilder.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
+        log.info("Configuring CORS settings");
         CorsConfiguration configuration = new CorsConfiguration();
-//        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedOrigins(List.of("http://192.168.1.49:3000", "http://ornetserver:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowCredentials(true);
