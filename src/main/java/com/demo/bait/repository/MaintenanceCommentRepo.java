@@ -11,4 +11,5 @@ public interface MaintenanceCommentRepo extends JpaRepository<MaintenanceComment
     List<MaintenanceComment> findByMaintenanceAndDevice(Maintenance maintenance, Device device);
     List<MaintenanceComment> findByMaintenanceAndLinkedDevice(Maintenance maintenance, LinkedDevice linkedDevice);
     List<MaintenanceComment> findByMaintenanceAndSoftware(Maintenance maintenance, Software software);
+    List<MaintenanceComment> findByFilesContaining(FileUpload fileUpload);
 }

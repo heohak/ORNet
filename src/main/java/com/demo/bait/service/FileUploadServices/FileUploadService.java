@@ -49,6 +49,7 @@ public class FileUploadService {
     private MaintenanceRepo maintenanceRepo;
     private ThirdPartyITRepo thirdPartyITRepo;
     private ClientRepo clientRepo;
+    private MaintenanceCommentRepo maintenanceCommentRepo;
 
     @Transactional
     public Set<FileUpload> uploadFiles(List<MultipartFile> files) throws IOException {
@@ -308,6 +309,13 @@ public class FileUploadService {
             for (Maintenance maintenance : maintenances) {
                 maintenance.getFiles().remove(fileUpload);
                 maintenanceRepo.save(maintenance);
+            }
+
+            log.debug("Unlinking file from Maintenance Comments for File ID: {}", fileId);
+            List<MaintenanceComment> maintenanceComments = maintenanceCommentRepo.findByFilesContaining(fileUpload);
+            for (MaintenanceComment comment : maintenanceComments) {
+                comment.getFiles().remove(fileUpload);
+                maintenanceCommentRepo.save(comment);
             }
 
             log.debug("Unlinking file from Devices for File ID: {}", fileId);

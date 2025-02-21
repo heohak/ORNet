@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -42,6 +43,7 @@ public class MaintenanceService {
     private LinkedDeviceMapper linkedDeviceMapper;
     private SoftwareMapper softwareMapper;
     private MaintenanceCommentRepo maintenanceCommentRepo;
+    private ClientRepo clientRepo;
 
     @Transactional
     public ResponseDTO addMaintenance(MaintenanceDTO maintenanceDTO) {
@@ -51,7 +53,7 @@ public class MaintenanceService {
             maintenance.setMaintenanceName(maintenanceDTO.maintenanceName());
             maintenance.setMaintenanceDate(maintenanceDTO.maintenanceDate());
             maintenance.setLastDate(maintenanceDTO.lastDate());
-            maintenance.setComment(maintenanceDTO.comment());
+            maintenance.setComment(maintenanceDTO.description());
 
             if (maintenanceDTO.fileIds() != null) {
                 log.debug("Attaching {} files to maintenance record", maintenanceDTO.fileIds().size());
@@ -106,6 +108,8 @@ public class MaintenanceService {
                 maintenance.setSoftwares(softwares);
             }
 
+            maintenance.setInternalComment(maintenanceDTO.internalComment());
+
             maintenanceRepo.save(maintenance);
             log.info("Maintenance record added successfully with ID: {}", maintenance.getId());
             return new ResponseDTO(maintenance.getId().toString());
@@ -139,6 +143,7 @@ public class MaintenanceService {
             updateDevices(maintenance, maintenanceDTO);
             updateLinkedDevices(maintenance, maintenanceDTO);
             updateSoftware(maintenance, maintenanceDTO);
+            updateMaintenanceInternalComment(maintenance, maintenanceDTO);
 
             maintenanceRepo.save(maintenance);
 
@@ -204,8 +209,14 @@ public class MaintenanceService {
     }
 
     public void updateMaintenanceComment(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
-        if (maintenanceDTO.comment() != null) {
-            maintenance.setComment(maintenanceDTO.comment());
+        if (maintenanceDTO.description() != null) {
+            maintenance.setComment(maintenanceDTO.description());
+        }
+    }
+
+    public void updateMaintenanceInternalComment(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.internalComment() != null) {
+            maintenance.setInternalComment(maintenanceDTO.internalComment());
         }
     }
 
@@ -301,6 +312,51 @@ public class MaintenanceService {
         }
     }
 
+    @Transactional
+    public ResponseDTO deleteMaintenanceById(Integer maintenanceId) {
+        if (maintenanceId == null) {
+            log.debug("Maintenance ID is null. Cant delete maintenance.");
+            return null;
+        }
+        try {
+            Optional<Maintenance> maintenanceOpt = maintenanceRepo.findById(maintenanceId);
+            if (maintenanceOpt.isEmpty()) {
+                log.warn("Maintenance record with ID {} not found", maintenanceId);
+                throw new EntityNotFoundException("Maintenance with ID " + maintenanceId + " not found");
+            }
+            Maintenance maintenance = maintenanceOpt.get();
+
+            List<MaintenanceComment> comments = maintenanceCommentRepo.findAllByMaintenance(maintenance);
+            if (comments != null && !comments.isEmpty()) {
+                comments.forEach(comment -> {
+                    comment.getFiles().clear();
+                    maintenanceCommentRepo.delete(comment);
+                });
+            }
+
+            List<Client> clients = clientRepo.findAllByMaintenancesContaining(maintenance);
+            if (clients != null && !clients.isEmpty()) {
+                clients.forEach(client -> {
+                    client.getMaintenances().remove(maintenance);
+                    clientRepo.save(client);
+                });
+            }
+
+            maintenance.getFiles().clear();
+            maintenance.getDevices().clear();
+            maintenance.getLinkedDevices().clear();
+            maintenance.getSoftwares().clear();
+
+            maintenanceRepo.delete(maintenance);
+            log.debug("Maintenance with ID {} was deleted successfully.", maintenanceId);
+
+            return new ResponseDTO("Maintenance deleted successfully.");
+        } catch (Exception e) {
+            log.error("Error while deleting maintenance with ID: {}", maintenanceId, e);
+            throw e;
+        }
+    }
+
     public List<MaintenanceDTO> getAllMaintenances() {
         log.info("Fetching all maintenance records");
         try {
@@ -379,6 +435,42 @@ public class MaintenanceService {
             return connections;
         } catch (Exception e) {
             log.error("Error while fetching maintenance connections with ID: {}", maintenanceId, e);
+            throw e;
+        }
+    }
+
+    @Transactional
+    public LocalDate getNextMaintenanceDateForClient(Integer clientId) {
+        log.info("Getting next maintenance date for client with ID: {}", clientId);
+
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning null.");
+            return null;
+        }
+
+        try {
+            Optional<Client> clientOpt = clientRepo.findById(clientId);
+            if (clientOpt.isEmpty()) {
+                log.error("Client with ID {} not found", clientId);
+                throw new EntityNotFoundException("Client with ID " + clientId + " not found");
+            }
+            Client client = clientOpt.get();
+            LocalDate today = LocalDate.now();
+            LocalDate nextMaintenanceDate = client.getMaintenances().stream()
+                    .map(Maintenance::getMaintenanceDate)
+                    .filter(date -> date != null && (date.isEqual(today) || date.isAfter(today)))
+                    .min(LocalDate::compareTo)
+                    .orElse(null);
+
+            client.setNextMaintenance(nextMaintenanceDate);
+            clientRepo.save(client);
+
+            if (nextMaintenanceDate == null) {
+                log.info("No upcoming maintenance date found for client with ID: {}", clientId);
+            }
+            return nextMaintenanceDate;
+        } catch (Exception e) {
+            log.error("Error while getting next maintenance date for client with ID: {}", clientId, e);
             throw e;
         }
     }

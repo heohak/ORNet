@@ -17,6 +17,7 @@ public interface MaintenanceMapper {
 
     List<MaintenanceDTO> toDtoList(List<Maintenance> maintenances);
 
+    @Mapping(source = "comment", target = "description")
     @Mapping(source = "location.id", target = "locationId")
     @Mapping(source = "baitWorker.id", target = "baitWorkerId")
     @Mapping(target = "fileIds", expression = "java(mapFilesToIds(maintenance.getFiles()))")
