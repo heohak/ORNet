@@ -456,9 +456,12 @@ public class MaintenanceService {
             }
             Client client = clientOpt.get();
             LocalDate today = LocalDate.now();
+
             LocalDate nextMaintenanceDate = client.getMaintenances().stream()
+                    .filter(m -> m.getMaintenanceDate() != null
+                            && (m.getMaintenanceDate().isEqual(today) || m.getMaintenanceDate().isAfter(today))
+                            && m.getMaintenanceStatus() == MaintenanceStatus.OPEN)
                     .map(Maintenance::getMaintenanceDate)
-                    .filter(date -> date != null && (date.isEqual(today) || date.isAfter(today)))
                     .min(LocalDate::compareTo)
                     .orElse(null);
 
