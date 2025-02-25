@@ -66,4 +66,10 @@ public class MaintenanceGetController {
         Integer parsedClientId = requestParamParser.parseId(clientId, "client ID");
         return maintenanceService.getNextMaintenanceDateForClient(parsedClientId);
     }
+
+    @GetMapping("/last/{locationId}")
+    public LocalDate getLastMaintenanceDateForLocation(@PathVariable String locationId) {
+        Integer parsedLocationId = requestParamParser.parseId(locationId, "Location ID");
+        return maintenanceService.getLastMaintenanceDateForLocation(parsedLocationId);
+    }
 }
