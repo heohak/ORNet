@@ -86,10 +86,17 @@ public class SecurityConfig {
 
         // Use BindAuthenticator to authenticate via LDAP bind with user credentials
         BindAuthenticator bindAuthenticator = new BindAuthenticator(contextSource);
-        // NOTE: Ensure that the login username does not include a domain prefix like "bait\"
-        bindAuthenticator.setUserDnPatterns(new String[]{
-            "CN={0},OU=SBSUsers,OU=Users,OU=MyBusiness,DC=bait,DC=local"
-        });
+        // NOTE: Ensure that the login username does not include a domain prefix
+        // bindAuthenticator.setUserDnPatterns(new String[]{
+        //     "CN={0},OU=SBSUsers,OU=Users,OU=MyBusiness,DC=bait,DC=local"
+        // });
+        bindAuthenticator.setUserSearch(
+            new FilterBasedLdapUserSearch(
+                "OU=SBSUsers,OU=Users,OU=MyBusiness",
+                "(sAMAccountName={0})",
+                contextSource
+            )
+        );
 
         // Create the LDAP authentication provider using the bind authenticator and authorities populator
         LdapAuthenticationProvider ldapAuthenticationProvider =
