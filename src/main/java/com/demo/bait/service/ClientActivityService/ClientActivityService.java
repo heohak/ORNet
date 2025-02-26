@@ -143,7 +143,10 @@ public class ClientActivityService {
             clientActivity.setWorkTypes(workTypes);
         }
 
-        clientActivity.setCrisis(clientActivityDTO.crisis() != null ? clientActivityDTO.crisis() : false);
+//        clientActivity.setCrisis(clientActivityDTO.crisis() != null ? clientActivityDTO.crisis() : false);
+        if (clientActivityDTO.crisis() != null) {
+            clientActivity.setCrisis(clientActivityDTO.crisis());
+        }
 
         if (clientActivityDTO.statusId() != null) {
             ticketStatusRepo.findById(clientActivityDTO.statusId()).ifPresent(clientActivity::setStatus);
