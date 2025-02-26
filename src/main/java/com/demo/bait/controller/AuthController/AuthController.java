@@ -31,6 +31,12 @@ public class AuthController {
 
         log.debug("Login attempt received for username: {}", username);
 
+        if (username.contains("\\")) {
+            log.debug("Username '{}' contains a domain prefix. Stripping it.", username);
+            username = username.substring(username.indexOf("\\") + 1);
+            log.debug("Username after stripping domain: {}", username);
+        }
+        
         // Bypass for admin test user
         if ("admin".equals(username) && "admin".equals(password)) {
             log.debug("Bypassing LDAP authentication for admin user: {}", username);
