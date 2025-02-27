@@ -4,6 +4,7 @@ import com.demo.bait.Security.CustomAuthenticationEntryPoint;
 import com.demo.bait.Security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,12 +33,25 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    @Value("${ldap.bind.user}")
+    private String ldapBindUser;
+
+    @Value("${ldap.bind.password}")
+    private String ldapBindPassword;
+    
     @Bean
     public DefaultSpringSecurityContextSource contextSource() {
         log.info("Initializing LDAP context source with URL: ldap://bait-dc.bait.local:389 and base DN: DC=bait,DC=local");
+        
+        // Create the context source
         DefaultSpringSecurityContextSource contextSource = new DefaultSpringSecurityContextSource(
                 List.of("ldap://bait-dc.bait.local:389"),
                 "DC=bait,DC=local");
+
+        // Set bind DN and password from the injected values
+        contextSource.setUserDn(ldapBindUser);
+        contextSource.setPassword(ldapBindPassword);
+
         return contextSource;
     }
 
