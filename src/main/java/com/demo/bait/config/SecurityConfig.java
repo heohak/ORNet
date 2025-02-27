@@ -94,7 +94,7 @@ public class SecurityConfig {
         bindAuthenticator.setUserSearch(
             new FilterBasedLdapUserSearch(
                 "OU=SBSUsers,OU=Users,OU=MyBusiness",
-                "(sAMAccountName={0})",
+                "(userPrincipalName={0})",
                 contextSource
             )
         );
