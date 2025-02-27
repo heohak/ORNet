@@ -95,7 +95,9 @@ public class SecurityConfig {
         // Define the LDAP authorities populator to search for groups under "CN=Users,DC=bait,DC=local"
         DefaultLdapAuthoritiesPopulator authoritiesPopulator =
                 new DefaultLdapAuthoritiesPopulator(contextSource, "CN=Users");
-        authoritiesPopulator.setGroupSearchFilter("(member={0})");
+        // authoritiesPopulator.setGroupSearchFilter("(member={0})");
+        String groupFilter = "(&(member={0})(|(cn=CRMusers)(cn=CRMadmins)))";
+        authoritiesPopulator.setGroupSearchFilter(groupFilter);
         authoritiesPopulator.setGroupRoleAttribute("cn");
         authoritiesPopulator.setConvertToUpperCase(true);
 
