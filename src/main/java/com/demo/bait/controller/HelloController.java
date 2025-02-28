@@ -48,7 +48,7 @@ public class HelloController {
         System.out.println("Logged in user: " + username);
         System.out.println("Roles: " + roles);
 
-        return ResponseEntity.ok("Here is your profile, " + username + "!");
+        return ResponseEntity.ok("Here is your profile, " + username + "!" + " Roles: " + roles);
     }
 
     @GetMapping("/api/details")
