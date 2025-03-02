@@ -45,6 +45,10 @@ public class HelloController {
         String username = authentication.getName();
         Collection<? extends GrantedAuthority> roles = authentication.getAuthorities();
 
+        if (username != null && username.endsWith("@bait.local")) {
+            username = username.substring(0, username.indexOf("@"));
+        }
+
         System.out.println("Logged in user: " + username);
         System.out.println("Roles: " + roles);
 
