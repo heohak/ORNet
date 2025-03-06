@@ -2,15 +2,14 @@ package com.demo.bait.service.DeviceServices;
 
 import com.demo.bait.dto.*;
 import com.demo.bait.entity.*;
+import com.demo.bait.entity.CustomRevisionEntity.CustomRevisionEntity;
 import com.demo.bait.entity.classificator.DeviceClassificator;
-import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import com.demo.bait.mapper.DeviceMapper;
 import com.demo.bait.mapper.TicketMapper;
 import com.demo.bait.repository.*;
 import com.demo.bait.repository.classificator.DeviceClassificatorRepo;
 import com.demo.bait.service.CommentServices.CommentService;
 import com.demo.bait.service.FileUploadServices.FileUploadService;
-import com.demo.bait.service.MaintenanceServices.MaintenanceService;
 import com.demo.bait.service.MaintenanceServices.MaintenanceSpecificationService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -488,14 +487,44 @@ public class DeviceService {
             AuditReader auditReader = AuditReaderFactory.get(entityManager);
             List<Number> revisions = auditReader.getRevisions(Device.class, deviceId);
 
-            List<Device> history = new ArrayList<>();
+            List<DeviceDTO> historyDtoList = new ArrayList<>();
             for (Number rev : revisions) {
                 Device deviceVersion = auditReader.find(Device.class, deviceId, rev);
-                history.add(deviceVersion);
+                CustomRevisionEntity revisionEntity = auditReader.findRevision(CustomRevisionEntity.class, rev);
+
+                DeviceDTO dto = deviceMapper.toDto(deviceVersion);
+                DeviceDTO updatedDto = new DeviceDTO(
+                        dto.id(),
+                        dto.clientId(),
+                        dto.locationId(),
+                        dto.deviceName(),
+                        dto.classificatorId(),
+                        dto.department(),
+                        dto.room(),
+                        dto.serialNumber(),
+                        dto.licenseNumber(),
+                        dto.version(),
+                        dto.versionUpdateDate(),
+                        dto.firstIPAddress(),
+                        dto.secondIPAddress(),
+                        dto.subnetMask(),
+                        dto.softwareKey(),
+                        dto.introducedDate(),
+                        dto.writtenOffDate(),
+                        dto.commentIds(),
+                        dto.fileIds(),
+                        dto.attributes(),
+                        dto.workstationNo(),
+                        dto.cameraNo(),
+                        dto.otherNo(),
+                        revisionEntity != null ? revisionEntity.getUsername() : null // changedBy
+                );
+
+                historyDtoList.add(updatedDto);
             }
 
-            log.info("Fetched {} revisions for device with ID: {}", history.size(), deviceId);
-            return deviceMapper.toDtoList(history);
+            log.info("Fetched {} revisions for device with ID: {}", historyDtoList.size(), deviceId);
+            return historyDtoList;
         } catch (Exception e) {
             log.error("Error while fetching history for device with ID: {}", deviceId, e);
             throw e;
