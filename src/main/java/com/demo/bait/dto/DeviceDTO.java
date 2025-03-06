@@ -15,5 +15,6 @@ public record DeviceDTO(Integer id, Integer clientId, Integer locationId, String
                         String secondIPAddress, String subnetMask, String softwareKey, LocalDate introducedDate,
                         LocalDate writtenOffDate, List<Integer> commentIds, List<Integer> fileIds,
                         Map<String, Object> attributes,
-                        String workstationNo, String cameraNo, String otherNo) {
+                        String workstationNo, String cameraNo, String otherNo,
+                        String changedBy) {
 }
