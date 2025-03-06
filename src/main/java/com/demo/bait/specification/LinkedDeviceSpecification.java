@@ -32,7 +32,14 @@ public class LinkedDeviceSpecification implements Specification<LinkedDevice> {
     public static Specification<LinkedDevice> isTemplate(Boolean template) {
         return (root, query, criteriaBuilder) -> {
             if (template != null) {
-                return criteriaBuilder.equal(root.get("template"), template);
+                if (template) {
+                    return criteriaBuilder.equal(root.get("template"), true);
+                } else {
+                    return criteriaBuilder.or(
+                            criteriaBuilder.equal(root.get("template"), false),
+                            criteriaBuilder.isNull(root.get("template"))
+                    );
+                }
             }
             return criteriaBuilder.conjunction();
         };
