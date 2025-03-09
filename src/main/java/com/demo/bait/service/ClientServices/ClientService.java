@@ -2,6 +2,7 @@ package com.demo.bait.service.ClientServices;
 
 import com.demo.bait.dto.*;
 import com.demo.bait.entity.*;
+import com.demo.bait.entity.CustomRevisionEntity.CustomRevisionEntity;
 import com.demo.bait.entity.classificator.WorkTypeClassificator;
 import com.demo.bait.mapper.ClientActivityMapper;
 import com.demo.bait.mapper.ClientMapper;
@@ -292,14 +293,40 @@ public class ClientService {
             AuditReader auditReader = AuditReaderFactory.get(entityManager);
             List<Number> revisions = auditReader.getRevisions(Client.class, clientId);
 
-            List<Client> history = new ArrayList<>();
+            List<ClientDTO> historyDtoList = new ArrayList<>();
             for (Number rev : revisions) {
                 Client clientVersion = auditReader.find(Client.class, clientId, rev);
-                history.add(clientVersion);
+                CustomRevisionEntity revisionEntity = auditReader.findRevision(CustomRevisionEntity.class, rev);
+
+                ClientDTO dto = clientMapper.toDto(clientVersion);
+
+                ClientDTO updatedDto = new ClientDTO(
+                        dto.id(),
+                        dto.fullName(),
+                        dto.shortName(),
+                        dto.country(),
+                        dto.locationIds(),
+                        dto.thirdPartyIds(),
+                        dto.pathologyClient(),
+                        dto.surgeryClient(),
+                        dto.editorClient(),
+                        dto.otherMedicalDevices(),
+                        dto.prospect(),
+                        dto.agreement(),
+                        dto.activeCustomer(),
+                        dto.lastMaintenance(),
+                        dto.nextMaintenance(),
+                        dto.maintenanceIds(),
+                        dto.maintenanceDescription(),
+                        dto.contractTermsId(),
+                        revisionEntity != null ? revisionEntity.getUsername() : null
+                );
+
+                historyDtoList.add(updatedDto);
             }
-            List<ClientDTO> clientHistory = clientMapper.toDtoList(history);
-            log.debug("Fetched history for Client with ID {}: {}", clientId, clientHistory);
-            return clientHistory;
+
+            log.info("Fetched {} revisions for Client with ID: {}", historyDtoList.size(), clientId);
+            return historyDtoList;
         } catch (Exception e) {
             log.error("Error while fetching history for Client with ID: {}", clientId, e);
             throw e;
