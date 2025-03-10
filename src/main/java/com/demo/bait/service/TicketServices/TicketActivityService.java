@@ -53,6 +53,9 @@ public class TicketActivityService {
             throw new SecurityException("User is not authenticated");
         }
         String username = authentication.getName();
+        if (username != null && username.endsWith("@bait.local")) {
+            username = username.substring(0, username.indexOf("@"));
+        }
         log.debug("Authenticated user: {}", username);
 
         log.debug("Adding activity: '{}' to ticket with ID: {}", newActivity, ticketId);
