@@ -49,6 +49,9 @@ public class ClientActivityCommentService {
             throw new SecurityException("User is not authenticated");
         }
         String username = authentication.getName();
+        if (username != null && username.endsWith("@bait.local")) {
+            username = username.substring(0, username.indexOf("@"));
+        }
         log.debug("Authenticated user: {}", username);
 
         log.debug("Adding activity: '{}' to client activity with ID: {}", newActivity, clientActivity);
