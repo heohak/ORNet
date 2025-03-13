@@ -133,6 +133,7 @@ public class MaintenanceService {
 
             updateMaintenanceName(maintenance, maintenanceDTO);
             updateMaintenanceDate(maintenance, maintenanceDTO);
+            updateFirstDate(maintenance, maintenanceDTO);
             updateLastDate(maintenance, maintenanceDTO);
             updateMaintenanceComment(maintenance, maintenanceDTO);
             updateMaintenanceStatus(maintenance, maintenanceDTO);
@@ -217,6 +218,12 @@ public class MaintenanceService {
     public void updateMaintenanceInternalComment(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
         if (maintenanceDTO.internalComment() != null) {
             maintenance.setInternalComment(maintenanceDTO.internalComment());
+        }
+    }
+
+    public void updateFirstDate(Maintenance maintenance, MaintenanceDTO maintenanceDTO) {
+        if (maintenanceDTO.firstDate() != null) {
+            maintenance.setFirstDate(maintenanceDTO.firstDate());
         }
     }
 
@@ -474,6 +481,45 @@ public class MaintenanceService {
             return nextMaintenanceDate;
         } catch (Exception e) {
             log.error("Error while getting next maintenance date for client with ID: {}", clientId, e);
+            throw e;
+        }
+    }
+
+    @Transactional
+    public LocalDate getLastMaintenanceDateForClient(Integer clientId) {
+        log.info("Getting last maintenance date for client with ID: {}", clientId);
+
+        if (clientId == null) {
+            log.warn("Client ID is null. Returning null.");
+            return null;
+        }
+
+        try {
+            Optional<Client> clientOpt = clientRepo.findById(clientId);
+            if (clientOpt.isEmpty()) {
+                log.error("Client with ID {} not found", clientId);
+                throw new EntityNotFoundException("Client with ID " + clientId + " not found");
+            }
+            Client client = clientOpt.get();
+            LocalDate today = LocalDate.now();
+
+            LocalDate nextMaintenanceDate = client.getMaintenances().stream()
+                    .filter(m -> m.getLastDate() != null
+                            && (m.getLastDate().isEqual(today) || m.getLastDate().isBefore(today))
+                            && m.getMaintenanceStatus() == MaintenanceStatus.DONE)
+                    .map(Maintenance::getLastDate)
+                    .min(LocalDate::compareTo)
+                    .orElse(null);
+
+            client.setLastMaintenance(nextMaintenanceDate);
+            clientRepo.save(client);
+
+            if (nextMaintenanceDate == null) {
+                log.info("No previous maintenance date found for client with ID: {}", clientId);
+            }
+            return nextMaintenanceDate;
+        } catch (Exception e) {
+            log.error("Error while getting last maintenance date for client with ID: {}", clientId, e);
             throw e;
         }
     }

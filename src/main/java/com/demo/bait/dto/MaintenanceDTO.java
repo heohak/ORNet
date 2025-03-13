@@ -8,7 +8,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Builder
-public record MaintenanceDTO(Integer id, String maintenanceName, LocalDate maintenanceDate, LocalDate lastDate,
+public record MaintenanceDTO(Integer id, String maintenanceName, LocalDate maintenanceDate, LocalDate firstDate,
+                             LocalDate lastDate,
                              String description, List<Integer> fileIds, Integer locationId,
                              MaintenanceStatus maintenanceStatus, Duration timeSpent,
                              Integer baitWorkerId, List<Integer> deviceIds, List<Integer> linkedDeviceIds,

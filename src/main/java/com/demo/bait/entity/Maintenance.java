@@ -26,6 +26,7 @@ public class Maintenance {
 
     private String maintenanceName;
     private LocalDate maintenanceDate;
+    private LocalDate firstDate;
     private LocalDate lastDate;
     @Column(columnDefinition = "TEXT")
     private String comment;  // this is actually the description
