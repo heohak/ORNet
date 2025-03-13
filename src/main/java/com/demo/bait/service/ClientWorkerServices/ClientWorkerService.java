@@ -40,6 +40,7 @@ public class ClientWorkerService {
     private ClientMapper clientMapper;
     private TicketRepo ticketRepo;
     private ClientActivityRepo clientActivityRepo;
+    private ThirdPartyITRepo thirdPartyITRepo;
 
     @Transactional
     public ResponseDTO addWorker(ClientWorkerDTO workerDTO) {
@@ -147,6 +148,11 @@ public class ClientWorkerService {
             for (ClientActivity activity : activities) {
                 activity.getContacts().remove(worker);
                 clientActivityRepo.save(activity);
+            }
+            List<ThirdPartyIT> thirdPartyITs = thirdPartyITRepo.findAllByContact(worker);
+            for (ThirdPartyIT thirdPartyIT : thirdPartyITs) {
+                thirdPartyIT.setContact(null);
+                thirdPartyITRepo.save(thirdPartyIT);
             }
             worker.getRoles().clear();
             worker.setClient(null);

@@ -52,7 +52,7 @@ public class MaintenanceService {
             Maintenance maintenance = new Maintenance();
             maintenance.setMaintenanceName(maintenanceDTO.maintenanceName());
             maintenance.setMaintenanceDate(maintenanceDTO.maintenanceDate());
-            maintenance.setLastDate(maintenanceDTO.lastDate());
+//            maintenance.setLastDate(maintenanceDTO.lastDate());
             maintenance.setComment(maintenanceDTO.description());
 
             if (maintenanceDTO.fileIds() != null) {
@@ -508,7 +508,7 @@ public class MaintenanceService {
                             && (m.getLastDate().isEqual(today) || m.getLastDate().isBefore(today))
                             && m.getMaintenanceStatus() == MaintenanceStatus.DONE)
                     .map(Maintenance::getLastDate)
-                    .min(LocalDate::compareTo)
+                    .max(LocalDate::compareTo)
                     .orElse(null);
 
             client.setLastMaintenance(nextMaintenanceDate);
