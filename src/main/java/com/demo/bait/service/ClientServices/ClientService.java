@@ -376,8 +376,11 @@ public class ClientService {
 
             List<ClientActivity> activities = clientActivityRepo.findAll();
 
+            // Filter by client existence and status ID == 1
             Map<Integer, List<ClientActivity>> activitiesByClient = activities.stream()
-                    .filter(activity -> activity.getClient() != null)
+                    .filter(activity -> activity.getClient() != null &&
+                            activity.getStatus() != null &&
+                            activity.getStatus().getId() == 1)
                     .collect(Collectors.groupingBy(activity -> activity.getClient().getId()));
 
             for (Map.Entry<Integer, List<ClientActivity>> entry : activitiesByClient.entrySet()) {
@@ -388,9 +391,7 @@ public class ClientService {
                         .map(ClientActivity::getEndDateTime)
                         .filter(Objects::nonNull)
                         .reduce((closest, current) -> {
-                            if (closest == null) {
-                                return current;
-                            }
+                            if (closest == null) return current;
                             if (current.isBefore(today) && closest.isBefore(today)) {
                                 return current.isBefore(closest) ? current : closest;
                             } else if (current.isBefore(today)) {
