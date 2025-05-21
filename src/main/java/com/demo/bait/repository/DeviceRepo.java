@@ -15,11 +15,16 @@ public interface DeviceRepo extends JpaRepository<Device, Integer>, JpaSpecifica
     List<Device> findByClientId(Integer clientId);
     List<Device> findByClassificatorId(Integer classificatorId);
 
-//    @Query("SELECT d.maintenances FROM Device d WHERE d.id = :deviceId AND EXISTS " +
-//            "(SELECT m FROM d.maintenances m WHERE m.maintenanceDate BETWEEN :startDate AND :endDate)")
-//    List<Maintenance> findMaintenancesByDeviceAndDateRange(@Param("deviceId") Integer deviceId,
-//                                                           @Param("startDate") LocalDate startDate,
-//                                                           @Param("endDate") LocalDate endDate);
+    @Query("""
+    SELECT m
+      FROM Maintenance m
+      JOIN m.devices d
+     WHERE d.id = :deviceId
+       AND m.maintenanceDate BETWEEN :startDate AND :endDate
+    """)
+    List<Maintenance> findMaintenancesByDeviceAndDateRange(@Param("deviceId") Integer deviceId,
+                                                           @Param("startDate") LocalDate startDate,
+                                                           @Param("endDate") LocalDate endDate);
 
     List<Device> findByClassificator(DeviceClassificator classificator);
     Device findByCommentsContaining(Comment comment);

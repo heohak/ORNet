@@ -13,11 +13,16 @@ import java.util.List;
 
 public interface LocationRepo extends JpaRepository<Location, Integer>, JpaSpecificationExecutor<Location> {
 
-//    @Query("SELECT l.maintenances FROM Location l WHERE l.id = :locationId AND EXISTS " +
-//            "(SELECT m FROM l.maintenances m WHERE m.maintenanceDate BETWEEN :startDate AND :endDate)")
-//    List<Maintenance> findMaintenancesByLocationAndDateRange(@Param("locationId") Integer locationId,
-//                                                             @Param("startDate") LocalDate startDate,
-//                                                             @Param("endDate") LocalDate endDate);
+    @Query("""
+    SELECT m
+      FROM Maintenance m
+     WHERE m.location.id = :locationId
+       AND m.maintenanceDate BETWEEN :startDate AND :endDate
+    """)
+    List<Maintenance> findMaintenancesByLocationAndDateRange(@Param("locationId") Integer locationId,
+                                                             @Param("startDate") LocalDate startDate,
+                                                             @Param("endDate") LocalDate endDate);
+
 
     Location findByCommentsContaining(Comment comment);
 }
