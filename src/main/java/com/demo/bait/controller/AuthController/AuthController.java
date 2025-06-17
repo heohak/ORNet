@@ -36,11 +36,6 @@ public class AuthController {
             username = username.substring(username.indexOf("\\") + 1);
             log.debug("Username after stripping domain: {}", username);
         }
-
-        if (!username.contains("@")) {
-            username = username + "@bait.local";
-            log.debug("Username after appending domain: {}", username);
-        }
         
         // Bypass for admin test user
         if ("admin".equals(username) && "admin".equals(password)) {
@@ -59,6 +54,11 @@ public class AuthController {
             String token = jwtUtils.generateToken(username, roles);
             log.debug("JWT token generated for test user: {}", username);
             return ResponseEntity.ok(Map.of("token", token));
+        }
+
+        if (!username.contains("@")) {
+            username = username + "@bait.local";
+            log.debug("Username after appending domain: {}", username);
         }
 
         try {
